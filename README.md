@@ -49,6 +49,7 @@ Via command line app can be simply installed with following command:
     snap install red-app
 ### Snapstore Store link:
 [![red-app](https://snapcraft.io//red-app/trending.svg)](https://snapcraft.io/red-app)
+
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/red-app)
 
 ## FAQ:
