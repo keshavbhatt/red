@@ -5,6 +5,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QDialog>
 #include <QPointer>
 #include <QUrl>
 

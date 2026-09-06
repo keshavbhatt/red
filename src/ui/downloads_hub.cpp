@@ -156,8 +156,15 @@ void DownloadsHub::requestDownload(const QUrl& url)
 
 void DownloadsHub::openDialog(const QUrl& url)
 {
+    // Ctrl+D can arrive twice (window shortcut + page hotkey): reuse the dialog.
+    if (QDialog* existing = m_openDialogs.value(url.toString()); existing != nullptr) {
+        existing->raise();
+        existing->activateWindow();
+        return;
+    }
     auto* dialog = new DownloadDialog(url, m_settings, m_theme, *m_probe, *m_thumbnails, m_dialogParent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
+    m_openDialogs.insert(url.toString(), dialog);
     connect(dialog, &QDialog::accepted, this, [this, dialog] {
         const quint64 id = m_queue->add(dialog->job());
         qCInfo(lcUi) << "queued download" << id << dialog->job().url;
