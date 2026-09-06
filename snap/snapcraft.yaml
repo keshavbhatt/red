@@ -1,0 +1,82 @@
+name: red-app
+adopt-info: red
+grade: stable
+confinement: strict
+base: core24
+compression: lzo
+
+title: Red
+summary: YouTube in a real desktop app, with a TV mode, ad blocking and downloads
+website: https://github.com/keshavbhatt/red
+source-code: https://github.com/keshavbhatt/red
+issues: https://github.com/keshavbhatt/red/issues
+license: MIT
+icon: snap/gui/icon.svg
+
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  red-app:
+    command: usr/bin/red
+    desktop: usr/share/applications/com.ktechpit.red.desktop
+    common-id: com.ktechpit.red
+    extensions:
+      - kde-neon-6
+    plugs:
+      - home
+      - desktop
+      - desktop-legacy
+      - opengl
+      - x11
+      - wayland
+      - network
+      - network-bind
+      - network-status
+      - unity7
+      - browser-support
+      - audio-playback
+      - audio-record
+      - removable-media
+      - screen-inhibit-control
+      - joystick
+      - hardware-observe
+      - mount-observe
+
+parts:
+  red:
+    plugin: cmake
+    source: .
+    parse-info:
+      - usr/share/metainfo/com.ktechpit.red.metainfo.xml
+    build-snaps:
+      - cmake/latest/stable
+    build-packages:
+      - libxkbcommon-dev
+      - libdrm-dev
+    stage-packages:
+      - libdrm2
+      # libqxcb links against it; without it the snap does not start.
+      - libxcb-shape0
+      # OpenType coverage for confined Qt (the snap ships no host fonts).
+      - fonts-noto-core
+      # The download engine merges and converts with the runtime's ffmpeg
+      # (ADR-004: ffmpeg is never downloaded).
+      - ffmpeg
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DRED_BUILD_TESTS=OFF
+    override-build: |
+      craftctl default
+      mkdir -p ${CRAFT_PART_INSTALL}/meta/gui
+      cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/com.ktechpit.red.png \
+        ${CRAFT_PART_INSTALL}/meta/gui/icon.png
+      sed -i "s|^Icon=.*|Icon=\${SNAP}/meta/gui/icon.png|" \
+        ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.red.desktop
+    prime:
+      - -usr/include
+      - -usr/lib/*/cmake
+      - -usr/share/man
+      - -usr/share/doc

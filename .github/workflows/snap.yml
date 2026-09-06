@@ -1,0 +1,46 @@
+# Builds the snap on GitHub's CI for both architectures. Publishing to the
+# store is opt-in: set the repo variable PUBLISH_TO_STORE=true and the
+# SNAPCRAFT_STORE_CREDENTIALS secret to release pushes on main to edge.
+name: snap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'cmake/**'
+      - 'CMakeLists.txt'
+      - 'dist/**'
+      - 'snap/**'
+      - '.github/workflows/snap.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build snap (${{ matrix.arch }})
+        uses: snapcore/action-build@v1
+        id: build
+
+      - name: Publish to the Snap Store (edge)
+        if: >-
+          vars.PUBLISH_TO_STORE == 'true' &&
+          github.ref == 'refs/heads/main' &&
+          github.event_name == 'push'
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
