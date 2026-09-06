@@ -40,6 +40,7 @@
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QResizeEvent>
 #include <QSessionManager>
 #include <QShortcut>
 #include <QSplitter>
@@ -58,6 +59,7 @@ namespace red::ui {
 namespace {
 constexpr QSize kDefaultSize(1280, 800);
 constexpr QSize kMinimumSize(640, 420);
+constexpr int kPanelFoldWidth = 900;
 
 QSize miniPlayerSize(core::MiniPlayerSize size)
 {
@@ -375,12 +377,24 @@ void MainWindow::toggleVisibility()
 
 // ---- chrome ----------------------------------------------------------------
 
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    // The panel needs room next to the page; below ~900 px it folds away and
+    // comes back with the width (the user's choice is kept in m_panelVisible).
+    const bool fits = width() >= kPanelFoldWidth;
+    if (m_downloads->panel()->isVisible() != (fits && m_panelVisible && !isFullScreen() && !m_miniPlayer &&
+                                              m_webView->mode() == core::AppMode::Desktop)) {
+        applyChrome();
+    }
+}
+
 void MainWindow::applyChrome()
 {
     const bool tv = m_webView->mode() == core::AppMode::Tv;
     const bool bare = isFullScreen() || m_miniPlayer || tv;
     m_rail->setVisible(!bare && m_settings.showRail());
-    m_downloads->panel()->setVisible(!bare && m_panelVisible);
+    m_downloads->panel()->setVisible(!bare && m_panelVisible && width() >= kPanelFoldWidth);
     m_actions->downloads->setEnabled(!tv && !m_miniPlayer);
     m_actions->miniPlayer->setEnabled(!tv);
 }

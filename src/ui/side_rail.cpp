@@ -169,7 +169,7 @@ void SideRail::setLoading(bool loading)
         return;
     }
     m_loading = loading;
-    m_reload->setToolTip(loading ? tr("Stop loading  (Esc)") : tr("Reload  (F5)"));
+    m_reload->setToolTip(loading ? tr("Stop loading") : tr("Reload  (F5)"));
     applyIcons();
 }
 
