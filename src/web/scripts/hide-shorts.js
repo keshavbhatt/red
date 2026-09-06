@@ -65,8 +65,8 @@
             guide.navigationEndpoint.browseEndpoint.browseId === 'FEshorts') {
             return true;
         }
-        if (guide && guide.icon && guide.icon.iconType === 'YOUTUBE_SHORTS_FILL_24') {
-            return true;
+        if (guide && guide.icon && /SHORTS/.test(guide.icon.iconType || '')) {
+            return true; // TAB_SHORTS_CAIRO (desktop), YOUTUBE_SHORTS_FILL_24 (TV)
         }
         return false;
     }
@@ -83,7 +83,8 @@
     var CSS = [
         'ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer, ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),',
         'ytd-rich-item-renderer:has(> #content > ytm-shorts-lockup-view-model-v2), ytd-rich-item-renderer:has(ytm-shorts-lockup-view-model),',
-        'ytd-guide-entry-renderer:has(> a[href="/shorts"]), ytd-mini-guide-entry-renderer:has(> a[href="/shorts"]),',
+        'ytd-guide-entry-renderer:has(> a[href^="/shorts"]), ytd-mini-guide-entry-renderer:has(> a[href^="/shorts"]),',
+        'ytd-guide-entry-renderer:has(yt-icon[icon$="SHORTS"]), ytd-mini-guide-entry-renderer:has(yt-icon[icon$="SHORTS"]),',
         'ytd-video-renderer:has(a[href^="/shorts/"]), ytd-grid-video-renderer:has(a[href^="/shorts/"])',
         '{ display: none !important; }'
     ].join('\n');
