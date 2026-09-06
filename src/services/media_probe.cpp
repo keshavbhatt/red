@@ -29,7 +29,8 @@ quint64 MediaProbe::probe(const QUrl& url, bool flat)
 {
     const quint64 id = m_nextId++;
     if (!hasEngine()) {
-        QTimer::singleShot(0, this, [this, id] { Q_EMIT failed(id, tr("The download engine is not ready.")); });
+        QTimer::singleShot(0, this,
+                           [this, id] { Q_EMIT failed(id, tr("The download engine is not ready.")); });
         return id;
     }
     Run run;

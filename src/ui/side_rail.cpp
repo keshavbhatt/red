@@ -30,7 +30,8 @@ SideRail::SideRail(Actions& actions, core::ThemeService& theme, QWidget* parent)
     setFixedWidth(kRailWidth);
     setupUi();
     applyIcons();
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) { applyIcons(); });
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
+            [this](Qt::ColorScheme) { applyIcons(); });
 }
 
 QToolButton* SideRail::makeButton(QAction* action, const QString& icon)
@@ -120,7 +121,8 @@ void SideRail::setMenu(QMenu* menu)
 void SideRail::applyIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QList<QToolButton*> buttons{m_back, m_forward, m_reload, m_downloads, m_miniPlayer, m_tv, m_settings, m_menu};
+    const QList<QToolButton*> buttons{m_back,       m_forward, m_reload,   m_downloads,
+                                      m_miniPlayer, m_tv,      m_settings, m_menu};
     for (QToolButton* b : buttons) {
         b->setIcon(icons::themed(b->property("redIcon").toString(), t.text, t.muted));
     }
@@ -130,8 +132,9 @@ void SideRail::applyIcons()
     m_download->setProperty("redAccent", m_downloadable);
     m_download->style()->unpolish(m_download);
     m_download->style()->polish(m_download);
-    m_badge->setStyleSheet(u"background:%1;color:%2;border-radius:8px;font-size:10px;font-weight:700;padding:0 4px;"_s.arg(
-        t.accent.name(), t.accentText.name()));
+    m_badge->setStyleSheet(
+        u"background:%1;color:%2;border-radius:8px;font-size:10px;font-weight:700;padding:0 4px;"_s.arg(
+            t.accent.name(), t.accentText.name()));
 }
 
 void SideRail::setDownloadable(bool downloadable)
@@ -140,8 +143,10 @@ void SideRail::setDownloadable(bool downloadable)
         return;
     }
     m_downloadable = downloadable;
-    m_download->setToolTip(downloadable ? tr("Download this video  (%1)").arg(m_actions.download->shortcut().toString(QKeySequence::NativeText))
-                                        : tr("Open a video, playlist or channel to download it"));
+    m_download->setToolTip(downloadable
+                               ? tr("Download this video  (%1)")
+                                     .arg(m_actions.download->shortcut().toString(QKeySequence::NativeText))
+                               : tr("Open a video, playlist or channel to download it"));
     applyIcons();
 }
 

@@ -12,6 +12,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDate>
 #include <QDir>
 #include <QFileDialog>
 #include <QFormLayout>
@@ -20,9 +21,8 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QListWidget>
-#include <QPushButton>
-#include <QDate>
 #include <QLocale>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QStandardItemModel>
 #include <QTabWidget>
@@ -113,7 +113,8 @@ QWidget* DownloadDialog::buildHero()
     m_thumb = new QLabel(hero);
     m_thumb->setFixedSize(kThumbW, kThumbH);
     m_thumb->setAlignment(Qt::AlignCenter);
-    m_thumb->setStyleSheet(u"border-radius:8px;background:%1;"_s.arg(Tokens::forScheme(m_theme.isDark()).hover.name()));
+    m_thumb->setStyleSheet(
+        u"border-radius:8px;background:%1;"_s.arg(Tokens::forScheme(m_theme.isDark()).hover.name()));
     layout->addWidget(m_thumb, 0, Qt::AlignTop);
 
     auto* text = new QVBoxLayout;
@@ -137,7 +138,8 @@ QWidget* DownloadDialog::buildHero()
     statusRow->addWidget(m_retry);
     statusRow->addStretch(1);
     text->addLayout(statusRow);
-    m_wholePlaylist = new QCheckBox(tr("This link is part of a playlist — download the whole playlist"), hero);
+    m_wholePlaylist =
+        new QCheckBox(tr("This link is part of a playlist — download the whole playlist"), hero);
     m_wholePlaylist->setVisible(false);
     connect(m_wholePlaylist, &QCheckBox::toggled, this, [this](bool on) {
         const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(m_url);
@@ -241,7 +243,9 @@ QWidget* DownloadDialog::buildAudioTab()
     grid->addWidget(m_audioQuality, 0, 3);
     grid->addWidget(m_audioEmbedThumb, 1, 0, 1, 2);
     grid->addWidget(m_audioEmbedMeta, 1, 2, 1, 2);
-    auto* hint = new QLabel(tr("Converting to MP3, FLAC or WAV re-encodes the audio; \"Best\" keeps YouTube's original stream."), tab);
+    auto* hint = new QLabel(
+        tr("Converting to MP3, FLAC or WAV re-encodes the audio; \"Best\" keeps YouTube's original stream."),
+        tab);
     hint->setProperty("redMuted", true);
     hint->setWordWrap(true);
     grid->addWidget(hint, 2, 0, 1, 4);
@@ -257,12 +261,14 @@ QWidget* DownloadDialog::buildAdvancedTab()
     auto* layout = new QVBoxLayout(tab);
     layout->setContentsMargins(4, 12, 4, 4);
     layout->setSpacing(8);
-    m_formatsHint = new QLabel(tr("Pick one video stream and one audio stream, or a single combined stream."), tab);
+    m_formatsHint =
+        new QLabel(tr("Pick one video stream and one audio stream, or a single combined stream."), tab);
     m_formatsHint->setProperty("redMuted", true);
     layout->addWidget(m_formatsHint);
     m_formats = new QTreeWidget(tab);
     m_formats->setColumnCount(6);
-    m_formats->setHeaderLabels({tr("Stream"), tr("Resolution / bitrate"), tr("FPS"), tr("Codec"), tr("Range"), tr("Size")});
+    m_formats->setHeaderLabels(
+        {tr("Stream"), tr("Resolution / bitrate"), tr("FPS"), tr("Codec"), tr("Range"), tr("Size")});
     m_formats->setRootIsDecorated(false);
     m_formats->setUniformRowHeights(true);
     m_formats->setMinimumHeight(220);
@@ -373,7 +379,8 @@ QWidget* DownloadDialog::buildFooter()
     auto* row = new QHBoxLayout;
     row->setSpacing(8);
     auto* folderIcon = new QLabel(footer);
-    folderIcon->setPixmap(icons::pixmap(u"folder"_s, Tokens::forScheme(m_theme.isDark()).muted, 18, devicePixelRatioF()));
+    folderIcon->setPixmap(
+        icons::pixmap(u"folder"_s, Tokens::forScheme(m_theme.isDark()).muted, 18, devicePixelRatioF()));
     row->addWidget(folderIcon);
     m_folderLabel = new QLabel(footer);
     m_folderLabel->setProperty("redMuted", true);
@@ -408,7 +415,8 @@ void DownloadDialog::applyDefaults()
 {
     m_quality->setCurrentIndex(m_quality->findData(static_cast<int>(m_settings.defaultQuality())));
     m_container->setCurrentIndex(m_container->findData(static_cast<int>(m_settings.defaultContainer())));
-    m_audioFormat->setCurrentIndex(m_audioFormat->findData(static_cast<int>(m_settings.defaultAudioFormat())));
+    m_audioFormat->setCurrentIndex(
+        m_audioFormat->findData(static_cast<int>(m_settings.defaultAudioFormat())));
     m_embedThumb->setChecked(m_settings.embedThumbnail());
     m_embedMeta->setChecked(m_settings.embedMetadata());
     m_audioEmbedThumb->setChecked(m_settings.embedThumbnail());
@@ -478,7 +486,8 @@ void DownloadDialog::populateFromInfo()
         parts << m_info.uploader;
     }
     if (m_isPlaylist) {
-        parts << tr("%n videos", nullptr, m_info.entryCount > 0 ? m_info.entryCount : static_cast<int>(m_info.entries.size()));
+        parts << tr("%n videos", nullptr,
+                    m_info.entryCount > 0 ? m_info.entryCount : static_cast<int>(m_info.entries.size()));
     } else {
         if (!m_info.durationText.isEmpty()) {
             parts << m_info.durationText;
@@ -523,8 +532,11 @@ void DownloadDialog::populateFromInfo()
     if (!heights.isEmpty()) {
         auto* model = qobject_cast<QStandardItemModel*>(m_quality->model());
         for (int i = 0; i < m_quality->count(); ++i) {
-            const int h = core::qualityHeight(static_cast<core::VideoQuality>(m_quality->itemData(i).toInt()));
-            const bool available = h == 0 || heights.contains(h) || std::any_of(heights.cbegin(), heights.cend(), [h](int have) { return have >= h; });
+            const int h =
+                core::qualityHeight(static_cast<core::VideoQuality>(m_quality->itemData(i).toInt()));
+            const bool available =
+                h == 0 || heights.contains(h) ||
+                std::any_of(heights.cbegin(), heights.cend(), [h](int have) { return have >= h; });
             if (model != nullptr) {
                 if (QStandardItem* item = model->item(i); item != nullptr) {
                     item->setEnabled(available);
@@ -566,7 +578,8 @@ void DownloadDialog::populateFormats()
         return a.tbr > b.tbr;
     });
     for (const core::MediaFormat& f : formats) {
-        QTreeWidgetItem* parent = f.isVideoOnly() ? videoGroup : (f.isAudioOnly() ? audioGroup : combinedGroup);
+        QTreeWidgetItem* parent =
+            f.isVideoOnly() ? videoGroup : (f.isAudioOnly() ? audioGroup : combinedGroup);
         const int kind = f.isVideoOnly() ? 0 : (f.isAudioOnly() ? 1 : 2);
         QString stream = f.ext.toUpper();
         if (!f.note.isEmpty()) {
@@ -576,10 +589,12 @@ void DownloadDialog::populateFormats()
             stream += u" · "_s + f.language;
         }
         const QString res = f.hasVideo() ? u"%1×%2"_s.arg(f.width).arg(f.height)
-                                         : (f.abr > 0 ? u"%1 kbps"_s.arg(static_cast<int>(f.abr)) : u"%1 kbps"_s.arg(static_cast<int>(f.tbr)));
-        auto* item = new QTreeWidgetItem(parent, {stream, res, f.fps > 0 ? QString::number(static_cast<int>(f.fps)) : QString(),
-                                                  f.codecLabel(), f.hasVideo() ? f.dynamicRange : QString(),
-                                                  core::formatBytes(f.filesize)});
+                                         : (f.abr > 0 ? u"%1 kbps"_s.arg(static_cast<int>(f.abr))
+                                                      : u"%1 kbps"_s.arg(static_cast<int>(f.tbr)));
+        auto* item = new QTreeWidgetItem(
+            parent,
+            {stream, res, f.fps > 0 ? QString::number(static_cast<int>(f.fps)) : QString(), f.codecLabel(),
+             f.hasVideo() ? f.dynamicRange : QString(), core::formatBytes(f.filesize)});
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
         item->setCheckState(0, Qt::Unchecked);
         item->setData(0, kFormatIdRole, f.id);
@@ -636,13 +651,16 @@ void DownloadDialog::updateHero()
     }
     const QPixmap pm = m_thumbnails.get(thumbUrl);
     if (pm.isNull()) {
-        m_thumb->setPixmap(icons::pixmap(m_isPlaylist ? u"playlist"_s : u"video"_s, Tokens::forScheme(m_theme.isDark()).muted, 32, devicePixelRatioF()));
+        m_thumb->setPixmap(icons::pixmap(m_isPlaylist ? u"playlist"_s : u"video"_s,
+                                         Tokens::forScheme(m_theme.isDark()).muted, 32, devicePixelRatioF()));
         return;
     }
     const qreal dpr = devicePixelRatioF();
-    QPixmap scaled = pm.scaled(QSize(kThumbW, kThumbH) * dpr, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    const QRect crop((scaled.width() - static_cast<int>(kThumbW * dpr)) / 2, (scaled.height() - static_cast<int>(kThumbH * dpr)) / 2,
-                     static_cast<int>(kThumbW * dpr), static_cast<int>(kThumbH * dpr));
+    QPixmap scaled =
+        pm.scaled(QSize(kThumbW, kThumbH) * dpr, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    const QRect crop((scaled.width() - static_cast<int>(kThumbW * dpr)) / 2,
+                     (scaled.height() - static_cast<int>(kThumbH * dpr)) / 2, static_cast<int>(kThumbW * dpr),
+                     static_cast<int>(kThumbH * dpr));
     scaled = scaled.copy(crop);
     scaled.setDevicePixelRatio(dpr);
     m_thumb->setPixmap(scaled);
@@ -652,7 +670,8 @@ void DownloadDialog::updatePreview()
 {
     const core::DownloadOptions opts = options();
     const QString id = m_info.id.isEmpty() ? core::classifyYouTubeUrl(m_url).videoId : m_info.id;
-    QString preview = core::previewFileName(opts, m_info.title.isEmpty() ? tr("Video") : m_info.title, id, m_info.uploader);
+    QString preview =
+        core::previewFileName(opts, m_info.title.isEmpty() ? tr("Video") : m_info.title, id, m_info.uploader);
     if (m_isPlaylist) {
         preview = tr("%1/…").arg(m_info.title.isEmpty() ? tr("Playlist") : m_info.title);
     }
@@ -711,7 +730,7 @@ core::DownloadOptions DownloadDialog::options() const
 {
     core::DownloadOptions o;
     const int tab = m_tabs->currentIndex();
-    o.kind = tab == 1 ? core::DownloadOptions::Kind::Audio
+    o.kind = tab == 1   ? core::DownloadOptions::Kind::Audio
              : tab == 2 ? core::DownloadOptions::Kind::Custom
                         : core::DownloadOptions::Kind::Video;
     o.quality = static_cast<core::VideoQuality>(m_quality->currentData().toInt());

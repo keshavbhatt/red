@@ -45,6 +45,44 @@
         },
         isTv: function () {
             return api.config.mode === 'tv';
+        },
+        // Inserts (or replaces) a <style id> with the page's CSP nonce copied
+        // onto it; the nonce only exists once the document has parsed, so the
+        // element is re-created at DOMContentLoaded when it was added earlier.
+        style: function (id, css) {
+            var apply = function () {
+                var root = document.head || document.documentElement;
+                if (!root) {
+                    return;
+                }
+                var existing = document.getElementById(id);
+                var nonced = document.querySelector('style[nonce], script[nonce], link[nonce]');
+                var nonce = nonced && nonced.nonce ? nonced.nonce : '';
+                if (existing && existing.getAttribute('data-red-nonce') === (nonce ? '1' : '0') && existing.textContent === css) {
+                    return;
+                }
+                if (existing) {
+                    existing.remove();
+                }
+                var el = document.createElement('style');
+                el.id = id;
+                if (nonce) {
+                    el.nonce = nonce;
+                }
+                el.setAttribute('data-red-nonce', nonce ? '1' : '0');
+                el.textContent = css;
+                root.appendChild(el);
+            };
+            apply();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', apply, { once: true });
+            }
+        },
+        unstyle: function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.remove();
+            }
         }
     };
     window.__red = api;

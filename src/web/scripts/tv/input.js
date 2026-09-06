@@ -39,18 +39,18 @@
     function player() {
         return document.querySelector('.html5-video-player');
     }
+    red.style('red-tv-indicator-style', '#red-tv-indicator{position:fixed;top:24px;right:32px;background:rgba(28,28,28,.92);color:#f1f1f1;font:500 22px Roboto,Arial,sans-serif;padding:10px 18px;border-radius:8px;z-index:2147483646;pointer-events:none;transition:opacity .2s;opacity:0}#red-tv-indicator.red-on{opacity:1}');
     function indicator(text) {
         var el = document.getElementById('red-tv-indicator');
         if (!el) {
             el = document.createElement('div');
             el.id = 'red-tv-indicator';
-            el.setAttribute('style', 'position:fixed;top:24px;right:32px;background:rgba(28,28,28,.92);color:#f1f1f1;font:500 22px Roboto,Arial,sans-serif;padding:10px 18px;border-radius:8px;z-index:2147483646;pointer-events:none;transition:opacity .2s;opacity:0');
             document.body.appendChild(el);
         }
         el.textContent = text;
-        el.style.opacity = '1';
+        el.classList.add('red-on');
         clearTimeout(indicator.timer);
-        indicator.timer = setTimeout(function () { el.style.opacity = '0'; }, 1200);
+        indicator.timer = setTimeout(function () { el.classList.remove('red-on'); }, 1200);
     }
 
     // Right click → back; wheel swallowed (Leanback scrolls with keys).
@@ -67,12 +67,19 @@
     // Cursor auto-hide.
     var cursorTimer = null;
     function showCursor() {
+        if (!document.documentElement) {
+            return;
+        }
         document.documentElement.style.cursor = '';
         clearTimeout(cursorTimer);
-        cursorTimer = setTimeout(function () { document.documentElement.style.cursor = 'none'; }, 3000);
+        cursorTimer = setTimeout(function () {
+            if (document.documentElement) {
+                document.documentElement.style.cursor = 'none';
+            }
+        }, 3000);
     }
     document.addEventListener('mousemove', showCursor, true);
-    showCursor();
+    document.addEventListener('DOMContentLoaded', showCursor);
 
     // Hotkeys.
     document.addEventListener('keydown', function (e) {

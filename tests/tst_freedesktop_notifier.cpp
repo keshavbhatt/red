@@ -152,9 +152,9 @@ private Q_SLOTS:
         QTRY_COMPARE(m_server.lastSummary, u"Alice"_s);
         QCOMPARE(m_server.lastBody, u"hello"_s);
         QVERIFY(m_server.lastActions.contains(u"default"_s));
-        QCOMPARE(m_server.lastHints.value(u"category"_s).toString(), u"im.received"_s);
+        QCOMPARE(m_server.lastHints.value(u"category"_s).toString(), u"transfer.complete"_s);
         QCOMPARE(m_server.lastHints.value(u"desktop-entry"_s).toString(), u"com.ktechpit.red"_s);
-        QCOMPARE(m_server.lastHints.value(u"sound-name"_s).toString(), u"message-new-instant"_s);
+        QCOMPARE(m_server.lastHints.value(u"sound-name"_s).toString(), u"complete-download"_s);
         QVERIFY(m_server.lastHints.contains(u"image-data"_s));
         // Wire signature must match the spec so real daemons (KDE, GNOME) accept it.
         const auto rawImage = m_server.lastHints.value(u"image-data"_s).value<QDBusArgument>();

@@ -10,7 +10,7 @@ struct MediaState
 {
     enum class Playback
     {
-        None,    ///< no media element / nothing loaded
+        None, ///< no media element / nothing loaded
         Playing,
         Paused,
     };
@@ -18,10 +18,10 @@ struct MediaState
     Playback playback = Playback::None;
     QString videoId;
     QString title;
-    QString artist;  ///< channel name
-    QString artwork; ///< thumbnail URL
-    double duration = 0; ///< seconds
-    double position = 0; ///< seconds at the time of the report
+    QString artist;          ///< channel name
+    QString artwork;         ///< thumbnail URL
+    double duration = 0;     ///< seconds
+    double position = 0;     ///< seconds at the time of the report
     qint64 reportedAtMs = 0; ///< monotonic ms when `position` was sampled
     bool canGoNext = false;
     bool canGoPrevious = false;
@@ -36,7 +36,7 @@ inline MediaState MediaState::fromJson(const QJsonObject& o, qint64 nowMs)
 {
     MediaState s;
     const QString state = o.value(QStringLiteral("state")).toString();
-    s.playback = state == QStringLiteral("playing") ? Playback::Playing
+    s.playback = state == QStringLiteral("playing")  ? Playback::Playing
                  : state == QStringLiteral("paused") ? Playback::Paused
                                                      : Playback::None;
     s.videoId = o.value(QStringLiteral("videoId")).toString();

@@ -13,9 +13,9 @@ namespace red::core {
 enum class DownloadState
 {
     Queued,
-    Probing,     ///< reading metadata before the transfer starts
+    Probing, ///< reading metadata before the transfer starts
     Downloading,
-    Processing,  ///< merging / converting / embedding
+    Processing, ///< merging / converting / embedding
     Paused,
     Completed,
     Failed,
@@ -29,11 +29,11 @@ enum class DownloadState
 struct DownloadJob
 {
     quint64 id = 0;
-    QString url;         ///< what yt-dlp is given
-    QString videoId;     ///< YouTube id when known (thumbnail, dedupe)
+    QString url;     ///< what yt-dlp is given
+    QString videoId; ///< YouTube id when known (thumbnail, dedupe)
     QString title;
     QString uploader;
-    QString thumbnail;   ///< URL
+    QString thumbnail; ///< URL
     double duration = 0;
     DownloadOptions options;
     DownloadState state = DownloadState::Queued;
@@ -48,7 +48,7 @@ struct DownloadJob
     int itemCount = 0;         ///< playlist: total items
     QString currentItemTitle;  ///< playlist: current item
 
-    QStringList outputFiles;   ///< final paths (after_move)
+    QStringList outputFiles; ///< final paths (after_move)
     QString error;
     QDateTime createdAt;
     QDateTime finishedAt;

@@ -15,8 +15,7 @@ void askPermission(QWidget* parent, const QWebEnginePermission& permission, std:
     box->setWindowTitle(QObject::tr("Permission request"));
     box->setText(QObject::tr("YouTube wants to %1.")
                      .arg(web::PermissionController::describe(permission.permissionType())));
-    box->setInformativeText(
-        QObject::tr("Your choice is remembered. Change it in Settings → Advanced."));
+    box->setInformativeText(QObject::tr("Your choice is remembered. Change it in Settings → Advanced."));
     QPushButton* allow = box->addButton(QObject::tr("Allow"), QMessageBox::AcceptRole);
     box->addButton(QObject::tr("Deny"), QMessageBox::RejectRole);
     box->setDefaultButton(allow);

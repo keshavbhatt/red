@@ -52,7 +52,8 @@ QColor stateColor(const Tokens& t, core::DownloadState state)
 
 } // namespace
 
-DownloadCardDelegate::DownloadCardDelegate(ThumbnailCache& thumbnails, core::ThemeService& theme, QObject* parent)
+DownloadCardDelegate::DownloadCardDelegate(ThumbnailCache& thumbnails, core::ThemeService& theme,
+                                           QObject* parent)
     : QStyledItemDelegate(parent)
     , m_thumbnails(thumbnails)
     , m_theme(theme)
@@ -63,8 +64,8 @@ QSize DownloadCardDelegate::sizeHint(const QStyleOptionViewItem& option, const Q
     return {option.rect.width(), kCardHeight};
 }
 
-QList<DownloadCardDelegate::HitButton> DownloadCardDelegate::buttonsFor(const QRect& card, core::DownloadState state,
-                                                                        bool hasFile) const
+QList<DownloadCardDelegate::HitButton>
+DownloadCardDelegate::buttonsFor(const QRect& card, core::DownloadState state, bool hasFile) const
 {
     QList<HitButton> buttons;
     auto add = [&](Action action, const QString& icon, const QString& tooltip) {
@@ -133,13 +134,17 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     if (!thumb.isNull()) {
         const QPixmap scaled = thumb.scaled(thumbRect.size() * painter->device()->devicePixelRatio(),
                                             Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-        const QRect source((scaled.width() - thumbRect.width() * static_cast<int>(painter->device()->devicePixelRatio())) / 2,
-                           (scaled.height() - thumbRect.height() * static_cast<int>(painter->device()->devicePixelRatio())) / 2,
-                           thumbRect.width() * static_cast<int>(painter->device()->devicePixelRatio()),
-                           thumbRect.height() * static_cast<int>(painter->device()->devicePixelRatio()));
+        const QRect source(
+            (scaled.width() - thumbRect.width() * static_cast<int>(painter->device()->devicePixelRatio())) /
+                2,
+            (scaled.height() - thumbRect.height() * static_cast<int>(painter->device()->devicePixelRatio())) /
+                2,
+            thumbRect.width() * static_cast<int>(painter->device()->devicePixelRatio()),
+            thumbRect.height() * static_cast<int>(painter->device()->devicePixelRatio()));
         painter->drawPixmap(thumbRect, scaled, source);
     } else {
-        const QString glyph = index.data(core::DownloadQueue::IsPlaylistRole).toBool() ? u"playlist"_s : u"video"_s;
+        const QString glyph =
+            index.data(core::DownloadQueue::IsPlaylistRole).toBool() ? u"playlist"_s : u"video"_s;
         const QPixmap icon = icons::pixmap(glyph, t.muted, 24, painter->device()->devicePixelRatio());
         painter->drawPixmap(thumbRect.center().x() - 12, thumbRect.center().y() - 12, icon);
     }
@@ -155,7 +160,8 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     painter->setPen(t.text);
     const QString title = index.data(core::DownloadQueue::TitleRole).toString();
     const QRect titleRect(textLeft, card.top() + kMargin - 1, textRight - textLeft, 38);
-    const QString elidedTitle = painter->fontMetrics().elidedText(title, Qt::ElideRight, titleRect.width() * 2 - 20);
+    const QString elidedTitle =
+        painter->fontMetrics().elidedText(title, Qt::ElideRight, titleRect.width() * 2 - 20);
     painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, elidedTitle);
 
     QFont small = option.font;
@@ -167,10 +173,10 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     if (!uploader.isEmpty() && state == core::DownloadState::Completed) {
         status = uploader + u" · "_s + status;
     }
-    const QList<HitButton> buttons = buttonsFor(card, state, !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty());
-    const int buttonsWidth = hovered && !buttons.isEmpty()
-                                 ? static_cast<int>(buttons.size()) * (kButtonSize + kButtonGap) + 4
-                                 : 0;
+    const QList<HitButton> buttons =
+        buttonsFor(card, state, !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty());
+    const int buttonsWidth =
+        hovered && !buttons.isEmpty() ? static_cast<int>(buttons.size()) * (kButtonSize + kButtonGap) + 4 : 0;
     const QRect statusRect(textLeft, card.bottom() - kMargin - 18, textRight - textLeft - buttonsWidth, 18);
     painter->drawText(statusRect, Qt::AlignLeft | Qt::AlignVCenter,
                       painter->fontMetrics().elidedText(status, Qt::ElideRight, statusRect.width()));
@@ -192,8 +198,10 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         } else {
             // Indeterminate: a short moving segment based on the clock.
             const int span = track.width() / 4;
-            const int offset = static_cast<int>((QDateTime::currentMSecsSinceEpoch() / 12) % (track.width() + span)) - span;
-            QRect seg(track.left() + std::max(0, offset), track.top(), std::min(span, track.width() - std::max(0, offset)), track.height());
+            const int offset =
+                static_cast<int>((QDateTime::currentMSecsSinceEpoch() / 12) % (track.width() + span)) - span;
+            QRect seg(track.left() + std::max(0, offset), track.top(),
+                      std::min(span, track.width() - std::max(0, offset)), track.height());
             if (seg.width() > 0) {
                 QPainterPath segPath;
                 segPath.addRoundedRect(seg, 2, 2);
@@ -209,7 +217,8 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
             QPainterPath bp;
             bp.addRoundedRect(b.rect, 6, 6);
             painter->fillPath(bp, over ? t.hover : t.panel);
-            const QPixmap icon = icons::pixmap(b.icon, over ? t.text : t.muted, 16, painter->device()->devicePixelRatio());
+            const QPixmap icon =
+                icons::pixmap(b.icon, over ? t.text : t.muted, 16, painter->device()->devicePixelRatio());
             painter->drawPixmap(b.rect.center().x() - 8, b.rect.center().y() - 8, icon);
         }
     }
@@ -240,8 +249,8 @@ bool DownloadCardDelegate::editorEvent(QEvent* event, QAbstractItemModel*, const
     return false;
 }
 
-bool DownloadCardDelegate::helpEvent(QHelpEvent* event, QAbstractItemView* view, const QStyleOptionViewItem& option,
-                                     const QModelIndex& index)
+bool DownloadCardDelegate::helpEvent(QHelpEvent* event, QAbstractItemView* view,
+                                     const QStyleOptionViewItem& option, const QModelIndex& index)
 {
     if (event->type() != QEvent::ToolTip || !index.isValid()) {
         return QStyledItemDelegate::helpEvent(event, view, option, index);

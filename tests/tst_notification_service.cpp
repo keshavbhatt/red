@@ -1,4 +1,3 @@
-#include "core/notifications/dnd_controller.h"
 #include "core/notifications/notification_service.h"
 #include "core/settings/settings.h"
 
@@ -7,7 +6,6 @@
 #include <QTest>
 
 using namespace Qt::StringLiterals;
-using namespace std::chrono_literals;
 using namespace red::core;
 
 class FakeNotifier : public INotifier
@@ -51,56 +49,40 @@ private Q_SLOTS:
     {
         m_dir = std::make_unique<QTemporaryDir>();
         m_settings = std::make_unique<Settings>(m_dir->filePath(u"s.ini"_s));
-        m_dnd = std::make_unique<DndController>();
         m_primary = std::make_unique<FakeNotifier>();
         m_fallback = std::make_unique<FakeNotifier>();
-        m_service =
-            std::make_unique<NotificationService>(*m_settings, *m_dnd, m_primary.get(), m_fallback.get());
+        m_service = std::make_unique<NotificationService>(*m_settings, m_primary.get(), m_fallback.get());
     }
 
-    void fillsDefaultsAndAssignsIds()
+    void assignsIdsAndKeepsImage()
     {
-        m_settings->setNotificationTimeoutSec(7);
-        m_settings->setNotificationSound(false);
+        QImage thumb(8, 8, QImage::Format_ARGB32);
+        thumb.fill(Qt::red);
         Notification n;
-        n.title = u"Alice"_s;
-        n.body = u"hi"_s;
+        n.title = u"Download finished"_s;
+        n.body = u"Big Buck Bunny"_s;
+        n.image = thumb;
+        n.actions.append({u"folder"_s, u"Show in folder"_s});
         const quint64 id = m_service->notify(n);
         QVERIFY(id != 0);
         QCOMPARE(m_primary->shown.size(), 1);
         const Notification& sent = m_primary->shown.first().second;
-        QVERIFY(!sent.image.isNull()); // identicon substituted
-        QCOMPARE(sent.timeoutMs, 7000);
-        QCOMPARE(sent.sound, false);
+        QCOMPARE(sent.image, thumb);
+        QCOMPARE(sent.actions.size(), 1);
         QCOMPARE(m_service->activeCount(), 1);
-
         const quint64 next = m_service->notify(n);
         QVERIFY(next != id);
     }
 
-    void keepsProvidedImage()
+    void actionInvokedOnlyForKnownIds()
     {
-        QImage avatar(8, 8, QImage::Format_ARGB32);
-        avatar.fill(Qt::red);
-        Notification n;
-        n.title = u"Bob"_s;
-        n.image = avatar;
-        m_service->notify(n);
-        QCOMPARE(m_primary->shown.first().second.image, avatar);
-    }
-
-    void suppressedWhenDisabledOrDnd()
-    {
-        m_settings->setNotificationsEnabled(false);
-        QCOMPARE(m_service->notify(note(u"x"_s)), quint64{0});
-        m_settings->setNotificationsEnabled(true);
-
-        m_dnd->enableFor(30min);
-        QVERIFY(m_service->isSuppressed());
-        QCOMPARE(m_service->notify(note(u"x"_s)), quint64{0});
-        m_dnd->disable();
-        QVERIFY(m_service->notify(note(u"x"_s)) != 0);
-        QCOMPARE(m_primary->shown.size(), 1);
+        QSignalSpy spy(m_service.get(), &NotificationService::actionInvoked);
+        const quint64 id = m_service->notify(note(u"x"_s));
+        Q_EMIT m_primary->actionInvoked(999, u"folder"_s);
+        QCOMPARE(spy.count(), 0);
+        Q_EMIT m_primary->actionInvoked(id, u"folder"_s);
+        QCOMPARE(spy.count(), 1);
+        QCOMPARE(spy.first().at(1).toString(), u"folder"_s);
     }
 
     void activationOnlyForKnownIds()
@@ -157,25 +139,9 @@ private Q_SLOTS:
         QCOMPARE(m_service->backendName(), u"none"_s);
     }
 
-    void dndExpires()
-    {
-        QSignalSpy spy(m_dnd.get(), &DndController::stateChanged);
-        m_dnd->enableFor(std::chrono::minutes(0)); // fires on the next event-loop turn
-        QVERIFY(m_dnd->isActive());
-        QVERIFY(m_dnd->until().has_value());
-        QTRY_VERIFY(!m_dnd->isActive());
-        QCOMPARE(spy.count(), 2);
-
-        m_dnd->enableIndefinitely();
-        QVERIFY(!m_dnd->until().has_value());
-        QTest::qWait(20);
-        QVERIFY(m_dnd->isActive());
-    }
-
 private:
     std::unique_ptr<QTemporaryDir> m_dir;
     std::unique_ptr<Settings> m_settings;
-    std::unique_ptr<DndController> m_dnd;
     std::unique_ptr<FakeNotifier> m_primary;
     std::unique_ptr<FakeNotifier> m_fallback;
     std::unique_ptr<NotificationService> m_service;

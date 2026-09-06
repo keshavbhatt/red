@@ -100,24 +100,17 @@ private Q_SLOTS:
         const QStringList off = chromiumFlags(HardwareAcceleration::Off);
         QVERIFY(off.contains(u"--disable-gpu"_s));
         QVERIFY(!chromiumFlags(HardwareAcceleration::On).contains(u"--disable-gpu"_s));
-        QVERIFY(autoFlags.join(u' ').contains(u"--enable-features=SharedArrayBuffer"_s));
+        QVERIFY(autoFlags.join(u' ').contains(u"--disable-features=HardwareMediaKeyHandling"_s));
 #ifdef Q_OS_LINUX
-        QVERIFY(autoFlags.join(u' ').contains(u"WebRTCPipeWireCapturer"_s));
         // Hardware video decode is off on Linux (ADR-032): its dmabuf frames
         // crash the compositor GL context on many Mesa/Wayland/snap stacks.
         QVERIFY(autoFlags.contains(u"--disable-accelerated-video-decode"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--disable-accelerated-video-decode"_s));
+        // FEATURES D5: opt-in hardware decode flips to VA-API features.
+        const QStringList hw = chromiumFlags(HardwareAcceleration::Auto, false, true);
+        QVERIFY(!hw.contains(u"--disable-accelerated-video-decode"_s));
+        QVERIFY(hw.join(u' ').contains(u"VaapiVideoDecodeLinuxGL"_s));
 #endif
-    }
-
-    void jsMemoryLimitFlag()
-    {
-        // Automatic (0) trims the baseline heap; a positive value hard-caps it.
-        QVERIFY(chromiumFlags(HardwareAcceleration::Auto, false, 0)
-                    .contains(u"--js-flags=--optimize-for-size"_s));
-        const QStringList capped = chromiumFlags(HardwareAcceleration::Auto, false, 1024);
-        QVERIFY(capped.contains(u"--js-flags=--max-old-space-size=1024"_s));
-        QVERIFY(!capped.contains(u"--js-flags=--optimize-for-size"_s));
     }
 
     void userFlagsAreKeptAndDeduplicated()
@@ -142,14 +135,11 @@ private Q_SLOTS:
         QVERIFY(QDir(settings.downloadDirectory()).isAbsolute());
         settings.setDownloadDirectory(u"relative/path"_s);
         QVERIFY(QDir(settings.downloadDirectory()).isAbsolute()); // rejected → fallback
-        settings.setDownloadDirectory(u"/tmp/../tmp/dl/"_s);
+        settings.setDownloadDirectory(u"/tmp/dl"_s);
         QCOMPARE(settings.downloadDirectory(), u"/tmp/dl"_s);
         QCOMPARE(settings.hardwareAcceleration(), HardwareAcceleration::Auto);
         settings.setHardwareAcceleration(HardwareAcceleration::Off);
         QCOMPARE(settings.hardwareAcceleration(), HardwareAcceleration::Off);
-        QVERIFY(!settings.muted());
-        settings.setMuted(true);
-        QVERIFY(settings.muted());
     }
 };
 

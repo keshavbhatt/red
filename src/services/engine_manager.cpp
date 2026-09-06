@@ -240,9 +240,10 @@ void EngineManager::runNextStep()
 void EngineManager::queueComponent(const core::EngineComponent& component, bool verifySums)
 {
     m_steps.append([this, component, verifySums] {
-        const QString label = component.kind == core::EngineComponent::Kind::YtDlp    ? tr("yt-dlp")
-                              : component.kind == core::EngineComponent::Kind::Ffmpeg ? tr("ffmpeg")
-                                                                                       : tr("JavaScript runtime");
+        const QString label = component.kind == core::EngineComponent::Kind::YtDlp ? tr("yt-dlp")
+                              : component.kind == core::EngineComponent::Kind::Ffmpeg
+                                  ? tr("ffmpeg")
+                                  : tr("JavaScript runtime");
         setState(m_status.state, tr("Looking up %1…").arg(label));
         fetchRelease(component, verifySums, [this, component, label](const QUrl& asset, const QUrl& sums) {
             if (asset.isEmpty()) {
@@ -382,30 +383,33 @@ void EngineManager::installArchive(const core::EngineComponent& component, const
     }
     auto* tar = new QProcess(this);
     tar->setProcessEnvironment(core::engineProcessEnvironment());
-    const QStringList args{u"-xJf"_s, tempPath, u"-C"_s, extractDir->path(), u"--strip-components=2"_s,
-                           u"--wildcards"_s, u"*/bin/ffmpeg"_s, u"*/bin/ffprobe"_s};
-    connect(tar, &QProcess::finished, this, [this, tar, extractDir, component](int code, QProcess::ExitStatus) {
-        tar->deleteLater();
-        const std::unique_ptr<QTemporaryDir> dir(extractDir);
-        m_download.reset();
-        if (code != 0) {
-            fail(tr("Unpacking ffmpeg failed (tar exit %1).").arg(code));
-            return;
-        }
-        for (const QString& name : {u"ffmpeg"_s, u"ffprobe"_s}) {
-            const QString from = QDir(dir->path()).filePath(name);
-            const QString to = QDir(engineDirectory()).filePath(name);
-            QFile::remove(to);
-            if (!QFile::copy(from, to)) {
-                fail(tr("Cannot install %1.").arg(name));
-                return;
-            }
-            QFile::setPermissions(to, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner | QFile::ReadGroup |
-                                          QFile::ExeGroup | QFile::ReadOther | QFile::ExeOther);
-        }
-        qCInfo(lcServices) << "installed" << installPath(component);
-        runNextStep();
-    });
+    const QStringList args{
+        u"-xJf"_s,        tempPath,          u"-C"_s,           extractDir->path(), u"--strip-components=2"_s,
+        u"--wildcards"_s, u"*/bin/ffmpeg"_s, u"*/bin/ffprobe"_s};
+    connect(tar, &QProcess::finished, this,
+            [this, tar, extractDir, component](int code, QProcess::ExitStatus) {
+                tar->deleteLater();
+                const std::unique_ptr<QTemporaryDir> dir(extractDir);
+                m_download.reset();
+                if (code != 0) {
+                    fail(tr("Unpacking ffmpeg failed (tar exit %1).").arg(code));
+                    return;
+                }
+                for (const QString& name : {u"ffmpeg"_s, u"ffprobe"_s}) {
+                    const QString from = QDir(dir->path()).filePath(name);
+                    const QString to = QDir(engineDirectory()).filePath(name);
+                    QFile::remove(to);
+                    if (!QFile::copy(from, to)) {
+                        fail(tr("Cannot install %1.").arg(name));
+                        return;
+                    }
+                    QFile::setPermissions(to, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
+                                                  QFile::ReadGroup | QFile::ExeGroup | QFile::ReadOther |
+                                                  QFile::ExeOther);
+                }
+                qCInfo(lcServices) << "installed" << installPath(component);
+                runNextStep();
+            });
     connect(tar, &QProcess::errorOccurred, this, [this, tar, extractDir](QProcess::ProcessError) {
         if (tar->state() == QProcess::NotRunning) {
             tar->deleteLater();

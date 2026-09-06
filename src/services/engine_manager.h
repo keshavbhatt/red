@@ -45,7 +45,7 @@ public:
         State state = State::Unknown;
         QString ytdlpPath;
         QString ytdlpVersion;
-        QString jsRuntime;    ///< --js-runtimes spec
+        QString jsRuntime; ///< --js-runtimes spec
         QString ffmpegPath;
         QString latestVersion;
         bool updateAvailable = false;
@@ -90,9 +90,11 @@ private:
     void queueComponent(const core::EngineComponent& component, bool verifySums);
     void fetchRelease(const core::EngineComponent& component, bool verifySums,
                       const std::function<void(const QUrl& asset, const QUrl& sums)>& then);
-    void downloadFile(const QUrl& url, const QString& label, const std::function<void(const QString& path)>& then);
+    void downloadFile(const QUrl& url, const QString& label,
+                      const std::function<void(const QString& path)>& then);
     void fetchText(const QUrl& url, const std::function<void(const QByteArray&)>& then);
-    void installBinary(const core::EngineComponent& component, const QString& tempPath, const QString& expectedSha);
+    void installBinary(const core::EngineComponent& component, const QString& tempPath,
+                       const QString& expectedSha);
     void installArchive(const core::EngineComponent& component, const QString& tempPath);
     void finishInstall();
     [[nodiscard]] QString installPath(const core::EngineComponent& component) const;

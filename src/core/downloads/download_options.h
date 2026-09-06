@@ -24,7 +24,7 @@ struct DownloadOptions
     VideoQuality quality = VideoQuality::Best;
     Container container = Container::Mp4;
     AudioFormat audioFormat = AudioFormat::Best;
-    int audioBitrateKbps = 0; ///< 0 = best
+    int audioBitrateKbps = 0;  ///< 0 = best
     QString customVideoFormat; ///< Custom: video (or progressive) format id
     QString customAudioFormat; ///< Custom: audio format id (may be empty)
 
@@ -50,8 +50,8 @@ struct DownloadOptions
 struct EnginePaths
 {
     QString ytdlp;
-    QString ffmpeg;     ///< binary or directory; empty = let yt-dlp search PATH
-    QString jsRuntime;  ///< "quickjs:/path/qjs", "deno", "node:/path/node"…; empty = default
+    QString ffmpeg;      ///< binary or directory; empty = let yt-dlp search PATH
+    QString jsRuntime;   ///< "quickjs:/path/qjs", "deno", "node:/path/node"…; empty = default
     QString cookiesFile; ///< Netscape file; empty = none
 };
 

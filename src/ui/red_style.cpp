@@ -235,14 +235,22 @@ QMessageBox QLabel { min-width: 320px; }
 QHash<QString, QString> tokenMap(const Tokens& t)
 {
     return {
-        {u"accent"_s, t.accent.name()},     {u"accentHover"_s, t.accentHover.name()},
-        {u"accentText"_s, t.accentText.name()}, {u"bg"_s, t.bg.name()},
-        {u"rail"_s, t.rail.name()},         {u"panel"_s, t.panel.name()},
-        {u"elevated"_s, t.elevated.name()}, {u"hover"_s, t.hover.name()},
-        {u"input"_s, t.input.name()},       {u"border"_s, t.border.name()},
-        {u"text"_s, t.text.name()},         {u"muted"_s, t.muted.name()},
-        {u"link"_s, t.link.name()},         {u"success"_s, t.success.name()},
-        {u"warning"_s, t.warning.name()},   {u"danger"_s, t.danger.name()},
+        {u"accent"_s, t.accent.name()},
+        {u"accentHover"_s, t.accentHover.name()},
+        {u"accentText"_s, t.accentText.name()},
+        {u"bg"_s, t.bg.name()},
+        {u"rail"_s, t.rail.name()},
+        {u"panel"_s, t.panel.name()},
+        {u"elevated"_s, t.elevated.name()},
+        {u"hover"_s, t.hover.name()},
+        {u"input"_s, t.input.name()},
+        {u"border"_s, t.border.name()},
+        {u"text"_s, t.text.name()},
+        {u"muted"_s, t.muted.name()},
+        {u"link"_s, t.link.name()},
+        {u"success"_s, t.success.name()},
+        {u"warning"_s, t.warning.name()},
+        {u"danger"_s, t.danger.name()},
     };
 }
 

@@ -22,8 +22,8 @@ public:
     ~MprisService() override = default;
 
     /// The platform backend, never null (a no-op where MPRIS does not exist).
-    [[nodiscard]] static std::unique_ptr<MprisService> create(const QString& identity, const QString& desktopEntry,
-                                                              QObject* parent = nullptr);
+    [[nodiscard]] static std::unique_ptr<MprisService>
+    create(const QString& identity, const QString& desktopEntry, QObject* parent = nullptr);
 
     virtual void setMediaState(const core::MediaState& state) = 0;
     [[nodiscard]] virtual bool isRegistered() const = 0;

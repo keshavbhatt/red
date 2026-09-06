@@ -22,7 +22,6 @@
         'html.red-mini #movie_player video { width: 100% !important; height: 100% !important; left: 0 !important; top: 0 !important; object-fit: contain; }',
         'html.red-mini #movie_player .ytp-chrome-bottom { width: calc(100% - 24px) !important; }'
     ].join('\n');
-    var styleEl = null;
     var on = !!red.config.miniPlayer;
     function apply() {
         try {
@@ -30,16 +29,7 @@
             if (!html) {
                 return;
             }
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.id = 'red-mini-player';
-                styleEl.textContent = CSS;
-                var nonced = document.querySelector('style[nonce], script[nonce]');
-                if (nonced && nonced.nonce) {
-                    styleEl.nonce = nonced.nonce;
-                }
-                (document.head || html).appendChild(styleEl);
-            }
+            red.style('red-mini-player', CSS);
             html.classList.toggle('red-mini', on);
             window.dispatchEvent(new Event('resize'));
         } catch (e) {

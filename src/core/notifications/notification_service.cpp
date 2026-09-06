@@ -76,9 +76,15 @@ quint64 NotificationService::notify(Notification notification)
 
 void NotificationService::close(quint64 id)
 {
-    if (INotifier* owner = m_owner.value(id, nullptr); owner != nullptr) {
-        owner->close(id);
+    INotifier* owner = m_owner.value(id, nullptr);
+    if (m_active.remove(id) == 0) {
+        return;
     }
+    m_owner.remove(id);
+    if (owner != nullptr) {
+        owner->close(id); // the backend's later "closed" echo is ignored (unknown id)
+    }
+    Q_EMIT closed(id);
 }
 
 void NotificationService::handleFailed(quint64 id, const QString& reason)
@@ -89,8 +95,8 @@ void NotificationService::handleFailed(quint64 id, const QString& reason)
     }
     INotifier* failedBackend = m_owner.value(id, nullptr);
     INotifier* other = (failedBackend == m_primary) ? m_fallback : nullptr;
-    qCWarning(lcCore) << "notification" << id << "failed on" << (failedBackend ? failedBackend->name() : u"?"_s)
-                      << ":" << reason;
+    qCWarning(lcCore) << "notification" << id << "failed on"
+                      << (failedBackend ? failedBackend->name() : u"?"_s) << ":" << reason;
     if (other != nullptr && other->isAvailable()) {
         m_owner.insert(id, other);
         other->show(id, it.value());

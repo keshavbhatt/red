@@ -68,7 +68,7 @@ Enum enumFromInt(int value, Enum def, int count)
 
 QStringList sponsorCategories()
 {
-    return {u"sponsor"_s, u"selfpromo"_s, u"interaction"_s, u"intro"_s,
+    return {u"sponsor"_s, u"selfpromo"_s, u"interaction"_s,    u"intro"_s,
             u"outro"_s,   u"preview"_s,   u"music_offtopic"_s, u"filler"_s};
 }
 
@@ -181,7 +181,8 @@ void Settings::setSettingsDialogGeometry(const QByteArray& geometry)
 
 CloseAction Settings::closeAction() const
 {
-    return enumFromInt(intValue(keys::kCloseAction, static_cast<int>(kDefaultCloseAction)), kDefaultCloseAction, 2);
+    return enumFromInt(intValue(keys::kCloseAction, static_cast<int>(kDefaultCloseAction)),
+                       kDefaultCloseAction, 2);
 }
 
 void Settings::setCloseAction(CloseAction action)
@@ -302,8 +303,8 @@ void Settings::setZoomFactor(double factor)
 
 double Settings::interfaceScale() const
 {
-    return std::clamp(m_store->value(keys::kInterfaceScale, kDefaultInterfaceScale).toDouble(), kMinInterfaceScale,
-                      kMaxInterfaceScale);
+    return std::clamp(m_store->value(keys::kInterfaceScale, kDefaultInterfaceScale).toDouble(),
+                      kMinInterfaceScale, kMaxInterfaceScale);
 }
 
 void Settings::setInterfaceScale(double scale)
@@ -526,14 +527,16 @@ FilenamePattern Settings::filenamePattern() const
 
 void Settings::setFilenamePattern(FilenamePattern pattern)
 {
-    if (storeInt(keys::kFilenamePattern, static_cast<int>(kDefaultFilenamePattern), static_cast<int>(pattern))) {
+    if (storeInt(keys::kFilenamePattern, static_cast<int>(kDefaultFilenamePattern),
+                 static_cast<int>(pattern))) {
         Q_EMIT downloadDefaultsChanged();
     }
 }
 
 VideoQuality Settings::defaultQuality() const
 {
-    return enumFromInt(intValue(keys::kDefaultQuality, static_cast<int>(kDefaultQuality)), kDefaultQuality, 7);
+    return enumFromInt(intValue(keys::kDefaultQuality, static_cast<int>(kDefaultQuality)), kDefaultQuality,
+                       7);
 }
 
 void Settings::setDefaultQuality(VideoQuality quality)
@@ -545,8 +548,8 @@ void Settings::setDefaultQuality(VideoQuality quality)
 
 Container Settings::defaultContainer() const
 {
-    return enumFromInt(intValue(keys::kDefaultContainer, static_cast<int>(kDefaultContainer)), kDefaultContainer,
-                       3);
+    return enumFromInt(intValue(keys::kDefaultContainer, static_cast<int>(kDefaultContainer)),
+                       kDefaultContainer, 3);
 }
 
 void Settings::setDefaultContainer(Container container)
@@ -564,7 +567,8 @@ AudioFormat Settings::defaultAudioFormat() const
 
 void Settings::setDefaultAudioFormat(AudioFormat format)
 {
-    if (storeInt(keys::kDefaultAudioFormat, static_cast<int>(kDefaultAudioFormat), static_cast<int>(format))) {
+    if (storeInt(keys::kDefaultAudioFormat, static_cast<int>(kDefaultAudioFormat),
+                 static_cast<int>(format))) {
         Q_EMIT downloadDefaultsChanged();
     }
 }
@@ -850,7 +854,8 @@ SignInUserAgent Settings::signInUserAgent() const
 
 void Settings::setSignInUserAgent(SignInUserAgent agent)
 {
-    if (storeInt(keys::kSignInUserAgent, static_cast<int>(kDefaultSignInUserAgent), static_cast<int>(agent))) {
+    if (storeInt(keys::kSignInUserAgent, static_cast<int>(kDefaultSignInUserAgent),
+                 static_cast<int>(agent))) {
         Q_EMIT userAgentChanged();
     }
 }

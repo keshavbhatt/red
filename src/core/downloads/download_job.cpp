@@ -16,7 +16,8 @@ bool isActiveState(DownloadState state)
 
 bool isFinishedState(DownloadState state)
 {
-    return state == DownloadState::Completed || state == DownloadState::Failed || state == DownloadState::Cancelled;
+    return state == DownloadState::Completed || state == DownloadState::Failed ||
+           state == DownloadState::Cancelled;
 }
 
 QString stateLabel(DownloadState state)

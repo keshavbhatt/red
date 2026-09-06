@@ -39,8 +39,8 @@ public:
     [[nodiscard]] static QStringList youtubeTrackerPaths();
 
 private:
-    QSet<QString> m_hosts;              ///< blocked host suffixes (registrable + subdomains)
-    QStringList m_youtubePathPrefixes;  ///< blocked path prefixes on youtube.com hosts
+    QSet<QString> m_hosts;             ///< blocked host suffixes (registrable + subdomains)
+    QStringList m_youtubePathPrefixes; ///< blocked path prefixes on youtube.com hosts
 };
 
 } // namespace red::core

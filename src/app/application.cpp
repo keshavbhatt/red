@@ -126,7 +126,8 @@ void Application::evaluateGpuStability()
             m_settings->setGpuAutoDisabled(true);
             m_settings->setGpuProbeStrikes(0);
             m_settings->setGpuFallbackNotice(true);
-            qCWarning(lcApp) << "GPU proved unstable across" << strikes << "starts; falling back to software rendering";
+            qCWarning(lcApp) << "GPU proved unstable across" << strikes
+                             << "starts; falling back to software rendering";
         } else {
             m_settings->setGpuProbeStrikes(strikes);
             qCWarning(lcApp) << "GPU trial did not reach stability; strike" << strikes << "of 2";
@@ -196,7 +197,8 @@ bool Application::forwardToPrimary()
     for (const QJsonObject& command : commandsFor(m_cli)) {
         allSent = m_instance->sendToPrimary(command) && allSent;
     }
-    qCInfo(lcApp) << (allSent ? "forwarded commands to running instance" : "failed to reach running instance");
+    qCInfo(lcApp) << (allSent ? "forwarded commands to running instance"
+                              : "failed to reach running instance");
     return allSent;
 }
 

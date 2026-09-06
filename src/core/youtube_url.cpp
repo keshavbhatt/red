@@ -29,19 +29,23 @@ bool looksLikeVideoId(const QString& id)
 bool isYouTubeHost(const QString& host)
 {
     const QString h = host.toLower();
-    return hostMatches(h, QLatin1StringView("youtube.com")) || hostMatches(h, QLatin1StringView("youtu.be")) ||
+    return hostMatches(h, QLatin1StringView("youtube.com")) ||
+           hostMatches(h, QLatin1StringView("youtu.be")) ||
            hostMatches(h, QLatin1StringView("youtube-nocookie.com")) ||
-           hostMatches(h, QLatin1StringView("ytimg.com")) || hostMatches(h, QLatin1StringView("googlevideo.com"));
+           hostMatches(h, QLatin1StringView("ytimg.com")) ||
+           hostMatches(h, QLatin1StringView("googlevideo.com"));
 }
 
 bool isGoogleServiceHost(const QString& host)
 {
     const QString h = host.toLower();
-    return hostMatches(h, QLatin1StringView("google.com")) || hostMatches(h, QLatin1StringView("gstatic.com")) ||
+    return hostMatches(h, QLatin1StringView("google.com")) ||
+           hostMatches(h, QLatin1StringView("gstatic.com")) ||
            hostMatches(h, QLatin1StringView("googleapis.com")) ||
            hostMatches(h, QLatin1StringView("googleusercontent.com")) ||
            hostMatches(h, QLatin1StringView("ggpht.com")) || hostMatches(h, QLatin1StringView("gvt1.com")) ||
-           hostMatches(h, QLatin1StringView("recaptcha.net")) || hostMatches(h, QLatin1StringView("youtube.com"));
+           hostMatches(h, QLatin1StringView("recaptcha.net")) ||
+           hostMatches(h, QLatin1StringView("youtube.com"));
 }
 
 YouTubeUrlInfo classifyYouTubeUrl(const QUrl& url)
@@ -133,7 +137,8 @@ std::optional<QUrl> canonicalVideoUrl(const QUrl& url)
 bool isDownloadable(const QUrl& url)
 {
     const YouTubeUrlKind kind = classifyYouTubeUrl(url).kind;
-    return kind == YouTubeUrlKind::Video || kind == YouTubeUrlKind::Playlist || kind == YouTubeUrlKind::Channel;
+    return kind == YouTubeUrlKind::Video || kind == YouTubeUrlKind::Playlist ||
+           kind == YouTubeUrlKind::Channel;
 }
 
 QUrl thumbnailUrl(const QString& videoId, const QString& size)

@@ -35,7 +35,8 @@ public:
     DownloadCardDelegate(ThumbnailCache& thumbnails, core::ThemeService& theme, QObject* parent = nullptr);
     ~DownloadCardDelegate() override = default;
 
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option,
+               const QModelIndex& index) const override;
     [[nodiscard]] QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
                      const QModelIndex& index) override;
@@ -56,7 +57,8 @@ private:
         QString icon;
         QString tooltip;
     };
-    [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state, bool hasFile) const;
+    [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state,
+                                              bool hasFile) const;
 
     ThumbnailCache& m_thumbnails;
     core::ThemeService& m_theme;

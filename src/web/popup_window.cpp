@@ -10,8 +10,8 @@
 #include <QShortcut>
 #include <QVBoxLayout>
 #include <QWebEngineFullScreenRequest>
-#include <QWebEngineScript>
 #include <QWebEnginePage>
+#include <QWebEngineScript>
 #include <QWebEngineView>
 
 using namespace Qt::StringLiterals;

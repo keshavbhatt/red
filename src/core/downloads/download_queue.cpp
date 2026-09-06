@@ -67,9 +67,15 @@ QVariant DownloadQueue::data(const QModelIndex& index, int role) const
 QHash<int, QByteArray> DownloadQueue::roleNames() const
 {
     return {
-        {IdRole, "id"},           {TitleRole, "title"},           {UploaderRole, "uploader"},
-        {ThumbnailRole, "thumbnail"}, {StateRole, "state"},       {ProgressRole, "progress"},
-        {StatusLineRole, "statusLine"}, {FilePathRole, "filePath"}, {IsPlaylistRole, "isPlaylist"},
+        {IdRole, "id"},
+        {TitleRole, "title"},
+        {UploaderRole, "uploader"},
+        {ThumbnailRole, "thumbnail"},
+        {StateRole, "state"},
+        {ProgressRole, "progress"},
+        {StatusLineRole, "statusLine"},
+        {FilePathRole, "filePath"},
+        {IsPlaylistRole, "isPlaylist"},
         {ErrorRole, "error"},
     };
 }
@@ -531,7 +537,8 @@ bool DownloadQueue::save(const QString& filePath) const
         qCWarning(lcDownloads) << "cannot save downloads to" << filePath << file.errorString();
         return false;
     }
-    file.write(QJsonDocument(QJsonObject{{u"version"_s, 1}, {u"jobs"_s, entries}}).toJson(QJsonDocument::Compact));
+    file.write(
+        QJsonDocument(QJsonObject{{u"version"_s, 1}, {u"jobs"_s, entries}}).toJson(QJsonDocument::Compact));
     return file.commit();
 }
 

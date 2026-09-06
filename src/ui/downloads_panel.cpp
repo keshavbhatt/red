@@ -22,8 +22,8 @@ using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
-DownloadsPanel::DownloadsPanel(core::DownloadQueue& queue, core::Settings& settings, core::ThemeService& theme,
-                               ThumbnailCache& thumbnails, QWidget* parent)
+DownloadsPanel::DownloadsPanel(core::DownloadQueue& queue, core::Settings& settings,
+                               core::ThemeService& theme, ThumbnailCache& thumbnails, QWidget* parent)
     : QFrame(parent)
     , m_queue(queue)
     , m_settings(settings)
@@ -40,13 +40,17 @@ DownloadsPanel::DownloadsPanel(core::DownloadQueue& queue, core::Settings& setti
     connect(&m_queue, &QAbstractItemModel::rowsInserted, this, [this] { updateEmptyState(); });
     connect(&m_queue, &QAbstractItemModel::rowsRemoved, this, [this] { updateEmptyState(); });
     connect(&m_queue, &QAbstractItemModel::modelReset, this, [this] { updateEmptyState(); });
-    connect(&m_settings, &core::Settings::downloadDirectoryChanged, this, [this](const QString&) { updateFooter(); });
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) { applyIcons(); });
-    connect(&m_thumbnails, &ThumbnailCache::ready, this, [this](const QString&) { m_list->viewport()->update(); });
+    connect(&m_settings, &core::Settings::downloadDirectoryChanged, this,
+            [this](const QString&) { updateFooter(); });
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
+            [this](Qt::ColorScheme) { applyIcons(); });
+    connect(&m_thumbnails, &ThumbnailCache::ready, this,
+            [this](const QString&) { m_list->viewport()->update(); });
     connect(m_delegate, &DownloadCardDelegate::actionTriggered, this, &DownloadsPanel::cardAction);
     connect(m_list, &QListView::doubleClicked, this, [this](const QModelIndex& index) {
         if (!index.data(core::DownloadQueue::FilePathRole).toString().isEmpty()) {
-            Q_EMIT cardAction(index.data(core::DownloadQueue::IdRole).toULongLong(), DownloadCardDelegate::Action::Open);
+            Q_EMIT cardAction(index.data(core::DownloadQueue::IdRole).toULongLong(),
+                              DownloadCardDelegate::Action::Open);
         }
     });
     // Indeterminate bars and speed lines need a repaint while anything runs.
@@ -141,7 +145,8 @@ void DownloadsPanel::setupUi()
     m_emptyTitle->setProperty("redTitle", true);
     m_emptyTitle->setAlignment(Qt::AlignCenter);
     emptyLayout->addWidget(m_emptyTitle);
-    m_emptyBody = new QLabel(tr("Open a video, playlist or channel and press the download button, or paste a link."), empty);
+    m_emptyBody = new QLabel(
+        tr("Open a video, playlist or channel and press the download button, or paste a link."), empty);
     m_emptyBody->setProperty("redMuted", true);
     m_emptyBody->setWordWrap(true);
     m_emptyBody->setAlignment(Qt::AlignCenter);
@@ -218,7 +223,9 @@ void DownloadsPanel::setEngineStatus(const services::EngineManager::Status& stat
         color = t.link;
         break;
     case State::Ready:
-        text = status.updateAvailable ? tr("Update available") : (status.systemYtdlp ? tr("yt-dlp (system)") : u"yt-dlp "_s + status.ytdlpVersion);
+        text = status.updateAvailable
+                   ? tr("Update available")
+                   : (status.systemYtdlp ? tr("yt-dlp (system)") : u"yt-dlp "_s + status.ytdlpVersion);
         color = status.updateAvailable ? t.warning : t.success;
         icon = status.updateAvailable ? u"warning"_s : u"check"_s;
         break;
@@ -230,13 +237,16 @@ void DownloadsPanel::setEngineStatus(const services::EngineManager::Status& stat
     }
     m_engineChip->setText(text);
     m_engineChip->setIcon(icons::themed(icon, color));
-    m_engineChip->setToolTip(status.error.isEmpty() ? tr("Download engine: yt-dlp %1 · %2 · ffmpeg %3")
-                                                         .arg(status.ytdlpVersion.isEmpty() ? tr("missing") : status.ytdlpVersion,
-                                                              status.jsRuntime.isEmpty() ? tr("no JavaScript runtime") : core::jsRuntimeLabel(status.jsRuntime),
-                                                              status.ffmpegPath.isEmpty() ? tr("missing") : tr("ready"))
-                                                   : status.error);
-    m_engineChip->setStyleSheet(u"QToolButton{border:1px solid %1;border-radius:11px;padding:2px 8px 2px 6px;color:%2;font-size:11px;font-weight:600;}QToolButton:hover{background:%3;}"_s
-                                    .arg(t.border.name(), color.name(), t.hover.name()));
+    m_engineChip->setToolTip(
+        status.error.isEmpty() ? tr("Download engine: yt-dlp %1 · %2 · ffmpeg %3")
+                                     .arg(status.ytdlpVersion.isEmpty() ? tr("missing") : status.ytdlpVersion,
+                                          status.jsRuntime.isEmpty() ? tr("no JavaScript runtime")
+                                                                     : core::jsRuntimeLabel(status.jsRuntime),
+                                          status.ffmpegPath.isEmpty() ? tr("missing") : tr("ready"))
+                               : status.error);
+    m_engineChip->setStyleSheet(
+        u"QToolButton{border:1px solid %1;border-radius:11px;padding:2px 8px 2px 6px;color:%2;font-size:11px;font-weight:600;}QToolButton:hover{background:%3;}"_s
+            .arg(t.border.name(), color.name(), t.hover.name()));
 }
 
 void DownloadsPanel::updateEmptyState()

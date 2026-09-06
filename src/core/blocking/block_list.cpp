@@ -41,11 +41,8 @@ QStringList BlockList::adHosts()
 QStringList BlockList::trackerHosts()
 {
     return {
-        u"google-analytics.com"_s,
-        u"googletagmanager.com"_s,
-        u"googletagservices.com"_s,
-        u"analytics.google.com"_s,
-        u"crashlytics.com"_s,
+        u"google-analytics.com"_s, u"googletagmanager.com"_s, u"googletagservices.com"_s,
+        u"analytics.google.com"_s, u"crashlytics.com"_s,
         u"csp.withgoogle.com"_s, // CSP violation reports
     };
 }
@@ -53,22 +50,15 @@ QStringList BlockList::trackerHosts()
 QStringList BlockList::youtubeAdPaths()
 {
     return {
-        u"/pagead/"_s,
-        u"/api/stats/ads"_s,
-        u"/get_midroll_info"_s,
-        u"/youtubei/v1/player/ad_break"_s,
-        u"/pcs/activeview"_s,
-        u"/ptracking"_s,
+        u"/pagead/"_s,        u"/api/stats/ads"_s, u"/get_midroll_info"_s, u"/youtubei/v1/player/ad_break"_s,
+        u"/pcs/activeview"_s, u"/ptracking"_s,
     };
 }
 
 QStringList BlockList::youtubeTrackerPaths()
 {
     return {
-        u"/youtubei/v1/log_event"_s,
-        u"/api/stats/atr"_s,
-        u"/api/stats/delayplay"_s,
-        u"/csi_204"_s,
+        u"/youtubei/v1/log_event"_s, u"/api/stats/atr"_s, u"/api/stats/delayplay"_s, u"/csi_204"_s,
         u"/generate_204"_s,
     };
 }

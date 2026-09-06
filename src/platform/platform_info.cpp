@@ -38,8 +38,7 @@ QString packageType()
     // Each packaging format exports a distinctive marker into the runtime env.
     if (qEnvironmentVariableIsSet("SNAP")) {
         const QByteArray revision = qgetenv("SNAP_REVISION");
-        return revision.isEmpty() ? u"snap"_s
-                                  : u"snap (rev %1)"_s.arg(QString::fromUtf8(revision));
+        return revision.isEmpty() ? u"snap"_s : u"snap (rev %1)"_s.arg(QString::fromUtf8(revision));
     }
     if (qEnvironmentVariableIsSet("FLATPAK_ID")) {
         return u"flatpak (%1)"_s.arg(QString::fromUtf8(qgetenv("FLATPAK_ID")));

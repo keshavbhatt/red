@@ -78,9 +78,9 @@ bool portalOpenFile(const QString& filePath)
     }
     QDBusUnixFileDescriptor descriptor(fd);
     ::close(fd); // QDBusUnixFileDescriptor keeps its own dup
-    QDBusMessage call = QDBusMessage::createMethodCall(
-        u"org.freedesktop.portal.Desktop"_s, u"/org/freedesktop/portal/desktop"_s,
-        u"org.freedesktop.portal.OpenURI"_s, u"OpenFile"_s);
+    QDBusMessage call = QDBusMessage::createMethodCall(u"org.freedesktop.portal.Desktop"_s,
+                                                       u"/org/freedesktop/portal/desktop"_s,
+                                                       u"org.freedesktop.portal.OpenURI"_s, u"OpenFile"_s);
     call << QString() << QVariant::fromValue(descriptor) << QVariantMap{};
     const QDBusMessage reply = bus.call(call, QDBus::Block, 3000);
     return reply.type() == QDBusMessage::ReplyMessage;

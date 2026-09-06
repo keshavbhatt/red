@@ -157,7 +157,8 @@ QString friendlyError(const QString& stderrTail, int exitCode)
     if (probe.contains(u"HTTP Error 403"_s) || probe.contains(u"HTTP Error 429"_s)) {
         return u"YouTube refused the request (rate limited). Try again in a few minutes."_s;
     }
-    if (probe.contains(u"ffmpeg"_s, Qt::CaseInsensitive) && probe.contains(u"not found"_s, Qt::CaseInsensitive)) {
+    if (probe.contains(u"ffmpeg"_s, Qt::CaseInsensitive) &&
+        probe.contains(u"not found"_s, Qt::CaseInsensitive)) {
         return u"ffmpeg is missing. Reinstall the download engine in Settings → Downloads."_s;
     }
     if (probe.contains(u"Requested format is not available"_s)) {

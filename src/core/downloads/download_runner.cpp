@@ -32,7 +32,8 @@ DownloadRunner::DownloadRunner(quint64 jobId, const QString& program, const QStr
     connect(m_process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
         if (error == QProcess::FailedToStart) {
             qCWarning(lcDownloads) << "job" << m_jobId << "failed to start" << m_program;
-            Q_EMIT finished(m_jobId, false, -1, u"Could not start the download engine (%1)."_s.arg(m_program));
+            Q_EMIT finished(m_jobId, false, -1,
+                            u"Could not start the download engine (%1)."_s.arg(m_program));
         }
     });
 }
@@ -77,7 +78,8 @@ QString DownloadRunner::commandLine() const
     QStringList shown;
     for (const QString& a : m_arguments) {
         // Keep the log readable: the long progress templates add nothing.
-        shown << (a.startsWith(u"download:"_s) || a.startsWith(u"postprocess:"_s) || a.startsWith(u"before_dl:"_s)
+        shown << (a.startsWith(u"download:"_s) || a.startsWith(u"postprocess:"_s) ||
+                          a.startsWith(u"before_dl:"_s)
                       ? u"<template>"_s
                       : a);
     }

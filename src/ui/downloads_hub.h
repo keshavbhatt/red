@@ -40,8 +40,9 @@ class DownloadsHub : public QObject
     Q_DISABLE_COPY_MOVE(DownloadsHub)
 
 public:
-    DownloadsHub(core::Settings& settings, core::ThemeService& theme, core::NotificationService& notifications,
-                 web::CookieExporter& cookies, QWidget* dialogParent, QObject* parent = nullptr);
+    DownloadsHub(core::Settings& settings, core::ThemeService& theme,
+                 core::NotificationService& notifications, web::CookieExporter& cookies,
+                 QWidget* dialogParent, QObject* parent = nullptr);
     ~DownloadsHub() override;
 
     [[nodiscard]] DownloadsPanel* panel() { return m_panel; }
@@ -84,7 +85,7 @@ private:
     DownloadsPanel* m_panel = nullptr;
     QPointer<EngineSetupDialog> m_engineDialog;
     QTimer* m_persistTimer = nullptr;
-    QList<QUrl> m_pendingUrls; ///< waiting for the engine
+    QList<QUrl> m_pendingUrls;                  ///< waiting for the engine
     QHash<quint64, quint64> m_notificationJobs; ///< notification id → job id
 };
 

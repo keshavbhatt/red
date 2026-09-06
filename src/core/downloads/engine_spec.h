@@ -19,9 +19,9 @@ struct EngineComponent
         Ffmpeg,
     };
     Kind kind = Kind::YtDlp;
-    QString assetName;   ///< release asset file name
-    QString installName; ///< file name inside the engine directory
-    QUrl releaseApi;     ///< GitHub "latest release" JSON
+    QString assetName;    ///< release asset file name
+    QString installName;  ///< file name inside the engine directory
+    QUrl releaseApi;      ///< GitHub "latest release" JSON
     bool archive = false; ///< the asset is a tar.xz to extract
 };
 

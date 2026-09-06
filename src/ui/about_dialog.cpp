@@ -65,14 +65,18 @@ void AboutDialog::setupUi()
     version->setProperty("redMuted", true);
     identity->addWidget(version);
     identity->addSpacing(6);
-    auto* author = new QLabel(tr("Designed and developed by Keshav Bhatt · <a href=\"%1\">ktechpit.com</a>").arg(kWebsiteUrl), this);
+    auto* author = new QLabel(
+        tr("Designed and developed by Keshav Bhatt · <a href=\"%1\">ktechpit.com</a>").arg(kWebsiteUrl),
+        this);
     author->setTextFormat(Qt::RichText);
     author->setOpenExternalLinks(false);
     author->setTextInteractionFlags(Qt::TextBrowserInteraction);
     connect(author, &QLabel::linkActivated, this, [](const QString& link) { platform::openUrl(link); });
     identity->addWidget(author);
-    auto* disclaimer = new QLabel(tr("YouTube is a trademark of Google LLC. Red is an independent client and is not "
-                                     "affiliated with, endorsed by, or sponsored by YouTube or Google."), this);
+    auto* disclaimer =
+        new QLabel(tr("YouTube is a trademark of Google LLC. Red is an independent client and is not "
+                      "affiliated with, endorsed by, or sponsored by YouTube or Google."),
+                   this);
     disclaimer->setProperty("redMuted", true);
     disclaimer->setWordWrap(true);
     identity->addWidget(disclaimer);
@@ -101,7 +105,8 @@ void AboutDialog::setupUi()
     debugTitle->setProperty("redSection", true);
     debugRow->addWidget(debugTitle, 1);
     auto* copy = new QPushButton(tr("Copy"), this);
-    copy->setToolTip(tr("Copies versions, paths and recent log lines for a bug report. Your session is never included."));
+    copy->setToolTip(
+        tr("Copies versions, paths and recent log lines for a bug report. Your session is never included."));
     connect(copy, &QPushButton::clicked, this, &AboutDialog::copyDiagnostics);
     debugRow->addWidget(copy);
     root->addLayout(debugRow);

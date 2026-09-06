@@ -32,7 +32,8 @@ ThemeApplier::ThemeApplier(core::ThemeService& theme, QObject* parent)
     }
     QApplication::setFont(font);
     apply();
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) { apply(); });
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
+            [this](Qt::ColorScheme) { apply(); });
 }
 
 void ThemeApplier::apply()

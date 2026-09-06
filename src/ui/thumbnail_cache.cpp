@@ -19,7 +19,8 @@ ThumbnailCache::ThumbnailCache(QObject* parent)
     , m_network(new QNetworkAccessManager(this))
 {
     auto* disk = new QNetworkDiskCache(this);
-    disk->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + u"/thumbnails"_s);
+    disk->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::CacheLocation) +
+                            u"/thumbnails"_s);
     disk->setMaximumCacheSize(64 * 1024 * 1024);
     m_network->setCache(disk);
     m_network->setTransferTimeout(20000);

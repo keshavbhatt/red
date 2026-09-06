@@ -101,35 +101,18 @@
         'ytlr-ad-slot-renderer, ytlr-promo-shelf-renderer',
         '{ display: none !important; }'
     ].join('\n');
-    var styleEl = null;
     function applyCss() {
         try {
-            if (!enabled) {
-                if (styleEl && styleEl.parentNode) {
-                    styleEl.parentNode.removeChild(styleEl);
-                }
-                styleEl = null;
-                return;
-            }
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.id = 'red-adblock';
-                styleEl.textContent = CSS;
-                var nonced = document.querySelector('style[nonce], script[nonce]');
-                if (nonced && nonced.nonce) {
-                    styleEl.nonce = nonced.nonce;
-                }
-            }
-            var root = document.head || document.documentElement;
-            if (root && styleEl.parentNode !== root) {
-                root.appendChild(styleEl);
+            if (enabled) {
+                red.style('red-adblock', CSS);
+            } else {
+                red.unstyle('red-adblock');
             }
         } catch (e) {
             red.report('adblock.css', e);
         }
     }
     applyCss();
-    document.addEventListener('DOMContentLoaded', applyCss);
 
     // --- player layer: skip/fast-forward whatever still plays ------------------
     var player = null;

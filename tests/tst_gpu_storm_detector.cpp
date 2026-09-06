@@ -12,10 +12,9 @@ class TestGpuStormDetector : public QObject
 private Q_SLOTS:
     void matchesContextLossLines()
     {
-        QVERIFY(GpuStormDetector::isContextLossLine(
-            u"eglMakeCurrent failed with error EGL_BAD_DISPLAY"_s));
-        QVERIFY(GpuStormDetector::isContextLossLine(
-            u"Failed to make current since context is marked as lost"_s));
+        QVERIFY(GpuStormDetector::isContextLossLine(u"eglMakeCurrent failed with error EGL_BAD_DISPLAY"_s));
+        QVERIFY(
+            GpuStormDetector::isContextLossLine(u"Failed to make current since context is marked as lost"_s));
         QVERIFY(GpuStormDetector::isContextLossLine(u"GpuChannel: Failed to create SharedImageStub"_s));
         QVERIFY(!GpuStormDetector::isContextLossLine(u"just a normal log line"_s));
     }

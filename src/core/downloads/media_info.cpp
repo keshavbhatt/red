@@ -139,7 +139,8 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
     }
     info.duration = o.value(u"duration"_s).toDouble();
     // yt-dlp prints "19" for sub-minute videos; keep the m:ss shape everywhere.
-    info.durationText = info.duration > 0 ? formatDuration(info.duration) : o.value(u"duration_string"_s).toString();
+    info.durationText =
+        info.duration > 0 ? formatDuration(info.duration) : o.value(u"duration_string"_s).toString();
     info.viewCount = toInt64(o.value(u"view_count"_s));
     info.uploadDate = o.value(u"upload_date"_s).toString();
     info.isLive = o.value(u"is_live"_s).toBool();
@@ -256,7 +257,8 @@ QString formatCount(qint64 count)
         return QLocale::c().toString(static_cast<double>(count) / 1000.0, 'f', count < 10'000 ? 1 : 0) + u'K';
     }
     if (count < 1'000'000'000) {
-        return QLocale::c().toString(static_cast<double>(count) / 1e6, 'f', count < 10'000'000 ? 1 : 0) + u'M';
+        return QLocale::c().toString(static_cast<double>(count) / 1e6, 'f', count < 10'000'000 ? 1 : 0) +
+               u'M';
     }
     return QLocale::c().toString(static_cast<double>(count) / 1e9, 'f', 1) + u'B';
 }

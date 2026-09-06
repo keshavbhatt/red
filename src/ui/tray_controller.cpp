@@ -86,7 +86,8 @@ void TrayController::setMediaState(const core::MediaState& state)
 {
     m_media = state;
     const bool has = state.hasMedia();
-    m_nowPlaying->setText(has ? (state.title.isEmpty() ? tr("Now playing") : state.title) : tr("Nothing playing"));
+    m_nowPlaying->setText(has ? (state.title.isEmpty() ? tr("Now playing") : state.title)
+                              : tr("Nothing playing"));
     m_actions.playPause->setText(state.isPlaying() ? tr("Pause") : tr("Play"));
     m_actions.playPause->setEnabled(has);
     m_actions.next->setEnabled(has && state.canGoNext);

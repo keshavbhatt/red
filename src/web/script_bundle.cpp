@@ -4,9 +4,9 @@
 
 #include <QFile>
 #include <QJsonDocument>
-#include <QtEnvironmentVariables>
 #include <QWebEngineProfile>
 #include <QWebEngineScriptCollection>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 
@@ -40,12 +40,8 @@ QStringList ScriptBundle::bootstrapResources(bool tvMode)
     // Order matters: hooks.js provides the JSON/fetch/XHR modifier registry
     // every other script registers into (LESSONS V3).
     static const QStringList kShared{
-        u":/scripts/hooks.js"_s,
-        u":/scripts/adblock.js"_s,
-        u":/scripts/sponsorblock.js"_s,
-        u":/scripts/media-session.js"_s,
-        u":/scripts/hide-shorts.js"_s,
-        u":/scripts/codec-preference.js"_s,
+        u":/scripts/hooks.js"_s,           u":/scripts/adblock.js"_s,     u":/scripts/sponsorblock.js"_s,
+        u":/scripts/media-session.js"_s,   u":/scripts/hide-shorts.js"_s, u":/scripts/codec-preference.js"_s,
         u":/scripts/background-play.js"_s,
     };
     static const QStringList kDesktop{
@@ -53,11 +49,8 @@ QStringList ScriptBundle::bootstrapResources(bool tvMode)
         u":/scripts/mini-player.js"_s,
     };
     static const QStringList kTv{
-        u":/scripts/tv/h5vcc.js"_s,
-        u":/scripts/tv/identification.js"_s,
-        u":/scripts/tv/leanback-fixes.js"_s,
-        u":/scripts/tv/input.js"_s,
-        u":/scripts/tv/gamepad.js"_s,
+        u":/scripts/tv/h5vcc.js"_s, u":/scripts/tv/identification.js"_s, u":/scripts/tv/leanback-fixes.js"_s,
+        u":/scripts/tv/input.js"_s, u":/scripts/tv/gamepad.js"_s,
     };
     const QStringList features = kShared + (tvMode ? kTv : kDesktop);
     QStringList resources{u":/qtwebchannel/qwebchannel.js"_s, u":/scripts/bootstrap.js"_s};

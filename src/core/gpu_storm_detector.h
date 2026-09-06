@@ -14,8 +14,8 @@ namespace red::core {
 class GpuStormDetector
 {
 public:
-    static constexpr int kWindowMs = 3000;  ///< rolling window
-    static constexpr int kThreshold = 50;   ///< matching lines within the window → storm
+    static constexpr int kWindowMs = 3000; ///< rolling window
+    static constexpr int kThreshold = 50;  ///< matching lines within the window → storm
 
     /// Returns true the first (and only) time the storm threshold is crossed.
     bool observe(std::int64_t nowMs, const QString& line);

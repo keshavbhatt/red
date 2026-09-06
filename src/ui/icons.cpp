@@ -41,7 +41,8 @@ QPixmap render(const QByteArray& svg, int size, qreal dpr)
 
 QString cacheKey(const QString& name, const QColor& color, int size, qreal dpr)
 {
-    return name + u'|' + color.name(QColor::HexArgb) + u'|' + QString::number(size) + u'|' + QString::number(dpr);
+    return name + u'|' + color.name(QColor::HexArgb) + u'|' + QString::number(size) + u'|' +
+           QString::number(dpr);
 }
 
 } // namespace
@@ -62,7 +63,8 @@ QPixmap pixmap(const QString& name, const QColor& color, int size, qreal deviceP
 QIcon themed(const QString& name, const QColor& color, const QColor& disabledColor)
 {
     QIcon icon;
-    const QColor disabled = disabledColor.isValid() ? disabledColor : QColor(color.red(), color.green(), color.blue(), 90);
+    const QColor disabled =
+        disabledColor.isValid() ? disabledColor : QColor(color.red(), color.green(), color.blue(), 90);
     for (const int size : {16, 20, 24, 32, 48}) {
         for (const qreal dpr : {1.0, 2.0}) {
             icon.addPixmap(pixmap(name, color, size, dpr), QIcon::Normal);

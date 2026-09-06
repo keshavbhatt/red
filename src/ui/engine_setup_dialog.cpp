@@ -16,7 +16,8 @@ using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
-EngineSetupDialog::EngineSetupDialog(services::EngineManager& engine, core::ThemeService& theme, QWidget* parent)
+EngineSetupDialog::EngineSetupDialog(services::EngineManager& engine, core::ThemeService& theme,
+                                     QWidget* parent)
     : QDialog(parent)
     , m_engine(engine)
     , m_theme(theme)
@@ -59,7 +60,8 @@ void EngineSetupDialog::setupUi()
     heading->setProperty("redHeading", true);
     root->addWidget(heading);
     auto* intro = new QLabel(tr("Red downloads with yt-dlp. The engine and its helpers are fetched once from "
-                                "their official releases and kept up to date automatically."), this);
+                                "their official releases and kept up to date automatically."),
+                             this);
     intro->setProperty("redMuted", true);
     intro->setWordWrap(true);
     root->addWidget(intro);
@@ -120,9 +122,11 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     glyph(m_ytdlpGlyph, !s.ytdlpPath.isEmpty(), busy);
     glyph(m_jsGlyph, !s.jsRuntime.isEmpty(), busy);
     glyph(m_ffmpegGlyph, !s.ffmpegPath.isEmpty(), busy);
-    m_ytdlpText->setText(s.ytdlpPath.isEmpty() ? tr("will be downloaded (~40 MB)")
-                                               : (s.systemYtdlp ? tr("system installation") : s.ytdlpVersion));
-    m_jsText->setText(s.jsRuntime.isEmpty() ? tr("QuickJS will be downloaded (~3 MB)") : core::jsRuntimeLabel(s.jsRuntime));
+    m_ytdlpText->setText(s.ytdlpPath.isEmpty()
+                             ? tr("will be downloaded (~40 MB)")
+                             : (s.systemYtdlp ? tr("system installation") : s.ytdlpVersion));
+    m_jsText->setText(s.jsRuntime.isEmpty() ? tr("QuickJS will be downloaded (~3 MB)")
+                                            : core::jsRuntimeLabel(s.jsRuntime));
     m_ffmpegText->setText(s.ffmpegPath.isEmpty() ? tr("will be downloaded (~130 MB)") : s.ffmpegPath);
 
     m_step->setText(busy ? s.stepLabel : (s.isReady() ? tr("Everything is ready.") : QString()));
@@ -141,7 +145,8 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
 
     m_action->setEnabled(!busy);
     if (s.isReady()) {
-        m_action->setText(s.updateAvailable ? tr("Update to %1").arg(s.latestVersion) : tr("Check for updates"));
+        m_action->setText(s.updateAvailable ? tr("Update to %1").arg(s.latestVersion)
+                                            : tr("Check for updates"));
         m_action->setProperty("redPrimary", s.updateAvailable);
     } else {
         m_action->setText(s.state == services::EngineManager::State::Error ? tr("Retry") : tr("Set up"));

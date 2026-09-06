@@ -59,7 +59,8 @@ bool CookieExporter::looksSignedIn() const
 {
     for (const QNetworkCookie& c : m_cookies) {
         const QByteArray name = c.name();
-        if ((name == "SAPISID" || name == "__Secure-3PAPISID" || name == "SID") && c.domain().contains(u"youtube"_s)) {
+        if ((name == "SAPISID" || name == "__Secure-3PAPISID" || name == "SID") &&
+            c.domain().contains(u"youtube"_s)) {
             return true;
         }
     }

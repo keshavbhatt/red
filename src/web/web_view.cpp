@@ -34,7 +34,8 @@ const QUrl kSubscriptionsUrl(u"https://www.youtube.com/feed/subscriptions"_s);
 const QUrl kTvUrl(u"https://www.youtube.com/tv"_s);
 } // namespace
 
-WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QString& appVersion, QWidget* parent)
+WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QString& appVersion,
+                 QWidget* parent)
     : QWebEngineView(parent)
     , m_settings(settings)
     , m_theme(theme)
@@ -59,7 +60,8 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
     connect(&m_settings, &core::Settings::zoomFactorChanged, this, [this](double) { applyZoom(); });
     connect(m_page, &QWebEnginePage::renderProcessTerminated, this, &WebView::handleRenderProcessTerminated);
     connect(m_page, &QWebEnginePage::urlChanged, this, &WebView::handleUrlChanged);
-    connect(m_page, &QWebEnginePage::linkHovered, this, [this](const QString& url) { m_hoveredLink = QUrl(url); });
+    connect(m_page, &QWebEnginePage::linkHovered, this,
+            [this](const QString& url) { m_hoveredLink = QUrl(url); });
     connect(m_page, &QWebEnginePage::loadFinished, this, [this](bool ok) {
         if (ok) {
             if (url().scheme() != u"data"_s) {
@@ -270,7 +272,8 @@ void WebView::wirePopup(QWidget* window)
     m_permissions->attach(*popup->page());
 }
 
-void WebView::handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status, int exitCode)
+void WebView::handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status,
+                                            int exitCode)
 {
     if (status == QWebEnginePage::NormalTerminationStatus) {
         return;
@@ -371,7 +374,7 @@ void WebView::contextMenuEvent(QContextMenuEvent* event)
         const core::YouTubeUrlKind kind = core::classifyYouTubeUrl(downloadTarget).kind;
         const QString label = kind == core::YouTubeUrlKind::Playlist  ? tr("Download playlist…")
                               : kind == core::YouTubeUrlKind::Channel ? tr("Download channel…")
-                                                                       : tr("Download video…");
+                                                                      : tr("Download video…");
         QAction* download = menu->addAction(QIcon::fromTheme(u"download"_s), label);
         QFont bold = download->font();
         bold.setBold(true);

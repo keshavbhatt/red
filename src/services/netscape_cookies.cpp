@@ -14,7 +14,8 @@ bool isYouTubeSessionCookie(const QNetworkCookie& cookie)
     if (domain.startsWith(u'.')) {
         domain.remove(0, 1);
     }
-    for (const auto& suffix : {u"youtube.com"_s, u"google.com"_s, u"googlevideo.com"_s, u"youtube-nocookie.com"_s}) {
+    for (const auto& suffix :
+         {u"youtube.com"_s, u"google.com"_s, u"googlevideo.com"_s, u"youtube-nocookie.com"_s}) {
         if (domain == suffix || domain.endsWith(u'.' + suffix)) {
             return true;
         }
@@ -33,8 +34,8 @@ QString netscapeCookieText(const QList<QNetworkCookie>& cookies)
         // Session cookies get a far-future expiry: yt-dlp drops expiry-0 rows otherwise.
         const qint64 expiry = expires > 0 ? expires : QDateTime::currentSecsSinceEpoch() + 86400 * 30;
         const QString prefix = c.isHttpOnly() ? u"#HttpOnly_"_s : QString();
-        text += prefix + domain + u'\t' + (includeSubdomains ? u"TRUE"_s : u"FALSE"_s) + u'\t' + path + u'\t' +
-                (c.isSecure() ? u"TRUE"_s : u"FALSE"_s) + u'\t' + QString::number(expiry) + u'\t' +
+        text += prefix + domain + u'\t' + (includeSubdomains ? u"TRUE"_s : u"FALSE"_s) + u'\t' + path +
+                u'\t' + (c.isSecure() ? u"TRUE"_s : u"FALSE"_s) + u'\t' + QString::number(expiry) + u'\t' +
                 QString::fromUtf8(c.name()) + u'\t' + QString::fromUtf8(c.value()) + u'\n';
     }
     return text;

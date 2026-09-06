@@ -38,7 +38,8 @@ public:
         if (!m_iface.isValid()) {
             return;
         }
-        const QDBusReply<uint> reply = m_iface.call(u"Inhibit"_s, QCoreApplication::applicationName(), reason);
+        const QDBusReply<uint> reply =
+            m_iface.call(u"Inhibit"_s, QCoreApplication::applicationName(), reason);
         if (reply.isValid()) {
             m_cookie = reply.value();
             qCDebug(lcPlatform) << "screen inhibit acquired" << m_cookie;

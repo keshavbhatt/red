@@ -13,14 +13,14 @@ namespace red::app {
 
 struct CliOptions
 {
-    QString profile;                ///< --profile <name>; empty = default
-    bool tvMode = false;            ///< --tv
-    std::optional<QString> logFile; ///< --log-file <path>; nullopt = default location
-    bool noLogFile = false;         ///< --no-log-file
+    QString profile;                 ///< --profile <name>; empty = default
+    bool tvMode = false;             ///< --tv
+    std::optional<QString> logFile;  ///< --log-file <path>; nullopt = default location
+    bool noLogFile = false;          ///< --no-log-file
     std::optional<QString> download; ///< --download <url>
-    bool showSettings = false;      ///< --settings
-    bool quit = false;              ///< --quit (tell the running instance to exit)
-    QStringList urls;               ///< positional YouTube links
+    bool showSettings = false;       ///< --settings
+    bool quit = false;               ///< --quit (tell the running instance to exit)
+    QStringList urls;                ///< positional YouTube links
 
     /// True when the invocation only carries commands for a running instance.
     [[nodiscard]] bool hasCommands() const;

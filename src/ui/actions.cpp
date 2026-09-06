@@ -34,7 +34,8 @@ Actions::Actions(QWidget* owner)
     downloads = make(owner, tr("Downloads"), {QKeySequence(Qt::CTRL | Qt::Key_J)});
     miniPlayer = make(owner, tr("Mini player"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M)});
     tvMode = make(owner, tr("TV mode"), {QKeySequence(Qt::CTRL | Qt::Key_T)});
-    playPause = make(owner, tr("Play / Pause"), {QKeySequence(Qt::Key_MediaTogglePlayPause), QKeySequence(Qt::Key_MediaPlay)});
+    playPause = make(owner, tr("Play / Pause"),
+                     {QKeySequence(Qt::Key_MediaTogglePlayPause), QKeySequence(Qt::Key_MediaPlay)});
     next = make(owner, tr("Next video"), {QKeySequence(Qt::Key_MediaNext)});
     previous = make(owner, tr("Previous video"), {QKeySequence(Qt::Key_MediaPrevious)});
     zoomIn = make(owner, tr("Zoom in"), {QKeySequence::ZoomIn, QKeySequence(Qt::CTRL | Qt::Key_Equal)});
@@ -59,9 +60,9 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,     back,   forward,   reload,     download, downloadUrl, downloads, miniPlayer, tvMode,
-            playPause, next,  previous,  zoomIn,     zoomOut,  zoomReset,   fullScreen, showHide,  settings,
-            shortcuts, about, quit};
+    return {home,       back,       forward,   reload,   download,  downloadUrl, downloads,
+            miniPlayer, tvMode,     playPause, next,     previous,  zoomIn,      zoomOut,
+            zoomReset,  fullScreen, showHide,  settings, shortcuts, about,       quit};
 }
 
 } // namespace red::ui

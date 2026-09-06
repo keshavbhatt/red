@@ -18,7 +18,8 @@ class NotificationService : public QObject
 
 public:
     /// `primary` may be null (then `fallback` is used directly); `fallback` may be null.
-    NotificationService(Settings& settings, INotifier* primary, INotifier* fallback, QObject* parent = nullptr);
+    NotificationService(Settings& settings, INotifier* primary, INotifier* fallback,
+                        QObject* parent = nullptr);
     ~NotificationService() override = default;
 
     /// Returns the id, or 0 when no backend is available.

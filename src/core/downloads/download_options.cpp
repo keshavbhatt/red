@@ -254,8 +254,8 @@ QString previewFileName(const DownloadOptions& options, const QString& title, co
     case FilenamePattern::TitleId:
         return safeTitle + u" ["_s + id + u"]."_s + ext;
     case FilenamePattern::ChannelTitle:
-        return sanitizeForTemplate(uploader.isEmpty() ? u"Unknown"_s : uploader) + u" - "_s + safeTitle + u'.' +
-               ext;
+        return sanitizeForTemplate(uploader.isEmpty() ? u"Unknown"_s : uploader) + u" - "_s + safeTitle +
+               u'.' + ext;
     }
     return safeTitle + u'.' + ext;
 }
@@ -263,8 +263,8 @@ QString previewFileName(const DownloadOptions& options, const QString& title, co
 QStringList baseArguments(const EnginePaths& paths)
 {
     QStringList args{
-        u"--no-update"_s,    u"--no-colors"_s, u"--ignore-config"_s,
-        u"--no-cache-dir"_s, u"--no-mtime"_s,  u"--encoding"_s, u"utf-8"_s,
+        u"--no-update"_s, u"--no-colors"_s, u"--ignore-config"_s, u"--no-cache-dir"_s,
+        u"--no-mtime"_s,  u"--encoding"_s,  u"utf-8"_s,
     };
     if (!paths.ffmpeg.isEmpty()) {
         args << u"--ffmpeg-location"_s << paths.ffmpeg;
@@ -297,12 +297,14 @@ QStringList downloadArguments(const DownloadOptions& options, const EnginePaths&
     args << u"--newline"_s << u"--no-quiet"_s << u"--progress"_s << u"--continue"_s << u"--no-overwrites"_s;
     // Machine-readable progress: one JSON object per line behind a fixed prefix
     // (ADR-005). `|` gives a default for empty fields so the JSON stays valid.
-    args << u"--progress-template"_s
-         << u"download:"_s + kProgressPrefix +
-                u"{\"status\":%(progress.status|)j,\"downloaded\":%(progress.downloaded_bytes|0)j,"
-                u"\"total\":%(progress.total_bytes|0)j,\"estimate\":%(progress.total_bytes_estimate|0)j,"
-                u"\"speed\":%(progress.speed|0)j,\"eta\":%(progress.eta|0)j,\"filename\":%(progress.filename|)j,"
-                u"\"index\":%(info.playlist_index|0)j,\"id\":%(info.id|)j,\"count\":%(info.playlist_count|0)j}"_s;
+    args
+        << u"--progress-template"_s
+        << u"download:"_s + kProgressPrefix +
+               u"{\"status\":%(progress.status|)j,\"downloaded\":%(progress.downloaded_bytes|0)j,"
+               u"\"total\":%(progress.total_bytes|0)j,\"estimate\":%(progress.total_bytes_estimate|0)j,"
+               u"\"speed\":%(progress.speed|0)j,\"eta\":%(progress.eta|0)j,\"filename\":%(progress.filename|)"
+               u"j,"
+               u"\"index\":%(info.playlist_index|0)j,\"id\":%(info.id|)j,\"count\":%(info.playlist_count|0)j}"_s;
     args << u"--progress-template"_s
          << u"postprocess:"_s + kPostprocessPrefix +
                 u"{\"status\":%(progress.status|)j,\"postprocessor\":%(progress.postprocessor|)j,"

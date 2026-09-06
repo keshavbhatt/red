@@ -21,8 +21,8 @@
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QTemporaryFile>
-#include <QtEnvironmentVariables>
 #include <QTimer>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 
@@ -50,7 +50,8 @@ DownloadsHub::DownloadsHub(core::Settings& settings, core::ThemeService& theme,
 
     m_queue->load(core::DownloadQueue::defaultFilePath());
     m_queue->setMaxConcurrent(settings.concurrentDownloads());
-    connect(&settings, &core::Settings::concurrentDownloadsChanged, m_queue, &core::DownloadQueue::setMaxConcurrent);
+    connect(&settings, &core::Settings::concurrentDownloadsChanged, m_queue,
+            &core::DownloadQueue::setMaxConcurrent);
 
     auto cookiesProvider = [this]() -> std::unique_ptr<QTemporaryFile> {
         if (!m_settings.useSessionCookies()) {

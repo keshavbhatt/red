@@ -22,7 +22,8 @@ MprisDBusService::MprisDBusService(const QString& identity, const QString& deskt
     : MprisService(parent)
     , m_identity(identity)
     , m_desktopEntry(desktopEntry)
-    , m_serviceName(u"org.mpris.MediaPlayer2."_s + QCoreApplication::applicationName().toLower().replace(u'-', u'_'))
+    , m_serviceName(u"org.mpris.MediaPlayer2."_s +
+                    QCoreApplication::applicationName().toLower().replace(u'-', u'_'))
 {
     m_clock.start();
     new MprisRootAdaptor(this);
@@ -115,11 +116,14 @@ qlonglong MprisDBusService::positionUs() const
 void MprisDBusService::setMediaState(const core::MediaState& state)
 {
     const bool trackChanged = state.videoId != m_state.videoId || state.title != m_state.title ||
-                              state.artwork != m_state.artwork || !qFuzzyCompare(state.duration, m_state.duration);
+                              state.artwork != m_state.artwork ||
+                              !qFuzzyCompare(state.duration, m_state.duration);
     const bool statusChanged = state.playback != m_state.playback;
     const bool capsChanged =
         state.canGoNext != m_state.canGoNext || state.canGoPrevious != m_state.canGoPrevious;
-    const double expected = m_state.position + (m_state.isPlaying() ? static_cast<double>(state.reportedAtMs - m_state.reportedAtMs) / 1000.0 : 0.0);
+    const double expected =
+        m_state.position +
+        (m_state.isPlaying() ? static_cast<double>(state.reportedAtMs - m_state.reportedAtMs) / 1000.0 : 0.0);
     const bool seeked = std::abs(state.position - expected) > 2.0;
     m_state = state;
     if (!m_registered) {
@@ -151,8 +155,8 @@ void MprisDBusService::setMediaState(const core::MediaState& state)
 
 void MprisDBusService::emitPropertiesChanged(const QVariantMap& changed)
 {
-    QDBusMessage signal = QDBusMessage::createSignal(kObjectPath, u"org.freedesktop.DBus.Properties"_s,
-                                                     u"PropertiesChanged"_s);
+    QDBusMessage signal =
+        QDBusMessage::createSignal(kObjectPath, u"org.freedesktop.DBus.Properties"_s, u"PropertiesChanged"_s);
     signal << kPlayerInterface << changed << QStringList();
     QDBusConnection::sessionBus().send(signal);
 }

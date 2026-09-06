@@ -11,20 +11,20 @@ namespace red::core {
 
 struct MediaFormat
 {
-    QString id;         ///< yt-dlp format_id ("137", "251", "18", …)
-    QString ext;        ///< container of this stream
-    QString vcodec;     ///< "none" for audio-only
-    QString acodec;     ///< "none" for video-only
+    QString id;     ///< yt-dlp format_id ("137", "251", "18", …)
+    QString ext;    ///< container of this stream
+    QString vcodec; ///< "none" for audio-only
+    QString acodec; ///< "none" for video-only
     int width = 0;
     int height = 0;
     double fps = 0;
-    double tbr = 0;     ///< total bitrate kbps
-    double abr = 0;     ///< audio bitrate kbps
+    double tbr = 0;       ///< total bitrate kbps
+    double abr = 0;       ///< audio bitrate kbps
     qint64 filesize = -1; ///< exact or approximate bytes, -1 unknown
-    QString note;       ///< "1080p60", "medium", …
+    QString note;         ///< "1080p60", "medium", …
     QString dynamicRange; ///< "SDR", "HDR10", …
     QString language;
-    QString protocol;   ///< https, m3u8_native, …
+    QString protocol; ///< https, m3u8_native, …
 
     [[nodiscard]] bool hasVideo() const { return !vcodec.isEmpty() && vcodec != QLatin1StringView("none"); }
     [[nodiscard]] bool hasAudio() const { return !acodec.isEmpty() && acodec != QLatin1StringView("none"); }
@@ -46,7 +46,7 @@ struct SubtitleTrack
 struct MediaEntry
 {
     QString id;
-    QString url;   ///< webpage url (or the "url" of a flat entry)
+    QString url; ///< webpage url (or the "url" of a flat entry)
     QString title;
     QString uploader;
     QString thumbnail;

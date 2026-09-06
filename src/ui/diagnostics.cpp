@@ -14,15 +14,15 @@ using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
-QString buildDiagnostics(const core::Settings& settings, const QString& userAgent, const QString& engineSummary,
-                         int logLines)
+QString buildDiagnostics(const core::Settings& settings, const QString& userAgent,
+                         const QString& engineSummary, int logLines)
 {
     QString text;
     QTextStream out(&text);
     out << u"### Red diagnostics\n\n"_s;
     out << u"- Red: "_s << QCoreApplication::applicationVersion() << u'\n';
-    out << u"- Qt: "_s << QString::fromLatin1(qVersion()) << u" (built against "_s << QString::fromLatin1(QT_VERSION_STR)
-        << u")\n"_s;
+    out << u"- Qt: "_s << QString::fromLatin1(qVersion()) << u" (built against "_s
+        << QString::fromLatin1(QT_VERSION_STR) << u")\n"_s;
     out << u"- Chromium: "_s << qWebEngineChromiumVersion() << u" (security patches "_s
         << qWebEngineChromiumSecurityPatchVersion() << u")\n"_s;
     out << u"- Host: "_s << platform::describeHost() << u'\n';

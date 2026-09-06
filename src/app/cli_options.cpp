@@ -22,11 +22,11 @@ CliParseResult parseCliOptions(const QStringList& arguments)
     const QCommandLineOption profile({u"p"_s, u"profile"_s},
                                      u"Use a separate profile (own session and settings)."_s, u"name"_s);
     const QCommandLineOption tv({u"t"_s, u"tv"_s}, u"Start in TV mode (YouTube's living-room interface)."_s);
-    const QCommandLineOption logFile(u"log-file"_s, u"Write the log to <path> instead of the default location."_s,
-                                     u"path"_s);
+    const QCommandLineOption logFile(
+        u"log-file"_s, u"Write the log to <path> instead of the default location."_s, u"path"_s);
     const QCommandLineOption noLogFile(u"no-log-file"_s, u"Do not write a log file."_s);
-    const QCommandLineOption download({u"d"_s, u"download"_s}, u"Open the download dialog for a YouTube link."_s,
-                                      u"url"_s);
+    const QCommandLineOption download({u"d"_s, u"download"_s},
+                                      u"Open the download dialog for a YouTube link."_s, u"url"_s);
     const QCommandLineOption settings({u"s"_s, u"settings"_s}, u"Open the settings dialog."_s);
     const QCommandLineOption quit({u"q"_s, u"quit"_s}, u"Quit the running instance."_s);
     parser.addOptions({profile, tv, logFile, noLogFile, download, settings, quit});

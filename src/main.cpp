@@ -22,6 +22,7 @@ using namespace Qt::StringLiterals;
 
 #ifdef Q_OS_UNIX
 #include <QSocketNotifier>
+
 #include <csignal>
 #include <unistd.h>
 #endif
@@ -135,11 +136,15 @@ int main(int argc, char* argv[])
 
     red::ui::MainWindow window(app.settings(), app.themeService(),
                                QString::fromLatin1(red::app::version::kVersion));
-    QObject::connect(&app, &red::app::Application::raiseRequested, &window, &red::ui::MainWindow::showAndRaise);
+    QObject::connect(&app, &red::app::Application::raiseRequested, &window,
+                     &red::ui::MainWindow::showAndRaise);
     QObject::connect(&app, &red::app::Application::openRequested, &window, &red::ui::MainWindow::openUrl);
-    QObject::connect(&app, &red::app::Application::downloadRequested, &window, &red::ui::MainWindow::downloadUrl);
-    QObject::connect(&app, &red::app::Application::tvModeRequested, &window, [&window] { window.setTvMode(true); });
-    QObject::connect(&app, &red::app::Application::settingsRequested, &window, &red::ui::MainWindow::showSettings);
+    QObject::connect(&app, &red::app::Application::downloadRequested, &window,
+                     &red::ui::MainWindow::downloadUrl);
+    QObject::connect(&app, &red::app::Application::tvModeRequested, &window,
+                     [&window] { window.setTvMode(true); });
+    QObject::connect(&app, &red::app::Application::settingsRequested, &window,
+                     &red::ui::MainWindow::showSettings);
     QObject::connect(&app, &red::app::Application::quitRequested, &window, &red::ui::MainWindow::quit);
 
     const red::app::CliOptions& cli = app.cliOptions();
@@ -164,7 +169,8 @@ int main(int argc, char* argv[])
                 if (top != &window && top->isVisible() && top->isWindow() && !top->windowTitle().isEmpty()) {
                     const QString dialogPath = path.chopped(4) + u"-dialog%1.png"_s.arg(++extra);
                     top->grab().save(dialogPath);
-                    qInfo("debug grab saved to %s (%s)", qPrintable(dialogPath), qPrintable(top->windowTitle()));
+                    qInfo("debug grab saved to %s (%s)", qPrintable(dialogPath),
+                          qPrintable(top->windowTitle()));
                 }
             }
             if (!spec.first().contains(u"%1"_s)) {
@@ -203,7 +209,8 @@ int main(int argc, char* argv[])
     // Commands given on our own command line (we are the primary instance).
     for (const QJsonObject& command : red::app::commandsFor(cli)) {
         const QString name = command.value(QLatin1StringView(red::app::cmd::kKey)).toString();
-        if (name != QLatin1StringView(red::app::cmd::kRaise) && name != QLatin1StringView(red::app::cmd::kTv)) {
+        if (name != QLatin1StringView(red::app::cmd::kRaise) &&
+            name != QLatin1StringView(red::app::cmd::kTv)) {
             app.dispatchCommand(command);
         }
     }

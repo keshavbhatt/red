@@ -48,7 +48,8 @@ void RequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo& info)
         genericUa = m_genericUa;
     }
     if (!youtubeUa.isEmpty()) {
-        info.setHttpHeader("User-Agent", host == QLatin1StringView("www.youtube.com") ? youtubeUa : genericUa);
+        info.setHttpHeader("User-Agent",
+                           host == QLatin1StringView("www.youtube.com") ? youtubeUa : genericUa);
     }
     if (list->isEmpty() || url.scheme() == u"data"_s || url.scheme() == u"blob"_s) {
         return;

@@ -113,7 +113,8 @@ void MainWindow::setupUi()
 
     m_notifier = platform::createPlatformNotifier(this).release();
     m_notifications = new core::NotificationService(m_settings, m_notifier, nullptr, this);
-    m_downloads = new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(), this, this);
+    m_downloads =
+        new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(), this, this);
     m_tray = new TrayController(m_settings, *m_actions, this);
     m_media = new MediaController(m_settings, *m_webView, QApplication::desktopFileName(), this);
     m_hint = new web::FullScreenHint(this);
@@ -159,9 +160,11 @@ void MainWindow::setupUi()
         setFullScreenMode(false);
     });
 
-    m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F) : QColor(0xFF, 0xFF, 0xFF));
+    m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F)
+                                                           : QColor(0xFF, 0xFF, 0xFF));
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
-        m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F) : QColor(0xFF, 0xFF, 0xFF));
+        m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F)
+                                                               : QColor(0xFF, 0xFF, 0xFF));
     });
 }
 
@@ -210,32 +213,30 @@ void MainWindow::connectActions()
     connect(m_media, &MediaController::raiseRequested, this, &MainWindow::showAndRaise);
     connect(m_downloads, &DownloadsHub::activeCountChanged, m_rail, &SideRail::setActiveDownloads);
     connect(m_downloads, &DownloadsHub::showPanelRequested, this, [this] {
-        if (!m_panelVisible && !isFullScreen() && !m_miniPlayer && m_webView->mode() == core::AppMode::Desktop) {
+        if (!m_panelVisible && !isFullScreen() && !m_miniPlayer &&
+            m_webView->mode() == core::AppMode::Desktop) {
             m_actions->downloads->setChecked(true);
         }
     });
     connect(m_downloads->panel(), &DownloadsPanel::closeRequested, this,
             [this] { m_actions->downloads->setChecked(false); });
     connect(&m_settings, &core::Settings::showRailChanged, this, [this](bool) { applyChrome(); });
-    connect(&m_settings, &core::Settings::closeActionChanged, this, [this](core::CloseAction) {
-        QApplication::setQuitOnLastWindowClosed(false);
-    });
+    connect(&m_settings, &core::Settings::closeActionChanged, this,
+            [this](core::CloseAction) { QApplication::setQuitOnLastWindowClosed(false); });
     m_tray->setMediaState({});
 }
 
 void MainWindow::connectWebView()
 {
-    connect(m_webView, &web::WebView::fullScreenRequested, this, [this](bool on) {
-        m_actions->fullScreen->setChecked(on);
-    });
+    connect(m_webView, &web::WebView::fullScreenRequested, this,
+            [this](bool on) { m_actions->fullScreen->setChecked(on); });
     connect(m_webView, &web::WebView::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_webView, &web::WebView::permissionPromptRequested, this, &MainWindow::handlePermissionPrompt);
     connect(m_webView, &web::WebView::downloadRequested, m_downloads, &DownloadsHub::requestDownload);
     connect(m_webView, &web::WebView::downloadableChanged, m_rail, &SideRail::setDownloadable);
     connect(m_webView, &web::WebView::tvSignal, this, &MainWindow::handleTvSignal);
-    connect(m_webView->page(), &QWebEnginePage::loadingChanged, this, [this](const QWebEngineLoadingInfo&) {
-        m_rail->setLoading(m_webView->page()->isLoading());
-    });
+    connect(m_webView->page(), &QWebEnginePage::loadingChanged, this,
+            [this](const QWebEngineLoadingInfo&) { m_rail->setLoading(m_webView->page()->isLoading()); });
     connect(m_webView->page(), &QWebEnginePage::titleChanged, this, [this](const QString& title) {
         const QString clean = QString(title).remove(u" - YouTube"_s).remove(u" - YouTube TV"_s).trimmed();
         setWindowTitle(clean.isEmpty() || clean == u"YouTube"_s ? u"Red"_s : clean + u" — Red"_s);
@@ -246,7 +247,8 @@ void MainWindow::connectWebView()
     });
     // SponsorBlock: the page asks, the client answers through the bridge (ADR-007).
     auto* sponsor = new services::SponsorBlockClient(m_settings, this);
-    connect(m_webView, &web::WebView::sponsorSegmentsRequested, sponsor, &services::SponsorBlockClient::request);
+    connect(m_webView, &web::WebView::sponsorSegmentsRequested, sponsor,
+            &services::SponsorBlockClient::request);
     connect(sponsor, &services::SponsorBlockClient::segmentsReady, &m_webView->profile().bridge(),
             &web::Bridge::sponsorSegments);
 }
@@ -300,7 +302,8 @@ void MainWindow::saveWindowState()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray && m_tray->isAvailable()) {
+    if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray &&
+        m_tray->isAvailable()) {
         event->ignore();
         hide();
         return;
@@ -537,9 +540,11 @@ void MainWindow::showSettings()
     m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(m_settingsDialog, &SettingsDialog::clearCacheRequested, this, &MainWindow::clearCache);
     connect(m_settingsDialog, &SettingsDialog::clearSessionRequested, this, &MainWindow::confirmClearSession);
-    connect(m_settingsDialog, &SettingsDialog::openLogFolderRequested, m_actions->openLogFolder, &QAction::trigger);
+    connect(m_settingsDialog, &SettingsDialog::openLogFolderRequested, m_actions->openLogFolder,
+            &QAction::trigger);
     connect(m_settingsDialog, &SettingsDialog::copyDiagnosticsRequested, this, &MainWindow::copyDiagnostics);
-    connect(m_settingsDialog, &SettingsDialog::engineDialogRequested, m_downloads, &DownloadsHub::showEngineDialog);
+    connect(m_settingsDialog, &SettingsDialog::engineDialogRequested, m_downloads,
+            &DownloadsHub::showEngineDialog);
     m_settingsDialog->show();
 }
 
@@ -578,7 +583,8 @@ void MainWindow::confirmClearSession()
     if (choice != QMessageBox::Yes) {
         return;
     }
-    const QString marker = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/clear-session"_s;
+    const QString marker =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/clear-session"_s;
     QFile file(marker);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::critical(this, tr("Cannot clear session"), tr("Could not write %1.").arg(marker));
@@ -595,10 +601,11 @@ void MainWindow::maybeShowGpuFallbackNotice()
         return;
     }
     m_settings.setGpuFallbackNotice(false);
-    QMessageBox::information(this, tr("Hardware acceleration turned off"),
-                             tr("Red hit a graphics-driver problem and switched to software rendering so it stays "
-                                "stable.\n\nEverything still works; you can turn hardware acceleration back on in "
-                                "Settings → Advanced."));
+    QMessageBox::information(
+        this, tr("Hardware acceleration turned off"),
+        tr("Red hit a graphics-driver problem and switched to software rendering so it stays "
+           "stable.\n\nEverything still works; you can turn hardware acceleration back on in "
+           "Settings → Advanced."));
 }
 
 void MainWindow::handleRenderProcessGaveUp()
@@ -618,7 +625,8 @@ void MainWindow::handleRenderProcessGaveUp()
 
 void MainWindow::handlePermissionPrompt(const QWebEnginePermission& permission)
 {
-    askPermission(this, permission, [this, permission](bool allow) { m_webView->permissions().answer(permission, allow); });
+    askPermission(this, permission,
+                  [this, permission](bool allow) { m_webView->permissions().answer(permission, allow); });
 }
 
 } // namespace red::ui
