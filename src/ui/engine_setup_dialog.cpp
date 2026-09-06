@@ -62,6 +62,35 @@ void EngineSetupDialog::setupUi()
     auto* intro = new QLabel(tr("Red downloads with yt-dlp. It is fetched once from its official releases and kept "
                                 "up to date automatically; ffmpeg comes from your system."),
                              this);
+    intro->setProperty("redMuted", true);
+    intro->setWordWrap(true);
+    root->addWidget(intro);
+
+    auto* card = new QFrame(this);
+    card->setProperty("redCard", true);
+    auto* cardLayout = new QVBoxLayout(card);
+    cardLayout->setContentsMargins(16, 14, 16, 14);
+    cardLayout->setSpacing(10);
+    cardLayout->addWidget(makeRow(&m_ytdlpGlyph, &m_ytdlpText, u"yt-dlp"_s));
+    cardLayout->addWidget(makeRow(&m_jsGlyph, &m_jsText, tr("JavaScript runtime")));
+    cardLayout->addWidget(makeRow(&m_ffmpegGlyph, &m_ffmpegText, u"ffmpeg"_s));
+    root->addWidget(card);
+
+    m_step = new QLabel(this);
+    m_step->setProperty("redMuted", true);
+    root->addWidget(m_step);
+    m_progress = new QProgressBar(this);
+    m_progress->setTextVisible(false);
+    m_progress->setRange(0, 1000);
+    root->addWidget(m_progress);
+    m_error = new QLabel(this);
+    m_error->setWordWrap(true);
+    m_error->setVisible(false);
+    root->addWidget(m_error);
+
+    auto* buttons = new QHBoxLayout;
+    buttons->addStretch(1);
+    m_close = new QPushButton(tr("Close"), this);
     connect(m_close, &QPushButton::clicked, this, &QDialog::reject);
     buttons->addWidget(m_close);
     m_action = new QPushButton(tr("Set up"), this);
