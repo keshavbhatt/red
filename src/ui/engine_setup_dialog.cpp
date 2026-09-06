@@ -59,9 +59,10 @@ void EngineSetupDialog::setupUi()
     auto* heading = new QLabel(tr("Setting up downloads"), this);
     heading->setProperty("redHeading", true);
     root->addWidget(heading);
-    auto* intro = new QLabel(tr("Red downloads with yt-dlp. It is fetched once from its official releases and kept "
-                                "up to date automatically; ffmpeg comes from your system."),
-                             this);
+    auto* intro =
+        new QLabel(tr("Red downloads with yt-dlp. It is fetched once from its official releases and kept "
+                      "up to date automatically; ffmpeg comes from your system."),
+                   this);
     intro->setProperty("redMuted", true);
     intro->setWordWrap(true);
     root->addWidget(intro);
