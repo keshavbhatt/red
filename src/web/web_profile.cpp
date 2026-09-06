@@ -1,6 +1,7 @@
 #include "web/web_profile.h"
 
 #include "core/blocking/block_list.h"
+#include "core/theme/youtube_pref.h"
 #include "web/bridge.h"
 #include "web/cookie_exporter.h"
 #include "web/logging.h"
@@ -8,8 +9,11 @@
 #include "web/script_bundle.h"
 #include "web/user_agent.h"
 
+#include <QDateTime>
 #include <QDir>
+#include <QNetworkCookie>
 #include <QStandardPaths>
+#include <QWebEngineCookieStore>
 #include <QWebEngineSettings>
 
 using namespace Qt::StringLiterals;
@@ -80,7 +84,19 @@ WebProfile::WebProfile(core::Settings& settings, const QString& appVersion, QObj
     for (auto signal : {&core::Settings::sponsorBlockChanged, &core::Settings::tvConfigChanged}) {
         connect(&m_settings, signal, this, [this] { pushConfig(); });
     }
-    connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { pushConfig(); });
+    connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) {
+        applyThemeCookie();
+        pushConfig();
+    });
+    // YouTube keeps its theme in the PREF cookie; make it agree with ours as
+    // soon as the store has loaded it (and whenever YouTube rewrites it). Not
+    // at construction: the store is still empty then, and a bare PREF would
+    // wipe YouTube's other flags (autoplay, playback quality…).
+    connect(m_cookies.get(), &CookieExporter::cookieChanged, this, [this](const QNetworkCookie& c) {
+        if (c.name() == "PREF" && c.domain().endsWith(u"youtube.com"_s)) {
+            applyThemeCookie();
+        }
+    });
     connect(&m_settings, &core::Settings::hideShortsChanged, this, [this](bool) { pushConfig(); });
     connect(&m_settings, &core::Settings::codecPreferenceChanged, this,
             [this](core::CodecPreference) { pushConfig(); });
@@ -192,6 +208,25 @@ void WebProfile::pushConfig()
 {
     installBootstrap();
     Q_EMIT m_bridge->configChanged(scriptConfig());
+}
+
+void WebProfile::applyThemeCookie()
+{
+    const QString current = m_cookies->cookieValue(u"youtube.com"_s, "PREF");
+    const QString wanted = core::youTubePrefForTheme(current, m_settings.theme());
+    if (wanted == current || (wanted.isEmpty() && current.isEmpty())) {
+        return;
+    }
+    if (wanted.isEmpty()) {
+        return; // nothing but our bits would remain; YouTube regenerates the rest itself
+    }
+    QNetworkCookie cookie("PREF", wanted.toUtf8());
+    cookie.setDomain(u".youtube.com"_s);
+    cookie.setPath(u"/"_s);
+    cookie.setSecure(true);
+    cookie.setExpirationDate(QDateTime::currentDateTimeUtc().addYears(1));
+    cookieStore()->setCookie(cookie, QUrl(u"https://www.youtube.com/"_s));
+    qCDebug(lcWeb) << "youtube PREF theme bits set:" << wanted;
 }
 
 void WebProfile::setMode(core::AppMode mode)

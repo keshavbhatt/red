@@ -25,12 +25,16 @@ public:
     ~CookieExporter() override = default;
 
     [[nodiscard]] QList<QNetworkCookie> sessionCookies() const;
+    /// The current value of a cookie by name for a domain suffix, or empty.
+    [[nodiscard]] QString cookieValue(const QString& domainSuffix, const QByteArray& name) const;
     [[nodiscard]] bool looksSignedIn() const; ///< a SAPISID/SID cookie for youtube.com exists
     /// A fresh 0600 temp file, or nullptr when there is nothing to export.
     [[nodiscard]] std::unique_ptr<QTemporaryFile> writeTempFile() const;
 
 Q_SIGNALS:
     void signedInChanged(bool signedIn);
+    /// A YouTube/Google cookie was added or changed.
+    void cookieChanged(const QNetworkCookie& cookie);
 
 private:
     static QString keyOf(const QNetworkCookie& cookie);

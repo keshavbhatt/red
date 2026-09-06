@@ -29,6 +29,7 @@ void CookieExporter::handleAdded(const QNetworkCookie& cookie)
         return;
     }
     m_cookies.insert(keyOf(cookie), cookie);
+    Q_EMIT cookieChanged(cookie);
     const bool signedIn = looksSignedIn();
     if (signedIn != m_signedIn) {
         m_signedIn = signedIn;
@@ -48,6 +49,16 @@ void CookieExporter::handleRemoved(const QNetworkCookie& cookie)
         qCInfo(lcWeb) << "youtube session:" << (signedIn ? "signed in" : "signed out");
         Q_EMIT signedInChanged(signedIn);
     }
+}
+
+QString CookieExporter::cookieValue(const QString& domainSuffix, const QByteArray& name) const
+{
+    for (const QNetworkCookie& c : m_cookies) {
+        if (c.name() == name && c.domain().endsWith(domainSuffix)) {
+            return QString::fromUtf8(c.value());
+        }
+    }
+    return {};
 }
 
 QList<QNetworkCookie> CookieExporter::sessionCookies() const

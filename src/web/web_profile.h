@@ -52,6 +52,7 @@ private:
     void configureBlocking();
     void installBootstrap();
     void pushConfig();
+    void applyThemeCookie();
 
     core::Settings& m_settings;
     QString m_appVersion;

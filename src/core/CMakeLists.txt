@@ -45,6 +45,8 @@ qt_add_library(red_core STATIC
     storage_policy.h
     theme/theme_service.cpp
     theme/theme_service.h
+    theme/youtube_pref.cpp
+    theme/youtube_pref.h
     youtube_url.cpp
     youtube_url.h
     zoom_policy.cpp
