@@ -45,6 +45,8 @@ public:
 
     /// The job to enqueue after accept().
     [[nodiscard]] core::DownloadJob job() const;
+    /// Switches the Video / Audio / Advanced segment.
+    void selectKind(core::DownloadOptions::Kind kind);
 
 private:
     void setupUi();

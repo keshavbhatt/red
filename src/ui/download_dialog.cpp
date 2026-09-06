@@ -710,6 +710,13 @@ void DownloadDialog::chooseFolder()
     m_settings.setDownloadDirectory(dir);
 }
 
+void DownloadDialog::selectKind(core::DownloadOptions::Kind kind)
+{
+    m_tabs->setCurrentIndex(kind == core::DownloadOptions::Kind::Audio    ? 1
+                            : kind == core::DownloadOptions::Kind::Custom ? 2
+                                                                          : 0);
+}
+
 // ---- result ----------------------------------------------------------------
 
 QString DownloadDialog::playlistItemsSpec() const

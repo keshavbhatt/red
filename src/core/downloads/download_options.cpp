@@ -233,10 +233,10 @@ QString expectedExtension(const DownloadOptions& options)
     switch (options.kind) {
     case DownloadOptions::Kind::Audio: {
         const QString ext = audioFormatExtension(options.audioFormat);
-        return ext.isEmpty() ? u"m4a"_s : ext;
+        return ext.isEmpty() ? u"opus"_s : ext; // YouTube's best audio stream is Opus
     }
     case DownloadOptions::Kind::Custom:
-        return options.customVideoFormat.isEmpty() ? u"m4a"_s : containerExtension(options.container);
+        return options.customVideoFormat.isEmpty() ? u"opus"_s : containerExtension(options.container);
     case DownloadOptions::Kind::Video:
         return containerExtension(options.container);
     }

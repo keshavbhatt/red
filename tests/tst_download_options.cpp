@@ -75,7 +75,7 @@ private Q_SLOTS:
         c.customVideoFormat.clear();
         c.customAudioFormat = u"140"_s;
         QCOMPARE(formatSelector(c), u"140"_s);
-        QCOMPARE(expectedExtension(c), u"m4a"_s);
+        QCOMPARE(expectedExtension(c), u"opus"_s);
     }
 
     void playlistSubtitlesSponsorsAndLimits()

@@ -173,7 +173,9 @@ void DownloadsHub::openDialog(const QUrl& url)
     // Developer aid (headless verification): accept the dialog with its
     // defaults as soon as the probe has filled it in.
     if (qEnvironmentVariableIsSet("RED_DEBUG_AUTODOWNLOAD")) {
-        connect(m_probe, &services::MediaProbe::finished, dialog, [dialog](quint64, const core::MediaInfo&) {
+        const QString kind = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
+        connect(m_probe, &services::MediaProbe::finished, dialog, [dialog, kind](quint64, const core::MediaInfo&) {
+            dialog->selectKind(kind == u"audio"_s ? core::DownloadOptions::Kind::Audio : core::DownloadOptions::Kind::Video);
             QTimer::singleShot(1500, dialog, &QDialog::accept);
         });
     }
