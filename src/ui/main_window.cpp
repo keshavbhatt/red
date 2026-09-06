@@ -141,6 +141,7 @@ void MainWindow::setupUi()
 
     auto* overflow = new QMenu(this);
     overflow->addAction(m_actions->downloadUrl);
+    overflow->addAction(m_actions->copyLink);
     overflow->addAction(m_actions->fullScreen);
     overflow->addSeparator();
     overflow->addAction(m_actions->zoomIn);
@@ -194,6 +195,14 @@ void MainWindow::connectActions()
         }
     });
     connect(a.downloadUrl, &QAction::triggered, m_downloads, &DownloadsHub::promptForUrl);
+    connect(a.copyLink, &QAction::triggered, this, [this] {
+        // The canonical share link of what is on screen (TV mode: the video being watched).
+        const QUrl target =
+            m_webView->downloadableUrl().isEmpty() ? m_webView->url() : m_webView->downloadableUrl();
+        const std::optional<QUrl> canonical = core::canonicalVideoUrl(target);
+        QApplication::clipboard()->setText((canonical ? *canonical : target).toString());
+        m_hint->showHint(tr("Link copied"));
+    });
     connect(a.downloads, &QAction::toggled, this, &MainWindow::setDownloadsPanelVisible);
     connect(a.miniPlayer, &QAction::toggled, this, &MainWindow::setMiniPlayer);
     connect(a.tvMode, &QAction::toggled, this, &MainWindow::setTvMode);

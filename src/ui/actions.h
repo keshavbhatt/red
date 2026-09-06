@@ -27,6 +27,7 @@ public:
     QAction* download = nullptr;
     QAction* downloadUrl = nullptr;
     QAction* downloads = nullptr;
+    QAction* copyLink = nullptr;
     QAction* miniPlayer = nullptr;
     QAction* tvMode = nullptr;
     QAction* playPause = nullptr;

@@ -32,6 +32,7 @@ Actions::Actions(QWidget* owner)
     download = make(owner, tr("Download this…"), {QKeySequence(Qt::CTRL | Qt::Key_D)});
     downloadUrl = make(owner, tr("Download from link…"), {QKeySequence(Qt::CTRL | Qt::Key_N)});
     downloads = make(owner, tr("Downloads"), {QKeySequence(Qt::CTRL | Qt::Key_J)});
+    copyLink = make(owner, tr("Copy video link"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C)});
     miniPlayer = make(owner, tr("Mini player"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M)});
     tvMode = make(owner, tr("TV mode"), {QKeySequence(Qt::CTRL | Qt::Key_T)});
     playPause = make(owner, tr("Play / Pause"),
@@ -60,9 +61,9 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,       back,       forward,   reload,   download,  downloadUrl, downloads,
-            miniPlayer, tvMode,     playPause, next,     previous,  zoomIn,      zoomOut,
-            zoomReset,  fullScreen, showHide,  settings, shortcuts, about,       quit};
+    return {home,       back,     forward,   reload,    download, downloadUrl, downloads, copyLink,
+            miniPlayer, tvMode,   playPause, next,      previous, zoomIn,      zoomOut,   zoomReset,
+            fullScreen, showHide, settings,  shortcuts, about,    quit};
 }
 
 } // namespace red::ui
