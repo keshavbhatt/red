@@ -87,6 +87,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
     connect(&bridge, &Bridge::retryRequested, this, [this] { loadStart(); });
     connect(&bridge, &Bridge::mediaStateChanged, this, &WebView::handleMediaState);
     connect(&bridge, &Bridge::sponsorSegmentsRequested, this, &WebView::sponsorSegmentsRequested);
+    connect(&bridge, &Bridge::dislikesRequested, this, &WebView::dislikesRequested);
     connect(&bridge, &Bridge::tvSignalReceived, this, &WebView::tvSignal);
     connect(&bridge, &Bridge::downloadUrlRequested, this, [this](const QString& url) {
         const QUrl target(url);

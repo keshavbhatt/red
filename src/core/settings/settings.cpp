@@ -35,6 +35,7 @@ constexpr bool kDefaultPlayInBackground = true;
 constexpr bool kDefaultBlockAds = true;
 constexpr bool kDefaultBlockTrackers = true;
 constexpr bool kDefaultHideShorts = false;
+constexpr bool kDefaultShowDislikes = true;
 constexpr bool kDefaultSponsorBlock = true;
 constexpr bool kDefaultSponsorMarkers = true;
 constexpr FilenamePattern kDefaultFilenamePattern = FilenamePattern::Title;
@@ -427,6 +428,18 @@ void Settings::setHideShorts(bool enabled)
 {
     if (storeBool(keys::kHideShorts, kDefaultHideShorts, enabled)) {
         Q_EMIT hideShortsChanged(enabled);
+    }
+}
+
+bool Settings::showDislikes() const
+{
+    return boolValue(keys::kShowDislikes, kDefaultShowDislikes);
+}
+
+void Settings::setShowDislikes(bool enabled)
+{
+    if (storeBool(keys::kShowDislikes, kDefaultShowDislikes, enabled)) {
+        Q_EMIT showDislikesChanged(enabled);
     }
 }
 
@@ -888,6 +901,7 @@ void Settings::resetToDefaults()
     Q_EMIT playInBackgroundChanged(playInBackground());
     Q_EMIT blockingChanged();
     Q_EMIT hideShortsChanged(hideShorts());
+    Q_EMIT showDislikesChanged(showDislikes());
     Q_EMIT sponsorBlockChanged();
     Q_EMIT downloadDirectoryChanged(downloadDirectory());
     Q_EMIT downloadDefaultsChanged();

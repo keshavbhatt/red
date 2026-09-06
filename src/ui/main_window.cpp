@@ -6,6 +6,7 @@
 #include "core/youtube_url.h"
 #include "platform/file_manager.h"
 #include "platform/notifier_factory.h"
+#include "services/dislikes_client.h"
 #include "services/engine_manager.h"
 #include "services/sponsorblock_client.h"
 #include "ui/about_dialog.h"
@@ -254,6 +255,10 @@ void MainWindow::connectWebView()
             &services::SponsorBlockClient::request);
     connect(sponsor, &services::SponsorBlockClient::segmentsReady, &m_webView->profile().bridge(),
             &web::Bridge::sponsorSegments);
+    auto* dislikes = new services::DislikesClient(m_settings, this);
+    connect(m_webView, &web::WebView::dislikesRequested, dislikes, &services::DislikesClient::request);
+    connect(dislikes, &services::DislikesClient::dislikesReady, &m_webView->profile().bridge(),
+            &web::Bridge::dislikes);
 }
 
 // ---- lifecycle -------------------------------------------------------------

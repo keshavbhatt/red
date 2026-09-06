@@ -182,6 +182,9 @@ public:
     void setBlockTrackers(bool enabled);
     [[nodiscard]] bool hideShorts() const;
     void setHideShorts(bool enabled);
+    /// Return YouTube Dislike counts under the dislike button (FEATURES D14).
+    [[nodiscard]] bool showDislikes() const;
+    void setShowDislikes(bool enabled);
     [[nodiscard]] bool sponsorBlockEnabled() const;
     void setSponsorBlockEnabled(bool enabled);
     /// SponsorBlock category id (e.g. "sponsor") → action. Unknown ids get the default.
@@ -282,6 +285,7 @@ Q_SIGNALS:
     void playInBackgroundChanged(bool enabled);
     void blockingChanged(); ///< ads / trackers toggled
     void hideShortsChanged(bool enabled);
+    void showDislikesChanged(bool enabled);
     void sponsorBlockChanged(); ///< enabled, categories or markers
     void downloadDirectoryChanged(const QString& directory);
     void downloadDefaultsChanged(); ///< any downloads/ default that the dialog reads

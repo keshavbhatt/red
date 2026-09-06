@@ -71,6 +71,8 @@ Q_SIGNALS:
     void mediaStateChanged(const core::MediaState& state);
     /// SponsorBlock segments wanted for a video (answered via profile().bridge()).
     void sponsorSegmentsRequested(const QString& videoId);
+    /// Return YouTube Dislike wanted for a video (answered via profile().bridge()).
+    void dislikesRequested(const QString& videoId);
     /// Leanback signals: "exit", "reload", "openUrl"…
     void tvSignal(const QString& signal, const QString& argument);
     void downloadableChanged(bool downloadable);

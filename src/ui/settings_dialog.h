@@ -106,6 +106,7 @@ private:
     QCheckBox* m_blockAds = nullptr;
     QCheckBox* m_blockTrackers = nullptr;
     QCheckBox* m_hideShorts = nullptr;
+    QCheckBox* m_showDislikes = nullptr;
     QLabel* m_blockedCount = nullptr;
     QCheckBox* m_sponsorEnabled = nullptr;
     QCheckBox* m_sponsorMarkers = nullptr;

@@ -54,6 +54,7 @@ red_add_test(tst_theme_service       tst_theme_service.cpp       red_core GUI)
 red_add_test(tst_notification_service tst_notification_service.cpp red_core GUI)
 # services
 red_add_test(tst_netscape_cookies    tst_netscape_cookies.cpp    red_services)
+red_add_test(tst_dislikes_client     tst_dislikes_client.cpp     red_services)
 # platform
 if(LINUX)
     red_add_test(tst_freedesktop_notifier tst_freedesktop_notifier.cpp red_platform GUI)

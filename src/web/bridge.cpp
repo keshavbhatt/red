@@ -35,6 +35,11 @@ void Bridge::sponsorSkipped(const QString& category)
     Q_EMIT sponsorSegmentSkipped(category);
 }
 
+void Bridge::requestDislikes(const QString& videoId)
+{
+    Q_EMIT dislikesRequested(videoId);
+}
+
 void Bridge::tvSignal(const QString& signal, const QString& argument)
 {
     qCInfo(lcWebJs) << "tv signal" << signal << argument;

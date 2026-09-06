@@ -98,6 +98,7 @@ WebProfile::WebProfile(core::Settings& settings, const QString& appVersion, QObj
         }
     });
     connect(&m_settings, &core::Settings::hideShortsChanged, this, [this](bool) { pushConfig(); });
+    connect(&m_settings, &core::Settings::showDislikesChanged, this, [this](bool) { pushConfig(); });
     connect(&m_settings, &core::Settings::codecPreferenceChanged, this,
             [this](core::CodecPreference) { pushConfig(); });
     connect(&m_settings, &core::Settings::playInBackgroundChanged, this, [this](bool) { pushConfig(); });
@@ -191,6 +192,7 @@ QJsonObject WebProfile::scriptConfig() const
         {u"colorScheme"_s, themeName(m_settings.theme())},
         {u"adblock"_s, m_settings.blockAds()},
         {u"hideShorts"_s, m_mode == core::AppMode::Tv ? m_settings.tvHideShorts() : m_settings.hideShorts()},
+        {u"dislikes"_s, m_settings.showDislikes()},
         {u"sponsorBlock"_s, sponsor},
         {u"codec"_s, codecName(m_settings.codecPreference())},
         {u"backgroundPlay"_s, m_settings.playInBackground()},

@@ -5,6 +5,8 @@
 qt_add_library(red_services STATIC
     engine_manager.cpp
     engine_manager.h
+    dislikes_client.cpp
+    dislikes_client.h
     logging.cpp
     logging.h
     media_probe.cpp

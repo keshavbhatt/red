@@ -47,6 +47,7 @@ QStringList ScriptBundle::bootstrapResources(bool tvMode)
     static const QStringList kDesktop{
         u":/scripts/theme-control.js"_s,
         u":/scripts/mini-player.js"_s,
+        u":/scripts/dislikes.js"_s,
     };
     static const QStringList kTv{
         u":/scripts/tv/h5vcc.js"_s, u":/scripts/tv/identification.js"_s, u":/scripts/tv/leanback-fixes.js"_s,

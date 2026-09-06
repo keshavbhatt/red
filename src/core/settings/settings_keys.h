@@ -42,6 +42,7 @@ inline constexpr QLatin1StringView kSponsorBlockEnabled{"blocking/sponsorBlock"}
 inline constexpr QLatin1StringView kSponsorBlockCategories{"blocking/sponsorBlockCategories"};
 inline constexpr QLatin1StringView kSponsorBlockMarkers{"blocking/sponsorBlockMarkers"};
 inline constexpr QLatin1StringView kBlockedCount{"blocking/blockedCount"};
+inline constexpr QLatin1StringView kShowDislikes{"blocking/showDislikes"};
 
 // downloads/
 inline constexpr QLatin1StringView kDownloadDirectory{"downloads/directory"};

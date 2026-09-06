@@ -46,6 +46,7 @@ qt_add_resources(red_web "scripts"
         scripts/background-play.js
         scripts/theme-control.js
         scripts/mini-player.js
+        scripts/dislikes.js
         scripts/tv/h5vcc.js
         scripts/tv/identification.js
         scripts/tv/leanback-fixes.js

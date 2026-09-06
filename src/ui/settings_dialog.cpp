@@ -358,6 +358,9 @@ QWidget* SettingsDialog::buildBlocking()
     m_hideShorts = new QCheckBox(tr("Hide Shorts"), ads);
     connect(m_hideShorts, &QCheckBox::toggled, this, [this](bool on) { m_settings.setHideShorts(on); });
     v->addWidget(m_hideShorts);
+    m_showDislikes = new QCheckBox(tr("Show dislike counts (Return YouTube Dislike)"), ads);
+    connect(m_showDislikes, &QCheckBox::toggled, this, [this](bool on) { m_settings.setShowDislikes(on); });
+    v->addWidget(m_showDislikes);
     m_blockedCount = mutedLabel(QString(), ads);
     v->addWidget(m_blockedCount);
 
@@ -686,6 +689,7 @@ void SettingsDialog::loadValues()
     m_blockAds->setChecked(m_settings.blockAds());
     m_blockTrackers->setChecked(m_settings.blockTrackers());
     m_hideShorts->setChecked(m_settings.hideShorts());
+    m_showDislikes->setChecked(m_settings.showDislikes());
     m_sponsorEnabled->setChecked(m_settings.sponsorBlockEnabled());
     m_sponsorMarkers->setChecked(m_settings.sponsorBlockMarkers());
     for (QComboBox* combo : m_sponsorCombos) {

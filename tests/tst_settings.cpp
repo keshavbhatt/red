@@ -26,6 +26,7 @@ private Q_SLOTS:
         QVERIFY(m_settings->blockAds());
         QVERIFY(m_settings->blockTrackers());
         QVERIFY(m_settings->sponsorBlockEnabled());
+        QVERIFY(m_settings->showDislikes());
         QVERIFY(m_settings->autoplay());
         QCOMPARE(m_settings->codecPreference(), CodecPreference::Auto);
         QVERIFY(!m_settings->hardwareVideoDecode());

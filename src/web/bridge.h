@@ -28,6 +28,8 @@ public Q_SLOTS:
     void requestSponsorSegments(const QString& videoId);
     /// sponsorblock.js: a segment was skipped (for the counter/toast policy).
     void sponsorSkipped(const QString& category);
+    /// dislikes.js: the page shows a video and wants its dislike count.
+    void requestDislikes(const QString& videoId);
     /// TV scripts: Leanback asked to exit / reload / open a link.
     void tvSignal(const QString& signal, const QString& argument);
     /// The custom error page's "Try again" was clicked.
@@ -41,12 +43,15 @@ Q_SIGNALS:
     void mediaStateChanged(const QJsonObject& state);
     void sponsorSegmentsRequested(const QString& videoId);
     void sponsorSegmentSkipped(const QString& category);
+    void dislikesRequested(const QString& videoId);
     void tvSignalReceived(const QString& signal, const QString& argument);
     void retryRequested();
     void downloadUrlRequested(const QString& url);
 
     // C++ → JS (consumed by scripts through the channel)
     void sponsorSegments(const QString& videoId, const QJsonArray& segments);
+    /// Return YouTube Dislike answer (-1 when unknown).
+    void dislikes(const QString& videoId, double count);
     /// "play", "pause", "playPause", "next", "previous", "seek" (arg = seconds),
     /// "stop", "mute", "volume" (arg = 0..1).
     void mediaCommand(const QString& command, double argument);
