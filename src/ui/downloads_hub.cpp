@@ -176,9 +176,12 @@ void DownloadsHub::openDialog(const QUrl& url)
         const QString kind = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
         connect(m_probe, &services::MediaProbe::finished, dialog,
                 [dialog, kind](quint64, const core::MediaInfo&) {
-                    dialog->selectKind(kind == u"audio"_s ? core::DownloadOptions::Kind::Audio
-                                                          : core::DownloadOptions::Kind::Video);
-                    QTimer::singleShot(1500, dialog, &QDialog::accept);
+                    dialog->selectKind(kind == u"audio"_s      ? core::DownloadOptions::Kind::Audio
+                                       : kind == u"advanced"_s ? core::DownloadOptions::Kind::Custom
+                                                               : core::DownloadOptions::Kind::Video);
+                    if (kind != u"advanced"_s) { // advanced needs a pick; leave it open for inspection
+                        QTimer::singleShot(1500, dialog, &QDialog::accept);
+                    }
                 });
     }
 }
