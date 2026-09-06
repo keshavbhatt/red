@@ -276,6 +276,7 @@ void MainWindow::start(bool tvMode)
         m_actions->downloads->setChecked(true);
     }
     show();
+    m_webView->setFocus(); // YouTube's own shortcuts (k, j, l, f, m…) need the page focused
     QTimer::singleShot(600, this, &MainWindow::maybeShowGpuFallbackNotice);
 }
 
