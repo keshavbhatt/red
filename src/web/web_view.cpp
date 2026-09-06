@@ -199,13 +199,9 @@ QUrl WebView::downloadableUrl() const
         const QString id = !info.videoId.isEmpty() ? info.videoId : m_media.videoId;
         return id.isEmpty() ? QUrl() : QUrl(u"https://www.youtube.com/watch?v="_s + id);
     }
-    if (core::isDownloadable(url())) {
-        return url();
-    }
-    if (!m_media.videoId.isEmpty()) {
-        return QUrl(u"https://www.youtube.com/watch?v="_s + m_media.videoId);
-    }
-    return {};
+    // Desktop: only the page itself counts — the player keeps the previous
+    // video around after leaving a watch page, which must not be offered.
+    return core::isDownloadable(url()) ? url() : QUrl();
 }
 
 // ---- zoom ------------------------------------------------------------------
