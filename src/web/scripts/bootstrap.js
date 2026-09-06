@@ -1,0 +1,80 @@
+// name:     bootstrap
+// purpose:  create window.__red (config + error reporting + config updates)
+//           and connect the QWebChannel bridge; every other script relies on it.
+// depends:  qt.webChannelTransport (QWebChannel), nothing from YouTube
+// verified: 2026-09-06
+// on-fail:  no-op; reports are queued until the bridge is ready
+//
+// The C++ side prepends `window.__redConfig = {...};` and qwebchannel.js to
+// this file, so `QWebChannel` and the config exist when it runs.
+(function () {
+    'use strict';
+    if (window.__red) {
+        return;
+    }
+    var pending = [];
+    var bridgeWaiters = [];
+    var configWaiters = [];
+    var api = {
+        config: window.__redConfig || {},
+        bridge: null,
+        report: function (name, error) {
+            var message = error && error.message ? error.message : String(error);
+            if (api.bridge) {
+                api.bridge.scriptFailed(name, message);
+            } else {
+                pending.push([name, message]);
+            }
+        },
+        log: function (message) {
+            if (api.bridge) {
+                api.bridge.log(String(message));
+            }
+        },
+        // Runs fn(bridge) now if connected, else once the channel is up.
+        onBridge: function (fn) {
+            if (api.bridge) {
+                try { fn(api.bridge); } catch (e) { api.report('onBridge', e); }
+            } else {
+                bridgeWaiters.push(fn);
+            }
+        },
+        // Runs fn(config) on every live config change (and never for the initial one).
+        onConfig: function (fn) {
+            configWaiters.push(fn);
+        },
+        isTv: function () {
+            return api.config.mode === 'tv';
+        }
+    };
+    window.__red = api;
+    try {
+        if (typeof QWebChannel === 'function' && window.qt && window.qt.webChannelTransport) {
+            new QWebChannel(window.qt.webChannelTransport, function (channel) {
+                api.bridge = channel.objects.bridge || null;
+                if (!api.bridge) {
+                    return;
+                }
+                pending.forEach(function (p) { api.bridge.scriptFailed(p[0], p[1]); });
+                pending = [];
+                try {
+                    api.bridge.configChanged.connect(function (config) {
+                        api.config = config || api.config;
+                        configWaiters.forEach(function (fn) {
+                            try { fn(api.config); } catch (e) { api.report('onConfig', e); }
+                        });
+                    });
+                } catch (e) {
+                    api.report('bootstrap.configChanged', e);
+                }
+                var waiters = bridgeWaiters;
+                bridgeWaiters = [];
+                waiters.forEach(function (fn) {
+                    try { fn(api.bridge); } catch (e) { api.report('onBridge', e); }
+                });
+            });
+        }
+    } catch (e) {
+        pending.push(['bootstrap', e && e.message ? e.message : String(e)]);
+    }
+})();
