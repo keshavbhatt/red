@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QObject>
 #include <QDialog>
+#include <QDialog>
 #include <QPointer>
 #include <QUrl>
 
@@ -88,6 +89,7 @@ private:
     QTimer* m_persistTimer = nullptr;
     QList<QUrl> m_pendingUrls;                  ///< waiting for the engine
     QHash<quint64, quint64> m_notificationJobs; ///< notification id → job id
+    QHash<QString, QPointer<QDialog>> m_openDialogs; ///< one dialog per URL
 };
 
 } // namespace red::ui
