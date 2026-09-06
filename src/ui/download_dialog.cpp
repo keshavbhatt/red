@@ -460,6 +460,12 @@ void DownloadDialog::handleProbeFinished(quint64 id, const core::MediaInfo& info
     m_isPlaylist = info.isPlaylist();
     m_status->clear();
     populateFromInfo();
+    if (info.isLive) {
+        // FEATURES E14 (LATER): recording a live stream needs its own UI.
+        m_status->setText(tr("This is a live stream. Red can download it once the stream has ended."));
+        m_download->setEnabled(false);
+        return;
+    }
     m_download->setEnabled(true);
 }
 
