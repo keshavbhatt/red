@@ -17,9 +17,7 @@ private Q_SLOTS:
         QCOMPARE(ytdlpComponent(u"windows"_s, u"x86_64"_s).installName, u"yt-dlp.exe"_s);
         QCOMPARE(jsRuntimeComponent(u"linux"_s, u"x86_64"_s).assetName, u"qjs-linux-x86_64"_s);
         QCOMPARE(jsRuntimeComponent(u"linux"_s, u"x86_64"_s).installName, u"qjs"_s);
-        QVERIFY(ffmpegComponent(u"linux"_s, u"x86_64"_s).archive);
-        QCOMPARE(ffmpegComponent(u"linux"_s, u"aarch64"_s).assetName,
-                 u"ffmpeg-master-latest-linuxarm64-gpl.tar.xz"_s);
+        QVERIFY(!ffmpegInstallHint().isEmpty()); // ffmpeg is never downloaded, only hinted
     }
 
     void versionCompare()

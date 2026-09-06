@@ -102,6 +102,8 @@ void EngineSetupDialog::setupUi()
             } else {
                 m_engine.checkForUpdates(true);
             }
+        } else if (m_engine.status().ffmpegMissing && !m_engine.status().ytdlpPath.isEmpty()) {
+            m_engine.initialize(); // re-detect after the user installed ffmpeg
         } else {
             m_engine.install();
         }
@@ -127,7 +129,8 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
                              : (s.systemYtdlp ? tr("system installation") : s.ytdlpVersion));
     m_jsText->setText(s.jsRuntime.isEmpty() ? tr("QuickJS will be downloaded (~3 MB)")
                                             : core::jsRuntimeLabel(s.jsRuntime));
-    m_ffmpegText->setText(s.ffmpegPath.isEmpty() ? tr("will be downloaded (~130 MB)") : s.ffmpegPath);
+    m_ffmpegText->setText(s.ffmpegPath.isEmpty() ? tr("not installed — %1").arg(core::ffmpegInstallHint())
+                                                 : s.ffmpegPath);
 
     m_step->setText(busy ? s.stepLabel : (s.isReady() ? tr("Everything is ready.") : QString()));
     m_progress->setVisible(busy);
@@ -139,7 +142,8 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
             m_progress->setRange(0, 0);
         }
     }
-    m_error->setVisible(!s.error.isEmpty() && s.state == services::EngineManager::State::Error);
+    m_error->setVisible(!s.error.isEmpty() &&
+                        (s.state == services::EngineManager::State::Error || s.ffmpegMissing));
     m_error->setText(s.error);
     m_error->setStyleSheet(u"color:%1;"_s.arg(t.danger.name()));
 
@@ -149,7 +153,10 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
                                             : tr("Check for updates"));
         m_action->setProperty("redPrimary", s.updateAvailable);
     } else {
-        m_action->setText(s.state == services::EngineManager::State::Error ? tr("Retry") : tr("Set up"));
+        const bool onlyFfmpeg = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && s.ffmpegMissing;
+        m_action->setText(onlyFfmpeg                                         ? tr("Check again")
+                          : s.state == services::EngineManager::State::Error ? tr("Retry")
+                                                                             : tr("Set up"));
         m_action->setProperty("redPrimary", true);
     }
     m_action->style()->unpolish(m_action);

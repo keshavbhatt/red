@@ -735,7 +735,7 @@ void SettingsDialog::refreshEngine(const services::EngineManager::Status& s)
         }
     } else if (s.isBusy()) {
         text = s.stepLabel;
-    } else if (s.state == services::EngineManager::State::Error) {
+    } else if (s.state == services::EngineManager::State::Error || s.ffmpegMissing) {
         text = tr("Problem: %1").arg(s.error);
     } else {
         text = tr("Not set up yet — the first download will fetch it.");

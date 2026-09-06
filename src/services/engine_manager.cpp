@@ -12,11 +12,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QProcess>
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QSysInfo>
-#include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QtEnvironmentVariables>
 
@@ -156,11 +154,16 @@ void EngineManager::detect()
     }
     // JS runtime: ours first (qjs in the engine dir), then the system.
     s.jsRuntime = core::detectSystemJsRuntime(extraSearchDirs());
-    // ffmpeg: ours, snap, system.
+    // ffmpeg: the system's (snap/flatpak runtime or distro package), never ours.
     s.ffmpegPath = core::detectSystemFfmpeg(extraSearchDirs());
+    s.ffmpegMissing = s.ffmpegPath.isEmpty();
 
-    const bool complete = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && !s.ffmpegPath.isEmpty();
+    const bool complete = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && !s.ffmpegMissing;
     s.state = complete ? State::Ready : State::NotInstalled;
+    if (s.ffmpegMissing) {
+        s.error = tr("ffmpeg is not installed. Red needs it to merge video and audio: %1, then try again.")
+                      .arg(core::ffmpegInstallHint());
+    }
     m_status = s;
     qCInfo(lcServices) << "engine:" << (complete ? "ready" : "incomplete") << "yt-dlp=" << s.ytdlpPath
                        << s.ytdlpVersion << "js=" << s.jsRuntime << "ffmpeg=" << s.ffmpegPath;
@@ -199,6 +202,7 @@ void EngineManager::install()
     if (m_status.isReady()) {
         return;
     }
+    const QString ffmpegError = m_status.ffmpegMissing ? m_status.error : QString();
     m_status.error.clear();
     m_steps.clear();
     if (m_status.ytdlpPath.isEmpty()) {
@@ -207,8 +211,12 @@ void EngineManager::install()
     if (m_status.jsRuntime.isEmpty()) {
         queueComponent(core::jsRuntimeComponent(m_os, m_cpu), false);
     }
-    if (m_status.ffmpegPath.isEmpty()) {
-        queueComponent(core::ffmpegComponent(m_os, m_cpu), false);
+    if (m_steps.isEmpty()) {
+        // Only ffmpeg is missing: nothing to download, the user has to install it.
+        m_status.error = ffmpegError;
+        setState(State::Error, ffmpegError);
+        Q_EMIT installFailed(ffmpegError);
+        return;
     }
     m_steps.append([this] { finishInstall(); });
     setState(State::Installing, tr("Preparing…"));
@@ -240,10 +248,8 @@ void EngineManager::runNextStep()
 void EngineManager::queueComponent(const core::EngineComponent& component, bool verifySums)
 {
     m_steps.append([this, component, verifySums] {
-        const QString label = component.kind == core::EngineComponent::Kind::YtDlp ? tr("yt-dlp")
-                              : component.kind == core::EngineComponent::Kind::Ffmpeg
-                                  ? tr("ffmpeg")
-                                  : tr("JavaScript runtime");
+        const QString label =
+            component.kind == core::EngineComponent::Kind::YtDlp ? tr("yt-dlp") : tr("JavaScript runtime");
         setState(m_status.state, tr("Looking up %1…").arg(label));
         fetchRelease(component, verifySums, [this, component, label](const QUrl& asset, const QUrl& sums) {
             if (asset.isEmpty()) {
@@ -251,11 +257,7 @@ void EngineManager::queueComponent(const core::EngineComponent& component, bool 
                 return;
             }
             auto afterDownload = [this, component](const QString& path, const QString& expectedSha) {
-                if (component.archive) {
-                    installArchive(component, path);
-                } else {
-                    installBinary(component, path, expectedSha);
-                }
+                installBinary(component, path, expectedSha);
             };
             if (sums.isEmpty()) {
                 downloadFile(asset, tr("Downloading %1…").arg(label),
@@ -372,61 +374,14 @@ void EngineManager::installBinary(const core::EngineComponent& component, const 
     runNextStep();
 }
 
-void EngineManager::installArchive(const core::EngineComponent& component, const QString& tempPath)
-{
-    setState(m_status.state, tr("Unpacking ffmpeg…"));
-    auto* extractDir = new QTemporaryDir(QDir(engineDirectory()).filePath(u"extract-XXXXXX"_s));
-    if (!extractDir->isValid()) {
-        delete extractDir;
-        fail(tr("Cannot unpack into %1.").arg(engineDirectory()));
-        return;
-    }
-    auto* tar = new QProcess(this);
-    tar->setProcessEnvironment(core::engineProcessEnvironment());
-    const QStringList args{
-        u"-xJf"_s,        tempPath,          u"-C"_s,           extractDir->path(), u"--strip-components=2"_s,
-        u"--wildcards"_s, u"*/bin/ffmpeg"_s, u"*/bin/ffprobe"_s};
-    connect(tar, &QProcess::finished, this,
-            [this, tar, extractDir, component](int code, QProcess::ExitStatus) {
-                tar->deleteLater();
-                const std::unique_ptr<QTemporaryDir> dir(extractDir);
-                m_download.reset();
-                if (code != 0) {
-                    fail(tr("Unpacking ffmpeg failed (tar exit %1).").arg(code));
-                    return;
-                }
-                for (const QString& name : {u"ffmpeg"_s, u"ffprobe"_s}) {
-                    const QString from = QDir(dir->path()).filePath(name);
-                    const QString to = QDir(engineDirectory()).filePath(name);
-                    QFile::remove(to);
-                    if (!QFile::copy(from, to)) {
-                        fail(tr("Cannot install %1.").arg(name));
-                        return;
-                    }
-                    QFile::setPermissions(to, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
-                                                  QFile::ReadGroup | QFile::ExeGroup | QFile::ReadOther |
-                                                  QFile::ExeOther);
-                }
-                qCInfo(lcServices) << "installed" << installPath(component);
-                runNextStep();
-            });
-    connect(tar, &QProcess::errorOccurred, this, [this, tar, extractDir](QProcess::ProcessError) {
-        if (tar->state() == QProcess::NotRunning) {
-            tar->deleteLater();
-            delete extractDir;
-            fail(tr("tar is not available to unpack ffmpeg."));
-        }
-    });
-    tar->start(u"tar"_s, args);
-}
-
 void EngineManager::finishInstall()
 {
     m_pendingVersion.clear();
     m_status.updateAvailable = false;
     detect();
     if (!m_status.isReady()) {
-        fail(tr("The engine is still incomplete after installation."));
+        fail(m_status.ffmpegMissing ? m_status.error
+                                    : tr("The engine is still incomplete after installation."));
         return;
     }
     m_settings.setEngineLastCheck(QDateTime::currentDateTimeUtc());

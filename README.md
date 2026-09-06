@@ -30,8 +30,8 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
 - Hide Shorts.
 
 **Downloads (yt-dlp)**
-- The engine (yt-dlp, a JavaScript runtime, ffmpeg) sets itself up on first use and keeps
-  itself updated — nothing to install.
+- yt-dlp and its JavaScript runtime set themselves up on first use and keep themselves
+  updated; ffmpeg comes from your system (the snap and Flatpak runtimes ship it).
 - Quality presets, MP4 / MKV / WebM, audio-only in MP3 / M4A / Opus / FLAC / WAV, subtitles,
   embedded thumbnail, metadata and chapters, sponsor-segment removal, playlist and channel
   entry picking, an advanced per-stream table.

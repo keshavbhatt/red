@@ -16,19 +16,16 @@ struct EngineComponent
     {
         YtDlp,
         JsRuntime,
-        Ffmpeg,
     };
     Kind kind = Kind::YtDlp;
-    QString assetName;    ///< release asset file name
-    QString installName;  ///< file name inside the engine directory
-    QUrl releaseApi;      ///< GitHub "latest release" JSON
-    bool archive = false; ///< the asset is a tar.xz to extract
+    QString assetName;   ///< release asset file name
+    QString installName; ///< file name inside the engine directory
+    QUrl releaseApi;     ///< GitHub "latest release" JSON
 };
 
 /// Components for the running platform/CPU (`cpuArchitecture` as QSysInfo gives it).
 [[nodiscard]] EngineComponent ytdlpComponent(const QString& os, const QString& cpu);
 [[nodiscard]] EngineComponent jsRuntimeComponent(const QString& os, const QString& cpu);
-[[nodiscard]] EngineComponent ffmpegComponent(const QString& os, const QString& cpu);
 
 /// <AppDataLocation>/engine
 [[nodiscard]] QString engineDirectory();
@@ -47,8 +44,12 @@ struct EngineComponent
 /// A JS runtime found on this machine, as a --js-runtimes spec ("deno:/usr/bin/deno"),
 /// searching `extraDirs` first. Empty when none.
 [[nodiscard]] QString detectSystemJsRuntime(const QStringList& extraDirs);
-/// ffmpeg on this machine (binary path), searching `extraDirs` first. Empty when none.
+/// ffmpeg on this machine (binary path), searching `extraDirs` first. Empty when
+/// none — ffmpeg is never downloaded (owner decision, ADR-004 revision): the
+/// snap/flatpak runtimes ship it and distro packages exist everywhere.
 [[nodiscard]] QString detectSystemFfmpeg(const QStringList& extraDirs);
+/// A one-line install hint for the running distro family ("sudo apt install ffmpeg").
+[[nodiscard]] QString ffmpegInstallHint();
 
 /// The environment engine processes run with: the system environment minus
 /// LD_LIBRARY_PATH / LD_PRELOAD, unless we run confined ($SNAP), where the

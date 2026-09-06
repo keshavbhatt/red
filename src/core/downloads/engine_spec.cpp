@@ -2,6 +2,7 @@
 
 #include <QDate>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -16,7 +17,6 @@ namespace {
 
 const QUrl kYtDlpApi(u"https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"_s);
 const QUrl kQuickJsApi(u"https://api.github.com/repos/quickjs-ng/quickjs/releases/latest"_s);
-const QUrl kFfmpegApi(u"https://api.github.com/repos/yt-dlp/FFmpeg-Builds/releases/latest"_s);
 
 bool isArm64(const QString& cpu)
 {
@@ -58,23 +58,6 @@ EngineComponent jsRuntimeComponent(const QString& os, const QString& cpu)
     } else {
         c.assetName = isArm64(cpu) ? u"qjs-linux-aarch64"_s : u"qjs-linux-x86_64"_s;
         c.installName = u"qjs"_s; // yt-dlp requires the executable to be named qjs
-    }
-    return c;
-}
-
-EngineComponent ffmpegComponent(const QString& os, const QString& cpu)
-{
-    EngineComponent c;
-    c.kind = EngineComponent::Kind::Ffmpeg;
-    c.releaseApi = kFfmpegApi;
-    c.archive = true;
-    if (os == u"windows"_s) {
-        c.assetName = u"ffmpeg-master-latest-win64-gpl.zip"_s;
-        c.installName = u"ffmpeg.exe"_s;
-    } else {
-        c.assetName = isArm64(cpu) ? u"ffmpeg-master-latest-linuxarm64-gpl.tar.xz"_s
-                                   : u"ffmpeg-master-latest-linux64-gpl.tar.xz"_s;
-        c.installName = u"ffmpeg"_s;
     }
     return c;
 }
@@ -174,12 +157,44 @@ QString detectSystemFfmpeg(const QStringList& extraDirs)
     return QStandardPaths::findExecutable(u"ffmpeg"_s);
 }
 
+QString ffmpegInstallHint()
+{
+    QFile osRelease(u"/etc/os-release"_s);
+    QString id;
+    if (osRelease.open(QIODevice::ReadOnly)) {
+        const QString text = QString::fromUtf8(osRelease.readAll());
+        for (const QString& line : text.split(u'\n')) {
+            if (line.startsWith(u"ID="_s) || line.startsWith(u"ID_LIKE="_s)) {
+                id += line.section(u'=', 1).remove(u'"').toLower() + u' ';
+            }
+        }
+    }
+    if (id.contains(u"arch"_s)) {
+        return u"sudo pacman -S ffmpeg"_s;
+    }
+    if (id.contains(u"fedora"_s) || id.contains(u"rhel"_s)) {
+        return u"sudo dnf install ffmpeg"_s;
+    }
+    if (id.contains(u"suse"_s)) {
+        return u"sudo zypper install ffmpeg"_s;
+    }
+    if (id.contains(u"debian"_s) || id.contains(u"ubuntu"_s)) {
+        return u"sudo apt install ffmpeg"_s;
+    }
+    return u"install the ffmpeg package with your package manager"_s;
+}
+
 QProcessEnvironment engineProcessEnvironment()
 {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     if (!env.contains(u"SNAP"_s)) {
         env.remove(u"LD_LIBRARY_PATH"_s);
         env.remove(u"LD_PRELOAD"_s);
+    }
+    // tar/xz/ffmpeg helpers must be findable even from a minimal launcher PATH.
+    const QString path = env.value(u"PATH"_s);
+    if (!path.split(u':').contains(u"/usr/bin"_s)) {
+        env.insert(u"PATH"_s, path.isEmpty() ? u"/usr/bin:/bin"_s : path + u":/usr/bin:/bin"_s);
     }
     // yt-dlp's own update nag and colour output are noise in our logs.
     env.insert(u"NO_COLOR"_s, u"1"_s);

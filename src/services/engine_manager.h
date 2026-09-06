@@ -45,8 +45,9 @@ public:
         State state = State::Unknown;
         QString ytdlpPath;
         QString ytdlpVersion;
-        QString jsRuntime; ///< --js-runtimes spec
-        QString ffmpegPath;
+        QString jsRuntime;  ///< --js-runtimes spec
+        QString ffmpegPath; ///< system ffmpeg; never downloaded
+        bool ffmpegMissing = false;
         QString latestVersion;
         bool updateAvailable = false;
         QString stepLabel;    ///< "Downloading yt-dlp…" while installing
@@ -95,7 +96,6 @@ private:
     void fetchText(const QUrl& url, const std::function<void(const QByteArray&)>& then);
     void installBinary(const core::EngineComponent& component, const QString& tempPath,
                        const QString& expectedSha);
-    void installArchive(const core::EngineComponent& component, const QString& tempPath);
     void finishInstall();
     [[nodiscard]] QString installPath(const core::EngineComponent& component) const;
     [[nodiscard]] QStringList extraSearchDirs() const;
