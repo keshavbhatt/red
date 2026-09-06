@@ -8,9 +8,9 @@ class ThemeService;
 
 namespace red::ui {
 
-/// Pushes the ThemeService's palette onto the QApplication (FEATURES A1, A2).
-/// Fusion style is used everywhere so palettes render identically across
-/// desktops; page-side theming is added in M3.
+/// Pushes the ThemeService palette and Red style sheet onto the QApplication.
+/// Fusion style is used everywhere so the sheet renders identically across
+/// desktops (FEATURES D1).
 class ThemeApplier : public QObject
 {
     Q_OBJECT

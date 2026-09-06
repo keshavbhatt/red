@@ -381,6 +381,7 @@ void EngineManager::installArchive(const core::EngineComponent& component, const
         return;
     }
     auto* tar = new QProcess(this);
+    tar->setProcessEnvironment(core::engineProcessEnvironment());
     const QStringList args{u"-xJf"_s, tempPath, u"-C"_s, extractDir->path(), u"--strip-components=2"_s,
                            u"--wildcards"_s, u"*/bin/ffmpeg"_s, u"*/bin/ffprobe"_s};
     connect(tar, &QProcess::finished, this, [this, tar, extractDir, component](int code, QProcess::ExitStatus) {

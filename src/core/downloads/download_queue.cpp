@@ -6,6 +6,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -456,9 +457,16 @@ void DownloadQueue::handleFinished(quint64 id, bool ok, int exitCode, const QStr
             if (!ok) {
                 j->error = u"Some items could not be downloaded."_s;
             }
-            if (j->totalBytes > 0) {
-                j->downloadedBytes = j->totalBytes;
+            // The progress counters covered one stream at a time; report the
+            // files that actually landed on disk.
+            qint64 onDisk = 0;
+            for (const QString& path : std::as_const(j->outputFiles)) {
+                onDisk += std::max<qint64>(0, QFileInfo(path).size());
             }
+            if (onDisk > 0) {
+                j->totalBytes = onDisk;
+            }
+            j->downloadedBytes = j->totalBytes;
         } else {
             j->state = DownloadState::Failed;
             j->error = friendlyError(stderrTail, exitCode);

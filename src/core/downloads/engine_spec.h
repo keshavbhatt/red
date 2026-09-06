@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QProcessEnvironment>
 #include <QString>
 #include <QStringList>
 #include <QUrl>
@@ -48,6 +49,12 @@ struct EngineComponent
 [[nodiscard]] QString detectSystemJsRuntime(const QStringList& extraDirs);
 /// ffmpeg on this machine (binary path), searching `extraDirs` first. Empty when none.
 [[nodiscard]] QString detectSystemFfmpeg(const QStringList& extraDirs);
+
+/// The environment engine processes run with: the system environment minus
+/// LD_LIBRARY_PATH / LD_PRELOAD, unless we run confined ($SNAP), where the
+/// staged libraries need them. A dev run against the snap runtime, or an
+/// AppImage, otherwise breaks system ffmpeg ("libxml2.so.2: cannot open").
+[[nodiscard]] QProcessEnvironment engineProcessEnvironment();
 
 /// "deno", "QuickJS", "Node.js" … from a --js-runtimes spec.
 [[nodiscard]] QString jsRuntimeLabel(const QString& spec);

@@ -2,9 +2,10 @@
 
 #include "core/theme/theme_service.h"
 #include "ui/logging.h"
-#include "ui/whatsapp_style.h"
+#include "ui/red_style.h"
 
 #include <QApplication>
+#include <QFontDatabase>
 #include <QStyleFactory>
 #include <QStyleHints>
 
@@ -21,21 +22,25 @@ ThemeApplier::ThemeApplier(core::ThemeService& theme, QObject* parent)
     } else {
         qCWarning(lcUi) << "Fusion style unavailable; using platform default";
     }
+    // YouTube's face when it is installed; the system UI font otherwise.
+    QFont font = QApplication::font();
+    if (QFontDatabase::families().contains(u"Roboto"_s)) {
+        font.setFamily(u"Roboto"_s);
+    }
+    if (font.pointSize() < 10) {
+        font.setPointSize(10);
+    }
+    QApplication::setFont(font);
     apply();
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
-            [this](Qt::ColorScheme) { apply(); });
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) { apply(); });
 }
 
 void ThemeApplier::apply()
 {
     QApplication::setPalette(m_theme.palette());
-    // WhatsApp Web's design language on top of the palette (green accent, rounded
-    // inputs, underlined tabs). Re-applied on every scheme change.
-    qApp->setStyleSheet(whatsappStyleSheet(m_theme.isDark()));
-    // WhatsApp Web follows prefers-color-scheme live (verified 2026-08-27 via
-    // CDP media emulation). Qt WebEngine derives that media query from the
-    // application colour scheme, so an explicit Light/Dark choice is pushed
-    // into QStyleHints; "System" leaves the platform value alone (ADR-020).
+    qApp->setStyleSheet(redStyleSheet(m_theme.isDark()));
+    // The page follows theme-control.js (FEATURES D1); the Qt colour scheme is
+    // still pushed so prefers-color-scheme agrees in "System" mode.
     QStyleHints* hints = QApplication::styleHints();
     if (m_theme.followsSystem()) {
         hints->unsetColorScheme();

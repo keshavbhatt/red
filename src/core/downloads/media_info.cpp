@@ -138,10 +138,8 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
         }
     }
     info.duration = o.value(u"duration"_s).toDouble();
-    info.durationText = o.value(u"duration_string"_s).toString();
-    if (info.durationText.isEmpty() && info.duration > 0) {
-        info.durationText = formatDuration(info.duration);
-    }
+    // yt-dlp prints "19" for sub-minute videos; keep the m:ss shape everywhere.
+    info.durationText = info.duration > 0 ? formatDuration(info.duration) : o.value(u"duration_string"_s).toString();
     info.viewCount = toInt64(o.value(u"view_count"_s));
     info.uploadDate = o.value(u"upload_date"_s).toString();
     info.isLive = o.value(u"is_live"_s).toBool();

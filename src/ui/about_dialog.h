@@ -3,37 +3,33 @@
 #include <QDialog>
 
 class QPlainTextEdit;
-class QPushButton;
 
 namespace red::core {
 class Settings;
-}
+class ThemeService;
+} // namespace red::core
 
 namespace red::ui {
 
-/// About box: app info, links, and a copyable diagnostics panel (FEATURES D1, D4).
+/// About box: brand hero, links, and a copyable diagnostics panel (FEATURES S7).
 class AboutDialog : public QDialog
 {
     Q_OBJECT
     Q_DISABLE_COPY_MOVE(AboutDialog)
 
 public:
-    AboutDialog(const core::Settings& settings, const QString& userAgent, QWidget* parent = nullptr);
+    AboutDialog(const core::Settings& settings, core::ThemeService& theme, const QString& userAgent,
+                const QString& engineSummary, QWidget* parent = nullptr);
     ~AboutDialog() override = default;
-
-protected:
-    void showEvent(QShowEvent* event) override;
 
 private:
     void setupUi();
-    void toggleDebugInfo();
     void copyDiagnostics();
-    void reportBug();
 
     const core::Settings& m_settings;
+    core::ThemeService& m_theme;
     QString m_userAgent;
-    QWidget* m_content = nullptr;
-    QPushButton* m_debugToggle = nullptr;
+    QString m_engineSummary;
     QPlainTextEdit* m_debugText = nullptr;
 };
 

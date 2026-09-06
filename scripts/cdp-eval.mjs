@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --experimental-websocket --no-warnings
-// Evaluate a JavaScript expression inside the WhatsApp Web page of a running
-// red started with QTWEBENGINE_REMOTE_DEBUGGING=<port>.
+// Evaluate a JavaScript expression inside the YouTube page of a running Red
+// started with QTWEBENGINE_CHROMIUM_FLAGS=--remote-debugging-port=<port>.
 //
 //   scripts/cdp-eval.mjs 'document.title'
 //   scripts/cdp-eval.mjs --port 9222 'JSON.stringify(Object.keys(localStorage))'
@@ -8,7 +8,7 @@
 //
 // Dev tool only: nothing here ships. Prints the JSON-serialised value.
 const args = process.argv.slice(2);
-let port = 9222;
+let port = 9422;
 const exprs = [];
 const calls = [];
 for (let i = 0; i < args.length; i++) {
@@ -20,8 +20,8 @@ for (let i = 0; i < args.length; i++) {
 if (exprs.length === 0 && calls.length === 0) { console.error('usage: cdp-eval.mjs [--port N] <expr>'); process.exit(2); }
 
 const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-const page = targets.find(t => t.type === 'page' && /(^|\.)whatsapp\.com$/.test(new URL(t.url).hostname));
-if (!page) { console.error('no whatsapp page target; targets: ' + targets.map(t => t.url).join(', ')); process.exit(1); }
+const page = targets.find(t => t.type === 'page' && /(^|\.)youtube\.com$/.test(new URL(t.url).hostname));
+if (!page) { console.error('no youtube page target; targets: ' + targets.map(t => t.url).join(', ')); process.exit(1); }
 
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });

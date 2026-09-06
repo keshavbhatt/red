@@ -1,5 +1,6 @@
 #include "services/media_probe.h"
 
+#include "core/downloads/engine_spec.h"
 #include "core/downloads/ytdlp_output.h"
 #include "services/logging.h"
 
@@ -41,6 +42,7 @@ quint64 MediaProbe::probe(const QUrl& url, bool flat)
     }
     run.process = new QProcess(this);
     run.process->setProcessChannelMode(QProcess::SeparateChannels);
+    run.process->setProcessEnvironment(core::engineProcessEnvironment());
     const QStringList args = core::probeArguments(paths, url.toString(), flat);
     connect(run.process, &QProcess::finished, this, [this, id] { handleFinished(id); });
     connect(run.process, &QProcess::errorOccurred, this, [this, id](QProcess::ProcessError error) {

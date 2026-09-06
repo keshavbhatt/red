@@ -174,6 +174,18 @@ QString detectSystemFfmpeg(const QStringList& extraDirs)
     return QStandardPaths::findExecutable(u"ffmpeg"_s);
 }
 
+QProcessEnvironment engineProcessEnvironment()
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (!env.contains(u"SNAP"_s)) {
+        env.remove(u"LD_LIBRARY_PATH"_s);
+        env.remove(u"LD_PRELOAD"_s);
+    }
+    // yt-dlp's own update nag and colour output are noise in our logs.
+    env.insert(u"NO_COLOR"_s, u"1"_s);
+    return env;
+}
+
 QString jsRuntimeLabel(const QString& spec)
 {
     const QString name = spec.section(u':', 0, 0);

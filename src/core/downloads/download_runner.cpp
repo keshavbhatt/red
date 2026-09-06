@@ -1,5 +1,6 @@
 #include "core/downloads/download_runner.h"
 
+#include "core/downloads/engine_spec.h"
 #include "core/logging.h"
 
 #include <QTemporaryFile>
@@ -24,6 +25,7 @@ DownloadRunner::DownloadRunner(quint64 jobId, const QString& program, const QStr
     , m_process(new QProcess(this))
 {
     m_process->setProcessChannelMode(QProcess::SeparateChannels);
+    m_process->setProcessEnvironment(engineProcessEnvironment());
     connect(m_process, &QProcess::readyReadStandardOutput, this, &DownloadRunner::readStdout);
     connect(m_process, &QProcess::readyReadStandardError, this, &DownloadRunner::readStderr);
     connect(m_process, &QProcess::finished, this, &DownloadRunner::handleFinished);

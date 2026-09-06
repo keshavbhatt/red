@@ -7,20 +7,20 @@
 
 #include <optional>
 
-// Command line surface (FEATURES S9). Every option maps to a UI action or a
-// startup mode — nothing here automates messaging.
+// Command line surface (FEATURES S10). Every option maps to a UI action or a
+// startup mode.
 namespace red::app {
 
 struct CliOptions
 {
     QString profile;                ///< --profile <name>; empty = default
-    bool startMinimized = false;    ///< --minimized
+    bool tvMode = false;            ///< --tv
     std::optional<QString> logFile; ///< --log-file <path>; nullopt = default location
     bool noLogFile = false;         ///< --no-log-file
-    std::optional<QString> newChat; ///< --new-chat <phone|url>
+    std::optional<QString> download; ///< --download <url>
     bool showSettings = false;      ///< --settings
     bool quit = false;              ///< --quit (tell the running instance to exit)
-    QStringList urls;               ///< positional whatsapp:// / wa.me links
+    QStringList urls;               ///< positional YouTube links
 
     /// True when the invocation only carries commands for a running instance.
     [[nodiscard]] bool hasCommands() const;
@@ -45,12 +45,14 @@ struct CliParseResult
 /// Always ends with a "raise" unless --quit was given.
 [[nodiscard]] QList<QJsonObject> commandsFor(const CliOptions& options);
 
-// Command vocabulary shared by sender and receiver (ADR-010).
+// Command vocabulary shared by sender and receiver (W-ADR-010).
 namespace cmd {
 inline constexpr auto kKey = "cmd";
 inline constexpr auto kUrlKey = "url";
 inline constexpr auto kRaise = "raise";
-inline constexpr auto kNewChat = "new-chat";
+inline constexpr auto kOpen = "open";
+inline constexpr auto kDownload = "download";
+inline constexpr auto kTv = "tv";
 inline constexpr auto kSettings = "settings";
 inline constexpr auto kQuit = "quit";
 } // namespace cmd

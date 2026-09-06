@@ -2,95 +2,46 @@
 
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
-#include "platform/crash_handler.h"
 #include "platform/platform_info.h"
 
 #include <QCoreApplication>
-#include <QRegularExpression>
 #include <QStandardPaths>
-#include <QStringList>
-#include <QUrl>
-#include <QUrlQuery>
+#include <QSysInfo>
+#include <QTextStream>
+#include <QtWebEngineCore/qtwebenginecoreglobal.h>
 
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
-namespace {
-QString chromiumVersion(const QString& userAgent)
+QString buildDiagnostics(const core::Settings& settings, const QString& userAgent, const QString& engineSummary,
+                         int logLines)
 {
-    static const QRegularExpression kChrome(u"Chrome/([\\d.]+)"_s);
-    const QRegularExpressionMatch m = kChrome.match(userAgent);
-    return m.hasMatch() ? m.captured(1) : u"unknown"_s;
-}
-} // namespace
-
-QString buildDiagnostics(const core::Settings& settings, const QString& userAgent, int logLines,
-                         bool includeCrash)
-{
-    QStringList out;
-    out << u"### Red diagnostics"_s;
-    out << u"- App: %1 %2"_s.arg(QCoreApplication::applicationName(), QCoreApplication::applicationVersion());
-    out << u"- Host: %1"_s.arg(platform::describeHost());
-    out << u"- Chromium: %1"_s.arg(chromiumVersion(userAgent));
-    out << u"- User agent: `%1`"_s.arg(userAgent);
-    out << u"- Settings: `%1`"_s.arg(settings.fileName());
-    out << u"- Data: `%1`"_s.arg(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-    out << u"- Log file: `%1`"_s.arg(core::LogSink::logFilePath().isEmpty() ? u"(disabled)"_s
-                                                                            : core::LogSink::logFilePath());
-    out << QString();
-    out << u"<details><summary>Recent log</summary>"_s << QString() << u"```"_s;
+    QString text;
+    QTextStream out(&text);
+    out << u"### Red diagnostics\n\n"_s;
+    out << u"- Red: "_s << QCoreApplication::applicationVersion() << u'\n';
+    out << u"- Qt: "_s << QString::fromLatin1(qVersion()) << u" (built against "_s << QString::fromLatin1(QT_VERSION_STR)
+        << u")\n"_s;
+    out << u"- Chromium: "_s << qWebEngineChromiumVersion() << u" (security patches "_s
+        << qWebEngineChromiumSecurityPatchVersion() << u")\n"_s;
+    out << u"- Host: "_s << platform::describeHost() << u'\n';
+    out << u"- CPU: "_s << QSysInfo::currentCpuArchitecture() << u'\n';
+    out << u"- User agent: "_s << userAgent << u'\n';
+    out << u"- Engine: "_s << engineSummary << u'\n';
+    out << u"- Settings: "_s << settings.fileName() << u'\n';
+    out << u"- Data: "_s << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) << u'\n';
+    out << u"- Log: "_s << core::LogSink::logFilePath() << u'\n';
+    out << u"- Hardware acceleration: "_s << static_cast<int>(settings.hardwareAcceleration())
+        << (settings.gpuAutoDisabled() ? u" (auto-disabled)"_s : QString()) << u'\n';
     const QStringList lines = core::LogSink::recentLines();
-    const qsizetype start = std::max<qsizetype>(0, lines.size() - logLines);
-    for (qsizetype i = start; i < lines.size(); ++i) {
-        out << lines.at(i);
+    const qsizetype from = std::max<qsizetype>(0, lines.size() - logLines);
+    out << u"\n<details><summary>Recent log</summary>\n\n```\n"_s;
+    for (qsizetype i = from; i < lines.size(); ++i) {
+        out << lines.at(i) << u'\n';
     }
-    out << u"```"_s << u"</details>"_s;
-
-    if (includeCrash) {
-        const QString crash = platform::lastCrashReport();
-        if (!crash.isEmpty()) {
-            out << QString() << u"<details><summary>Previous crash</summary>"_s << QString()
-                << u"```"_s;
-            for (const QString& line : crash.split(u'\n')) {
-                out << line;
-            }
-            out << u"```"_s << u"</details>"_s;
-        }
-    }
-    return out.join(u'\n');
-}
-
-QString bugReportUrl(const QString& userAgent, const QString& title, const QString& description)
-{
-    // Only the user's title, description and a short environment block go in the
-    // URL — logs and the crash backtrace would blow past GitHub's length limit
-    // and get the request rejected ("Malformed request"). Diagnostics are copied
-    // to the clipboard by the caller; the body must not repeat them, or pasting
-    // would duplicate the prefilled sections.
-    const QString described = description.trimmed().isEmpty()
-                                  ? u"<!-- describe the problem here -->"_s
-                                  : description.trimmed().left(1500);
-    const QString body =
-        u"**What happened?**\n\n"_s + described +
-        u"\n\n**Steps to reproduce**\n1. \n2. \n3. \n\n"
-        "**Expected behaviour**\n\n\n"
-        "**Environment**\n"_s +
-        u"- Red: %1\n"_s.arg(QCoreApplication::applicationVersion()) +
-        u"- OS: %1\n"_s.arg(platform::describeHost()) +
-        u"- Chromium: %1\n\n"_s.arg(chromiumVersion(userAgent)) +
-        u"<!-- Paste the diagnostics from your clipboard below. -->"_s;
-
-    QString issueTitle = u"[Bug] "_s;
-    issueTitle += title.trimmed().section(u'\n', 0, 0).left(80);
-
-    QUrl url(u"https://github.com/keshavbhatt/red/issues/new"_s);
-    QUrlQuery query;
-    query.addQueryItem(u"labels"_s, u"bug"_s);
-    query.addQueryItem(u"title"_s, issueTitle);
-    query.addQueryItem(u"body"_s, body);
-    url.setQuery(query);
-    return url.toString(QUrl::FullyEncoded);
+    out << u"```\n</details>\n"_s;
+    return text;
 }
 
 } // namespace red::ui

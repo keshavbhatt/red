@@ -1,12 +1,13 @@
 # Layered libraries. Dependency direction is enforced by target_link_libraries:
 #
-#   ui ──► web ──► core
+#   ui ──► web ──► services ─► core
 #   │        │
 #   └──► platform ─► core
 #
 # Nothing links to `ui` except the executable (via `app`).
 
 add_subdirectory(core)
+add_subdirectory(services)
 add_subdirectory(platform)
 add_subdirectory(web)
 add_subdirectory(ui)
