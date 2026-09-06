@@ -20,7 +20,7 @@ struct EngineComponent
     Kind kind = Kind::YtDlp;
     QString assetName;   ///< release asset file name
     QString installName; ///< file name inside the engine directory
-    QUrl releaseApi;     ///< GitHub "latest release" JSON
+    QString repo;        ///< GitHub "owner/name"; assets come from releases/latest/download/
 };
 
 /// Components for the running platform/CPU (`cpuArchitecture` as QSysInfo gives it).
@@ -33,6 +33,15 @@ struct EngineComponent
 
 /// yt-dlp tags are dates ("2026.08.19"); compares as dates, falls back to strings.
 [[nodiscard]] bool isNewerVersion(const QString& remote, const QString& local);
+
+/// https://github.com/<repo>/releases/latest/download/<asset> — GitHub redirects
+/// to the tagged asset without touching the rate-limited REST API.
+[[nodiscard]] QUrl latestAssetUrl(const QString& repo, const QString& asset);
+/// https://github.com/<repo>/releases/latest (redirects to /releases/tag/<tag>).
+[[nodiscard]] QUrl latestReleaseUrl(const QString& repo);
+/// The tag in a resolved release/asset URL ("…/releases/download/2026.08.19/x",
+/// "…/releases/tag/v0.16.2"); empty when the URL has no tag.
+[[nodiscard]] QString tagFromReleaseUrl(const QUrl& url);
 
 /// Reads "tag_name" out of a GitHub release JSON; empty on failure.
 [[nodiscard]] QString releaseTagFromJson(const QByteArray& json);

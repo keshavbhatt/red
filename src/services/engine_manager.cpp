@@ -280,13 +280,44 @@ void EngineManager::queueComponent(const core::EngineComponent& component, bool 
 void EngineManager::fetchRelease(const core::EngineComponent& component, bool verifySums,
                                  const std::function<void(const QUrl&, const QUrl&)>& then)
 {
-    fetchText(component.releaseApi, [this, component, verifySums, then](const QByteArray& json) {
-        const QUrl asset = core::assetUrlFromJson(json, component.assetName);
-        const QUrl sums = verifySums ? core::assetUrlFromJson(json, kSumsAsset) : QUrl();
-        if (component.kind == core::EngineComponent::Kind::YtDlp) {
-            m_pendingVersion = core::releaseTagFromJson(json);
+    // No REST API (60 requests/hour per IP): "latest/download/<asset>" answers
+    // with a redirect to "releases/download/<tag>/<asset>", which names the
+    // version. Only that first hop is followed by hand; the download itself
+    // follows the rest (the CDN hop carries a signed, tag-less URL).
+    const QUrl asset = core::latestAssetUrl(component.repo, component.assetName);
+    QNetworkRequest request(asset);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+    QNetworkReply* reply = m_network->head(request);
+    m_activeReply = reply;
+    connect(reply, &QNetworkReply::finished, this, [this, reply, component, verifySums, then] {
+        reply->deleteLater();
+        m_activeReply = nullptr;
+        const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        if (status == 404) {
+            then({}, {}); // no such asset for this platform
+            return;
         }
-        then(asset, sums);
+        if (reply->error() != QNetworkReply::NoError) {
+            fail(tr("Network error: %1").arg(reply->errorString()));
+            return;
+        }
+        const QUrl resolved = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        const QString tag = core::tagFromReleaseUrl(resolved);
+        qCInfo(lcServices) << "release lookup" << component.assetName << "->" << tag;
+        if (resolved.isEmpty() || tag.isEmpty()) {
+            fail(tr("GitHub did not point at a release for %1.").arg(component.assetName));
+            return;
+        }
+        if (component.kind == core::EngineComponent::Kind::YtDlp) {
+            m_pendingVersion = tag;
+        }
+        QUrl sums;
+        if (verifySums) {
+            sums =
+                QUrl(u"https://github.com/%1/releases/download/%2/%3"_s.arg(component.repo, tag, kSumsAsset));
+        }
+        then(resolved, sums);
     });
 }
 
@@ -398,18 +429,20 @@ void EngineManager::checkForUpdates(bool force)
     if (!force && last.isValid() && last.secsTo(QDateTime::currentDateTimeUtc()) < kUpdateCheckHours * 3600) {
         return;
     }
-    QNetworkRequest request(core::ytdlpComponent(m_os, m_cpu).releaseApi);
+    QNetworkRequest request(core::latestReleaseUrl(core::ytdlpComponent(m_os, m_cpu).repo));
     request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
-    request.setRawHeader("Accept", "application/vnd.github+json");
-    QNetworkReply* reply = m_network->get(request);
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+    QNetworkReply* reply = m_network->head(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply] {
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError) {
             qCInfo(lcServices) << "update check failed:" << reply->errorString();
             return;
         }
-        const QString latest = core::releaseTagFromJson(reply->readAll());
+        const QString latest =
+            core::tagFromReleaseUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         if (latest.isEmpty()) {
+            qCInfo(lcServices) << "update check: no tag in the release redirect";
             return;
         }
         m_settings.setEngineLastCheck(QDateTime::currentDateTimeUtc());

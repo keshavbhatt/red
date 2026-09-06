@@ -15,8 +15,8 @@ namespace red::core {
 
 namespace {
 
-const QUrl kYtDlpApi(u"https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"_s);
-const QUrl kQuickJsApi(u"https://api.github.com/repos/quickjs-ng/quickjs/releases/latest"_s);
+const QString kYtDlpRepo = u"yt-dlp/yt-dlp"_s;
+const QString kQuickJsRepo = u"quickjs-ng/quickjs"_s;
 
 bool isArm64(const QString& cpu)
 {
@@ -29,7 +29,7 @@ EngineComponent ytdlpComponent(const QString& os, const QString& cpu)
 {
     EngineComponent c;
     c.kind = EngineComponent::Kind::YtDlp;
-    c.releaseApi = kYtDlpApi;
+    c.repo = kYtDlpRepo;
     if (os == u"windows"_s) {
         c.assetName = isArm64(cpu) ? u"yt-dlp_arm64.exe"_s : u"yt-dlp.exe"_s;
         c.installName = u"yt-dlp.exe"_s;
@@ -48,7 +48,7 @@ EngineComponent jsRuntimeComponent(const QString& os, const QString& cpu)
 {
     EngineComponent c;
     c.kind = EngineComponent::Kind::JsRuntime;
-    c.releaseApi = kQuickJsApi;
+    c.repo = kQuickJsRepo;
     if (os == u"windows"_s) {
         c.assetName = u"qjs-windows-x86_64.exe"_s;
         c.installName = u"qjs.exe"_s;
@@ -90,6 +90,28 @@ bool isNewerVersion(const QString& remote, const QString& local)
         return remote.section(u'.', 3).toInt() > local.section(u'.', 3).toInt();
     }
     return QString::compare(remote, local) > 0;
+}
+
+QUrl latestAssetUrl(const QString& repo, const QString& asset)
+{
+    return QUrl(u"https://github.com/%1/releases/latest/download/%2"_s.arg(repo, asset));
+}
+
+QUrl latestReleaseUrl(const QString& repo)
+{
+    return QUrl(u"https://github.com/%1/releases/latest"_s.arg(repo));
+}
+
+QString tagFromReleaseUrl(const QUrl& url)
+{
+    const QStringList parts = url.path().split(u'/', Qt::SkipEmptyParts);
+    for (qsizetype i = 0; i + 1 < parts.size(); ++i) {
+        if ((parts.at(i) == u"download"_s || parts.at(i) == u"tag"_s) && i >= 1 &&
+            parts.at(i - 1) == u"releases"_s) {
+            return parts.at(i + 1);
+        }
+    }
+    return {};
 }
 
 QString releaseTagFromJson(const QByteArray& json)

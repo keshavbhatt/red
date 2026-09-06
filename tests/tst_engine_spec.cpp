@@ -32,6 +32,21 @@ private Q_SLOTS:
         QVERIFY(isNewerVersion(u"2026.09.01"_s, u"2026.08.19"_s));
     }
 
+    void redirectUrls()
+    {
+        QCOMPARE(latestAssetUrl(u"yt-dlp/yt-dlp"_s, u"yt-dlp_linux"_s),
+                 QUrl(u"https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux"_s));
+        QCOMPARE(latestReleaseUrl(u"quickjs-ng/quickjs"_s),
+                 QUrl(u"https://github.com/quickjs-ng/quickjs/releases/latest"_s));
+        QCOMPARE(tagFromReleaseUrl(
+                     QUrl(u"https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp_linux"_s)),
+                 u"2026.08.19"_s);
+        QCOMPARE(tagFromReleaseUrl(QUrl(u"https://github.com/quickjs-ng/quickjs/releases/tag/v0.16.2"_s)),
+                 u"v0.16.2"_s);
+        QCOMPARE(tagFromReleaseUrl(QUrl(u"https://github.com/yt-dlp/yt-dlp/releases/latest"_s)), QString());
+        QCOMPARE(ytdlpComponent(u"linux"_s, u"x86_64"_s).repo, u"yt-dlp/yt-dlp"_s);
+    }
+
     void releaseJsonAndSums()
     {
         const QByteArray json =
