@@ -137,7 +137,7 @@ QPushButton[redPrimary="true"] { background: {{accent}}; color: {{accentText}}; 
 QPushButton[redPrimary="true"]:hover { background: {{accentHover}}; border-color: {{accentHover}}; }
 QPushButton[redPrimary="true"]:disabled { background: {{hover}}; color: {{muted}}; border-color: transparent; }
 QPushButton[redFlat="true"], QToolButton[redFlat="true"] {
-    background: transparent; border: none; border-radius: 8px; padding: 6px; min-height: 0;
+    background: transparent; border: none; border-radius: 8px; padding: 6px 10px; min-height: 22px;
 }
 QPushButton[redFlat="true"]:hover, QToolButton[redFlat="true"]:hover { background: {{hover}}; }
 QPushButton[redFlat="true"]:pressed, QToolButton[redFlat="true"]:pressed { background: {{border}}; }
@@ -168,6 +168,13 @@ QCheckBox::indicator:checked { background: {{accent}}; border-color: {{accent}};
 QCheckBox::indicator:disabled { border-color: {{border}}; }
 QCheckBox::indicator:checked:disabled { background: {{hover}}; border-color: {{hover}}; }
 QRadioButton::indicator { border: 2px solid {{muted}}; border-radius: 9px; background: transparent; }
+QListView::indicator, QTreeView::indicator, QTableView::indicator {
+    width: 16px; height: 16px; border: 2px solid {{muted}}; border-radius: 4px; background: transparent;
+}
+QListView::indicator:hover, QTreeView::indicator:hover { border-color: {{text}}; }
+QListView::indicator:checked, QTreeView::indicator:checked, QTableView::indicator:checked {
+    background: {{accent}}; border-color: {{accent}}; image: url({{checkWhite}});
+}
 QRadioButton::indicator:hover { border-color: {{text}}; }
 QRadioButton::indicator:checked { border: 6px solid {{accent}}; background: {{accentText}}; width: 6px; height: 6px; }
 

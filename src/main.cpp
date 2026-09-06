@@ -207,13 +207,18 @@ int main(int argc, char* argv[])
 #endif
 
     // Commands given on our own command line (we are the primary instance).
-    for (const QJsonObject& command : red::app::commandsFor(cli)) {
-        const QString name = command.value(QLatin1StringView(red::app::cmd::kKey)).toString();
-        if (name != QLatin1StringView(red::app::cmd::kRaise) &&
-            name != QLatin1StringView(red::app::cmd::kTv)) {
-            app.dispatchCommand(command);
+    // Deferred until the window is mapped: a dialog opened before the
+    // (possibly full-screen) main window has a surface gets closed by the
+    // compositor on Wayland.
+    QTimer::singleShot(400, &window, [&app, &cli] {
+        for (const QJsonObject& command : red::app::commandsFor(cli)) {
+            const QString name = command.value(QLatin1StringView(red::app::cmd::kKey)).toString();
+            if (name != QLatin1StringView(red::app::cmd::kRaise) &&
+                name != QLatin1StringView(red::app::cmd::kTv)) {
+                app.dispatchCommand(command);
+            }
         }
-    }
+    });
 
     return red::app::Application::exec();
 }

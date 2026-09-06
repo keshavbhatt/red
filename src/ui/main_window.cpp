@@ -49,6 +49,7 @@
 #include <QWebEngineLoadingInfo>
 #include <QWebEnginePage>
 #include <QWebEnginePermission>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 
@@ -545,6 +546,9 @@ void MainWindow::showSettings()
     connect(m_settingsDialog, &SettingsDialog::copyDiagnosticsRequested, this, &MainWindow::copyDiagnostics);
     connect(m_settingsDialog, &SettingsDialog::engineDialogRequested, m_downloads,
             &DownloadsHub::showEngineDialog);
+    if (qEnvironmentVariableIsSet("RED_DEBUG_SETTINGS_PAGE")) { // headless verification aid
+        m_settingsDialog->showPage(qEnvironmentVariableIntValue("RED_DEBUG_SETTINGS_PAGE"));
+    }
     m_settingsDialog->show();
 }
 
