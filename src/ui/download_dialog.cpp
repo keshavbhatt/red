@@ -583,7 +583,14 @@ void DownloadDialog::populateFormats()
         }
         return a.tbr > b.tbr;
     });
+    // HLS duplicates of the same streams only add noise; keep them when they are all there is.
+    const bool hasDirect = std::any_of(formats.cbegin(), formats.cend(), [](const core::MediaFormat& f) {
+        return !f.protocol.startsWith(u"m3u8"_s);
+    });
     for (const core::MediaFormat& f : formats) {
+        if (hasDirect && f.protocol.startsWith(u"m3u8"_s)) {
+            continue;
+        }
         QTreeWidgetItem* parent =
             f.isVideoOnly() ? videoGroup : (f.isAudioOnly() ? audioGroup : combinedGroup);
         const int kind = f.isVideoOnly() ? 0 : (f.isAudioOnly() ? 1 : 2);
