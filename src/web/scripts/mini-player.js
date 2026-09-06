@@ -11,7 +11,7 @@
         return;
     }
     var CSS = [
-        'html.red-mini, html.red-mini body { overflow: hidden !important; background: #000 !important; }',
+        'html.red-mini, html.red-mini body, html.red-mini ytd-app, html.red-mini #movie_player { overflow: hidden !important; background: #000 !important; }',
         'html.red-mini #masthead-container, html.red-mini #guide, html.red-mini ytd-mini-guide-renderer,',
         'html.red-mini #secondary, html.red-mini #below, html.red-mini #comments, html.red-mini ytd-watch-next-secondary-results-renderer,',
         'html.red-mini #chat, html.red-mini ytd-playlist-panel-renderer, html.red-mini #masthead-ad',
@@ -19,7 +19,8 @@
         'html.red-mini #movie_player, html.red-mini ytd-player, html.red-mini #player-container, html.red-mini #player',
         '{ position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important;',
         '  max-height: none !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; z-index: 2147483000 !important; }',
-        'html.red-mini #movie_player video { width: 100% !important; height: 100% !important; left: 0 !important; top: 0 !important; object-fit: contain; }',
+        'html.red-mini #movie_player .html5-video-container { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }',
+        'html.red-mini #movie_player video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: contain; }',
         'html.red-mini #movie_player .ytp-chrome-bottom { width: calc(100% - 24px) !important; }'
     ].join('\n');
     var on = !!red.config.miniPlayer;
@@ -36,6 +37,10 @@
             red.report('mini-player', e);
         }
     }
+    red.setMiniPlayer = function (value) {
+        on = !!value;
+        apply();
+    };
     red.onBridge(function (bridge) {
         bridge.miniPlayerChanged.connect(function (value) {
             on = !!value;
