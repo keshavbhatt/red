@@ -71,8 +71,11 @@
         var md = metadata();
         var id = videoIdFromLocation() || md.videoId || '';
         var playing = v && !v.paused && !v.ended;
+        // Off a watch page the player is parked (still holds the last video):
+        // report nothing unless YouTube's own miniplayer is active.
+        var parked = !id && !document.querySelector('ytd-miniplayer[active]') && !red.isTv();
         var s = {
-            state: !v || (!id && v.readyState === 0) ? 'none' : (playing ? 'playing' : 'paused'),
+            state: !v || parked || (!id && v.readyState === 0) ? 'none' : (playing ? 'playing' : 'paused'),
             videoId: id,
             title: md.title,
             artist: md.artist,
