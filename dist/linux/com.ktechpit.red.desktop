@@ -1,0 +1,27 @@
+[Desktop Entry]
+Name=Red
+GenericName=YouTube Client
+Comment=YouTube in a real desktop app, with a TV mode, ad blocking and downloads
+Icon=com.ktechpit.red
+Exec=red %U
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;Player;Network;Qt;
+Keywords=YouTube;Video;TV;Download;Player;
+StartupWMClass=red
+StartupNotify=true
+X-GNOME-UsesNotifications=true
+
+Actions=TvMode;Download;Settings;
+
+[Desktop Action TvMode]
+Name=Open in TV mode
+Exec=red --tv
+
+[Desktop Action Download]
+Name=Download from a link…
+Exec=red --download ""
+
+[Desktop Action Settings]
+Name=Settings
+Exec=red --settings

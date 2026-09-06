@@ -504,7 +504,11 @@ void MainWindow::openUrl(const QString& url)
 void MainWindow::downloadUrl(const QString& url)
 {
     showAndRaise();
-    m_downloads->requestDownload(QUrl::fromUserInput(url));
+    if (url.trimmed().isEmpty()) {
+        m_downloads->promptForUrl(); // the desktop action "Download from a link…"
+        return;
+    }
+    m_downloads->requestDownload(QUrl::fromUserInput(url.trimmed()));
 }
 
 void MainWindow::handleTvSignal(const QString& signal, const QString&)

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ktechpit.red</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Red</name>
+  <summary>YouTube in a real desktop app, with a TV mode, ad blocking and downloads</summary>
+
+  <developer id="com.ktechpit">
+    <name>Keshav Bhatt</name>
+  </developer>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#ffd6d6</color>
+    <color type="primary" scheme_preference="dark">#4a0d0d</color>
+  </branding>
+
+  <description>
+    <p>
+      Red puts YouTube in a native window built on Qt 6 and Qt WebEngine — lightweight, fast,
+      and free of the browser tab. It adds what a browser cannot: a living-room TV mode, ad and
+      tracker blocking, SponsorBlock, media keys, a mini player, and a real download manager.
+    </p>
+    <ul>
+      <li>Desktop mode: the full YouTube site, signed in, with light/dark/system themes</li>
+      <li>TV mode: YouTube's smart-TV interface with keyboard, mouse and gamepad control</li>
+      <li>Ad and tracker blocking that never touches playback; SponsorBlock segment skipping</li>
+      <li>Downloads powered by yt-dlp: any video, playlist or channel, video or audio, with subtitles, thumbnails and chapters embedded</li>
+      <li>Media keys and desktop media controls (MPRIS); keeps the screen awake while playing</li>
+      <li>Mini player that floats above other windows; tray icon with playback controls</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">com.ktechpit.red.desktop</launchable>
+  <url type="homepage">https://github.com/keshavbhatt/red</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/red/issues</url>
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="10.0.0" date="2026-09-06">
+      <description><p>Complete rewrite on Qt 6: two modes, new ad blocking, yt-dlp downloads, MPRIS, mini player, new design.</p></description>
+    </release>
+  </releases>
+</component>
