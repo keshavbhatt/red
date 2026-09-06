@@ -49,13 +49,13 @@ QList<SponsorSegment> parseSponsorSegments(const QByteArray& body, const QString
         return result;
     }
     const QJsonArray videos = doc.array();
-    for (const QJsonValue& v : videos) {
+    for (const auto& v : videos) {
         const QJsonObject video = v.toObject();
         if (video.value(u"videoID"_s).toString() != videoId) {
             continue;
         }
         const QJsonArray segments = video.value(u"segments"_s).toArray();
-        for (const QJsonValue& s : segments) {
+        for (const auto& s : segments) {
             const QJsonObject o = s.toObject();
             const QJsonArray range = o.value(u"segment"_s).toArray();
             if (range.size() != 2) {

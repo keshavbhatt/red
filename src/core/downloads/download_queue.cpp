@@ -115,7 +115,7 @@ quint64 DownloadQueue::add(DownloadJob job)
     beginInsertRows({}, 0, 0);
     m_jobs.prepend(job);
     endInsertRows();
-    while (m_jobs.size() > kMaxEntries) {
+    if (m_jobs.size() > kMaxEntries) {
         // Drop the oldest finished entry; never an active one.
         for (int i = static_cast<int>(m_jobs.size()) - 1; i >= 0; --i) {
             if (m_jobs.at(i).isFinished()) {
@@ -125,7 +125,6 @@ quint64 DownloadQueue::add(DownloadJob job)
                 break;
             }
         }
-        break;
     }
     Q_EMIT jobAdded(job.id);
     Q_EMIT changed();
@@ -505,7 +504,7 @@ bool DownloadQueue::load(const QString& filePath)
     const QJsonObject root = doc.object();
     QList<DownloadJob> loaded;
     const QJsonArray entries = root.value(u"jobs"_s).toArray();
-    for (const QJsonValue& v : entries) {
+    for (const auto& v : entries) {
         DownloadJob j = DownloadJob::fromJson(v.toObject());
         if (j.id == 0 || j.url.isEmpty()) {
             continue;

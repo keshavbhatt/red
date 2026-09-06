@@ -21,7 +21,7 @@ QJsonArray toArray(const QStringList& list)
 QStringList fromArray(const QJsonArray& array)
 {
     QStringList list;
-    for (const QJsonValue& v : array) {
+    for (const auto& v : array) {
         list << v.toString();
     }
     return list;

@@ -3,10 +3,9 @@
 #include "core/downloads/download_job.h"
 #include "ui/download_card_delegate.h"
 
+#include <QDialog>
 #include <QHash>
 #include <QObject>
-#include <QDialog>
-#include <QDialog>
 #include <QPointer>
 #include <QUrl>
 
@@ -87,8 +86,8 @@ private:
     DownloadsPanel* m_panel = nullptr;
     QPointer<EngineSetupDialog> m_engineDialog;
     QTimer* m_persistTimer = nullptr;
-    QList<QUrl> m_pendingUrls;                  ///< waiting for the engine
-    QHash<quint64, quint64> m_notificationJobs; ///< notification id → job id
+    QList<QUrl> m_pendingUrls;                       ///< waiting for the engine
+    QHash<quint64, quint64> m_notificationJobs;      ///< notification id → job id
     QHash<QString, QPointer<QDialog>> m_openDialogs; ///< one dialog per URL
 };
 

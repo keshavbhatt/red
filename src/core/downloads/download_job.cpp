@@ -155,7 +155,7 @@ DownloadJob DownloadJob::fromJson(const QJsonObject& o)
     j.itemIndex = o.value(u"itemIndex"_s).toInt();
     j.itemCount = o.value(u"itemCount"_s).toInt();
     const QJsonArray files = o.value(u"outputFiles"_s).toArray();
-    for (const QJsonValue& f : files) {
+    for (const auto& f : files) {
         j.outputFiles << f.toString();
     }
     j.error = o.value(u"error"_s).toString();

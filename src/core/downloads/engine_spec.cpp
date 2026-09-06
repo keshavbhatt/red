@@ -122,7 +122,7 @@ QUrl assetUrlFromJson(const QByteArray& json, const QString& assetName)
         return {};
     }
     const QJsonArray assets = doc.object().value(u"assets"_s).toArray();
-    for (const QJsonValue& v : assets) {
+    for (const auto& v : assets) {
         const QJsonObject a = v.toObject();
         if (a.value(u"name"_s).toString() == assetName) {
             return QUrl(a.value(u"browser_download_url"_s).toString());

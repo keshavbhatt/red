@@ -15,12 +15,12 @@ constexpr int kStderrTailLines = 40;
 constexpr int kTerminateGraceMs = 3000;
 } // namespace
 
-DownloadRunner::DownloadRunner(quint64 jobId, const QString& program, const QStringList& arguments,
+DownloadRunner::DownloadRunner(quint64 jobId, QString program, QStringList arguments,
                                std::unique_ptr<QTemporaryFile> cookiesFile, QObject* parent)
     : QObject(parent)
     , m_jobId(jobId)
-    , m_program(program)
-    , m_arguments(arguments)
+    , m_program(std::move(program))
+    , m_arguments(std::move(arguments))
     , m_cookies(std::move(cookiesFile))
     , m_process(new QProcess(this))
 {

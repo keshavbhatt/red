@@ -22,7 +22,7 @@ class DownloadRunner : public QObject
     Q_DISABLE_COPY_MOVE(DownloadRunner)
 
 public:
-    DownloadRunner(quint64 jobId, const QString& program, const QStringList& arguments,
+    DownloadRunner(quint64 jobId, QString program, QStringList arguments,
                    std::unique_ptr<QTemporaryFile> cookiesFile, QObject* parent = nullptr);
     ~DownloadRunner() override;
 

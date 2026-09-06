@@ -147,7 +147,7 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
     info.hasChapters = !o.value(u"chapters"_s).toArray().isEmpty();
 
     const QJsonArray formats = o.value(u"formats"_s).toArray();
-    for (const QJsonValue& v : formats) {
+    for (const auto& v : formats) {
         const MediaFormat f = MediaFormat::fromJson(v.toObject());
         if (!f.id.isEmpty() && !f.isStoryboard()) {
             info.formats << f;
@@ -169,7 +169,7 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
     addSubs(o.value(u"automatic_captions"_s).toObject(), true);
 
     const QJsonArray entries = o.value(u"entries"_s).toArray();
-    for (const QJsonValue& v : entries) {
+    for (const auto& v : entries) {
         const QJsonObject e = v.toObject();
         if (e.isEmpty()) {
             continue;

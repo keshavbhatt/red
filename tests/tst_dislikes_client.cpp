@@ -11,7 +11,9 @@ class TestDislikesClient : public QObject
 private Q_SLOTS:
     void parsesVotes()
     {
-        QCOMPARE(DislikesClient::parseDislikes("{\"id\":\"x\",\"likes\":19000000,\"dislikes\":518123,\"rating\":4.9}"), 518123.0);
+        QCOMPARE(DislikesClient::parseDislikes(
+                     "{\"id\":\"x\",\"likes\":19000000,\"dislikes\":518123,\"rating\":4.9}"),
+                 518123.0);
         QCOMPARE(DislikesClient::parseDislikes("{}"), -1.0);
         QCOMPARE(DislikesClient::parseDislikes("nope"), -1.0);
     }
