@@ -151,6 +151,11 @@ int main(int argc, char* argv[])
     const red::app::CliOptions& cli = app.cliOptions();
     window.start(cli.tvMode);
 
+    // Developer aid: RED_DEBUG_WINDOW_SIZE=WxH sizes the window for a grab.
+    if (const QString size = qEnvironmentVariable("RED_DEBUG_WINDOW_SIZE"); size.contains(u'x')) {
+        window.resize(size.section(u'x', 0, 0).toInt(), size.section(u'x', 1, 1).toInt());
+    }
+
     // Developer aid: RED_DEBUG_OPEN=about|shortcuts|tray opens that screen
     // once the window is up (ADR-010).
     if (qEnvironmentVariableIsSet("RED_DEBUG_OPEN")) {
