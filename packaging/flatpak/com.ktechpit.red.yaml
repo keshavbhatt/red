@@ -1,9 +1,3 @@
-# Flatpak manifest for Red, on the pattern of the ktechpit apps on Flathub:
-# Qt WebEngine BaseApp + KDE 6.11 runtime (Qt 6.11, ffmpeg included).
-#
-# This in-tree copy builds the working tree (`type: dir`) for CI and local
-# checks. The Flathub repository (flathub/com.ktechpit.red) carries the same
-# manifest with a `type: git` source pinned to a release tag.
 app-id: com.ktechpit.red
 base: io.qt.qtwebengine.BaseApp
 base-version: '6.11'
@@ -12,42 +6,36 @@ runtime-version: '6.11'
 sdk: org.kde.Sdk
 command: red
 finish-args:
+  - --device=all
   - --share=network
   - --share=ipc
   - --socket=fallback-x11
   - --socket=wayland
   - --socket=pulseaudio
-  # GPU, and /dev/input for gamepads in TV mode (Chromium's Gamepad API).
-  - --device=all
 
   - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.ScreenSaver
   - --talk-name=org.kde.StatusNotifierWatcher
   - --talk-name=com.canonical.indicator.application
   - --talk-name=org.ayatana.indicator.application
-  # Desktop media controls (ADR-007).
   - --own-name=org.mpris.MediaPlayer2.red
-  # Keep the screen awake while a video plays (the portal is the fallback).
-  - --talk-name=org.freedesktop.ScreenSaver
 
-  # Where downloads go by default (~/Videos/Red) and the usual alternatives;
-  # any other folder is reached through the file chooser portal.
-  - --filesystem=xdg-videos
-  - --filesystem=xdg-music
+  # download directories for convenience
   - --filesystem=xdg-download
+  - --filesystem=xdg-music
+  - --filesystem=xdg-videos
 
 cleanup:
   - /include
   - /lib/cmake
+  - /lib/pkgconfig
   - /share/man
   - /share/doc
-  - /lib/pkgconfig
 
 cleanup-commands:
   - /app/cleanup-BaseApp.sh
 
 modules:
-  # JavaScript runtime for the download engine (yt-dlp needs one since 2025,
-  # ADR-004). With Deno on PATH the app never downloads QuickJS.
   - deno.yaml
 
   - name: red

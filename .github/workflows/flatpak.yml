@@ -1,7 +1,5 @@
-# Builds the Flatpak on GitHub's CI from the in-tree manifest, as a check on
-# manual runs and attached to the GitHub Release on a version tag. Nothing is
-# stored as a workflow artifact. Flathub itself builds from its own repository
-# (flathub/com.ktechpit.red) once the app is submitted there.
+# Build the Flatpak from the in-tree manifest; on a version tag the bundle is
+# attached to the GitHub Release. Flathub builds from its own repository.
 name: flatpak
 
 on:
@@ -24,8 +22,6 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     container:
-      # The newest published builder image; the 6.11 SDK is installed from
-      # Flathub by flatpak-builder itself (--install-deps-from).
       image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
       options: --privileged
     steps:
