@@ -24,7 +24,15 @@ apps:
     common-id: com.ktechpit.red
     extensions:
       - kde-neon-6
+    environment:
+      # ffmpeg for the download engine comes from the ffmpeg-2404 content snap
+      # (ADR-004): nothing is staged, nothing is downloaded.
+      PATH: $SNAP/ffmpeg-platform/usr/bin:$PATH
+      # Both triplets are listed so the recipe needs no build-time expansion;
+      # the one that does not exist is ignored by the loader.
+      LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/x86_64-linux-gnu:$SNAP/ffmpeg-platform/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
     plugs:
+      - ffmpeg-2404
       - home
       - desktop
       - desktop-legacy
@@ -40,9 +48,14 @@ apps:
       - audio-record
       - removable-media
       - screen-inhibit-control
+      # joystick: gamepads in TV mode (Chromium's Gamepad API reads /dev/input).
       - joystick
-      - hardware-observe
-      - mount-observe
+
+plugs:
+  ffmpeg-2404:
+    interface: content
+    target: $SNAP/ffmpeg-platform
+    default-provider: ffmpeg-2404
 
 parts:
   red:
@@ -61,9 +74,7 @@ parts:
       - libxcb-shape0
       # OpenType coverage for confined Qt (the snap ships no host fonts).
       - fonts-noto-core
-      # The download engine merges and converts with the runtime's ffmpeg
-      # (ADR-004: ffmpeg is never downloaded).
-      - ffmpeg
+      # No ffmpeg package: the ffmpeg-2404 content snap provides the binary.
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/usr

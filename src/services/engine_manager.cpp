@@ -100,7 +100,9 @@ QStringList EngineManager::extraSearchDirs() const
 {
     QStringList dirs{engineDirectory()};
     if (qEnvironmentVariableIsSet("SNAP")) {
-        dirs << qEnvironmentVariable("SNAP") + u"/usr/bin"_s;
+        // Own binaries, then the ffmpeg-2404 content snap (snapcraft.yaml).
+        dirs << qEnvironmentVariable("SNAP") + u"/usr/bin"_s
+             << qEnvironmentVariable("SNAP") + u"/ffmpeg-platform/usr/bin"_s;
     }
     dirs << QCoreApplication::applicationDirPath();
     return dirs;
