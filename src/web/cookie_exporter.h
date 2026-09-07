@@ -30,6 +30,9 @@ public:
     [[nodiscard]] bool looksSignedIn() const; ///< a SAPISID/SID cookie for youtube.com exists
     /// A fresh 0600 temp file, or nullptr when there is nothing to export.
     [[nodiscard]] std::unique_ptr<QTemporaryFile> writeTempFile() const;
+    /// Deletes every cookie whose domain matches the suffix (e.g. "google.com").
+    /// Returns how many were removed.
+    int deleteCookies(const QString& domainSuffix);
 
 Q_SIGNALS:
     void signedInChanged(bool signedIn);
@@ -41,6 +44,7 @@ private:
     void handleAdded(const QNetworkCookie& cookie);
     void handleRemoved(const QNetworkCookie& cookie);
 
+    QWebEngineCookieStore* m_store = nullptr;
     QHash<QString, QNetworkCookie> m_cookies;
     bool m_signedIn = false;
 };

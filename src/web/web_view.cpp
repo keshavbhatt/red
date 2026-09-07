@@ -5,10 +5,12 @@
 #include "core/zoom_policy.h"
 #include "platform/file_manager.h"
 #include "web/bridge.h"
+#include "web/cookie_exporter.h"
 #include "web/error_page.h"
 #include "web/logging.h"
 #include "web/permission_controller.h"
 #include "web/popup_window.h"
+#include "web/user_agent.h"
 #include "web/web_page.h"
 #include "web/web_profile.h"
 
@@ -190,6 +192,29 @@ void WebView::handleUrlChanged(const QUrl& url)
         m_downloadable = downloadable;
         Q_EMIT downloadableChanged(downloadable);
     }
+    recoverFromSignInRejection(url);
+}
+
+/// Google's "Couldn't sign you in" (embedded-browser check, ADR-008) sticks to
+/// the session: once rejected, every later attempt lands on /signin/rejected
+/// before the form even shows. Clearing Google's cookies and re-entering the
+/// flow once is enough now that the sign-in hosts see a Firefox identity.
+void WebView::recoverFromSignInRejection(const QUrl& url)
+{
+    if (!isGoogleSignInHost(url.host()) || !url.path().startsWith(u"/v3/signin/rejected"_s)) {
+        return;
+    }
+    if (m_signInRecoveryTried) {
+        qCWarning(lcWeb) << "Google rejected the sign-in again after a clean retry";
+        return;
+    }
+    m_signInRecoveryTried = true;
+    const int removed = m_profile->cookies().deleteCookies(u"google.com"_s);
+    qCInfo(lcWeb) << "sign-in rejected by Google; cleared" << removed << "google.com cookies, retrying";
+    QTimer::singleShot(300, this, [this] {
+        load(QUrl(
+            u"https://accounts.google.com/ServiceLogin?service=youtube&continue=https://www.youtube.com/signin"_s));
+    });
 }
 
 QUrl WebView::downloadableUrl() const

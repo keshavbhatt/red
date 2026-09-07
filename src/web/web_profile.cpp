@@ -137,8 +137,9 @@ void WebProfile::configureUserAgent()
     // The engine default is read once; effectiveUserAgent strips the QtWebEngine
     // token and applies the mode / override (ADR-001, ADR-008).
     static const QString engineDefault = QWebEngineProfile::defaultProfile()->httpUserAgent();
-    setHttpUserAgent(effectiveUserAgent(engineDefault, m_settings.userAgentOverride(), m_mode,
-                                        m_settings.signInUserAgent(), m_appVersion));
+    setHttpUserAgent(effectiveUserAgent(engineDefault, m_settings.userAgentOverride(), m_mode, m_appVersion));
+    m_interceptor->setSignInUserAgent(
+        signInUserAgent(m_settings.signInUserAgent(), m_settings.userAgentOverride()));
     if (m_mode == core::AppMode::Tv && m_settings.userAgentOverride().isEmpty()) {
         m_interceptor->setTvUserAgents(tvWireUserAgent(m_appVersion), tvGenericUserAgent(m_appVersion));
     } else {

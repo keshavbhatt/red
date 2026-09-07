@@ -12,6 +12,13 @@
     if (window.__red) {
         return;
     }
+    // Only YouTube (and Red's own about:blank error page) get the hooks.
+    // Google's sign-in pages in particular inspect the environment; patched
+    // natives there look like an "insecure browser".
+    var host = location.hostname;
+    if (host && !/(^|\.)(youtube|youtube-nocookie|googlevideo)\.com$/.test(host)) {
+        return;
+    }
     var pending = [];
     var bridgeWaiters = [];
     var configWaiters = [];

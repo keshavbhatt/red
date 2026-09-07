@@ -34,8 +34,28 @@ QString tvGenericUserAgent(const QString& appVersion)
     return u"Red/"_s + appVersion;
 }
 
+bool isGoogleSignInHost(const QString& host)
+{
+    const QString h = host.toLower();
+    for (const auto base :
+         {QLatin1StringView("accounts.google.com"), QLatin1StringView("accounts.youtube.com")}) {
+        if (h == base || h.endsWith(u'.' + base)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QString signInUserAgent(core::SignInUserAgent choice, const QString& userOverride)
+{
+    if (choice != core::SignInUserAgent::Firefox || !userOverride.trimmed().isEmpty()) {
+        return {};
+    }
+    return firefoxUserAgent();
+}
+
 QString effectiveUserAgent(const QString& engineDefault, const QString& userOverride, core::AppMode mode,
-                           core::SignInUserAgent signIn, const QString& appVersion)
+                           const QString& appVersion)
 {
     const QString trimmed = userOverride.trimmed();
     if (!trimmed.isEmpty()) {
@@ -43,9 +63,6 @@ QString effectiveUserAgent(const QString& engineDefault, const QString& userOver
     }
     if (mode == core::AppMode::Tv) {
         return tvNavigatorUserAgent(appVersion);
-    }
-    if (signIn == core::SignInUserAgent::Firefox) {
-        return firefoxUserAgent();
     }
     return sanitizeUserAgent(engineDefault);
 }

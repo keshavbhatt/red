@@ -20,8 +20,9 @@ for (let i = 0; i < args.length; i++) {
 if (exprs.length === 0 && calls.length === 0) { console.error('usage: cdp-eval.mjs [--port N] <expr>'); process.exit(2); }
 
 const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-const page = targets.find(t => t.type === 'page' && /(^|\.)youtube\.com$/.test(new URL(t.url).hostname));
-if (!page) { console.error('no youtube page target; targets: ' + targets.map(t => t.url).join(', ')); process.exit(1); }
+// The main view: a YouTube page, or Google's sign-in when it is showing there.
+const page = targets.find(t => t.type === 'page' && /(^|\.)(youtube|google)\.com$/.test(new URL(t.url).hostname));
+if (!page) { console.error('no page target; targets: ' + targets.map(t => t.url).join(', ')); process.exit(1); }
 
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });

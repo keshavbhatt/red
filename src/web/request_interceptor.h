@@ -30,6 +30,8 @@ public:
     void setBlockList(std::shared_ptr<const core::BlockList> list);
     /// Empty strings disable the UA rewrite (desktop mode).
     void setTvUserAgents(const QString& youtubeUa, const QString& genericUa);
+    /// User-Agent header for Google's sign-in hosts (desktop mode); empty = none.
+    void setSignInUserAgent(const QString& userAgent);
 
     [[nodiscard]] quint64 blockedCount() const { return m_blocked.load(std::memory_order_relaxed); }
     void resetBlockedCount(quint64 to = 0) { m_blocked.store(to, std::memory_order_relaxed); }
@@ -41,6 +43,7 @@ private:
     std::shared_ptr<const core::BlockList> m_list;
     QByteArray m_youtubeUa;
     QByteArray m_genericUa;
+    QByteArray m_signInUa;
     std::atomic<quint64> m_blocked{0};
 };
 

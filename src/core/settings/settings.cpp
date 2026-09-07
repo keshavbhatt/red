@@ -58,7 +58,7 @@ constexpr bool kDefaultTvHideShorts = false;
 constexpr bool kDefaultTvUnlockResolution = false;
 constexpr bool kDefaultTvLowMemory = false;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
-constexpr SignInUserAgent kDefaultSignInUserAgent = SignInUserAgent::Chrome;
+constexpr SignInUserAgent kDefaultSignInUserAgent = SignInUserAgent::Firefox;
 
 template <typename Enum>
 Enum enumFromInt(int value, Enum def, int count)

@@ -12,6 +12,7 @@ namespace red::web {
 
 CookieExporter::CookieExporter(QWebEngineCookieStore* store, QObject* parent)
     : QObject(parent)
+    , m_store(store)
 {
     connect(store, &QWebEngineCookieStore::cookieAdded, this, &CookieExporter::handleAdded);
     connect(store, &QWebEngineCookieStore::cookieRemoved, this, &CookieExporter::handleRemoved);
@@ -64,6 +65,19 @@ QString CookieExporter::cookieValue(const QString& domainSuffix, const QByteArra
 QList<QNetworkCookie> CookieExporter::sessionCookies() const
 {
     return m_cookies.values();
+}
+
+int CookieExporter::deleteCookies(const QString& domainSuffix)
+{
+    int removed = 0;
+    for (const QNetworkCookie& c : m_cookies.values()) {
+        const QString domain = c.domain().startsWith(u'.') ? c.domain().mid(1) : c.domain();
+        if (domain == domainSuffix || domain.endsWith(u'.' + domainSuffix)) {
+            m_store->deleteCookie(c);
+            ++removed;
+        }
+    }
+    return removed;
 }
 
 bool CookieExporter::looksSignedIn() const

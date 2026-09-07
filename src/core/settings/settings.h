@@ -60,10 +60,13 @@ enum class HardwareAcceleration
     Off,  ///< --disable-gpu
 };
 
+/// What Google's sign-in pages are told about the browser (ADR-008). Only
+/// the User-Agent header on accounts.google.com / accounts.youtube.com is
+/// affected; YouTube itself always sees the sanitized Chrome UA.
 enum class SignInUserAgent
 {
-    Chrome,  ///< engine default minus the QtWebEngine token (ADR-008)
-    Firefox, ///< escape hatch for Google's embedded-browser check
+    Firefox, ///< default: Google accepts Firefox where it rejects embedded Chrome
+    Chrome,  ///< same as the rest of the app
 };
 
 /// Quality ceiling for the video preset; the selector is bv*[height<=N]+ba.

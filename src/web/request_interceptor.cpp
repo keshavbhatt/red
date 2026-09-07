@@ -1,6 +1,7 @@
 #include "web/request_interceptor.h"
 
 #include "web/logging.h"
+#include "web/user_agent.h"
 
 #include <QWebEngineUrlRequestInfo>
 
@@ -26,6 +27,12 @@ void RequestInterceptor::setTvUserAgents(const QString& youtubeUa, const QString
     m_genericUa = genericUa.toUtf8();
 }
 
+void RequestInterceptor::setSignInUserAgent(const QString& userAgent)
+{
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    m_signInUa = userAgent.toUtf8();
+}
+
 std::shared_ptr<const core::BlockList> RequestInterceptor::snapshot() const
 {
     const std::lock_guard<std::mutex> lock(m_mutex);
@@ -40,16 +47,21 @@ void RequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo& info)
     // The UA split needs the same lock as the list; take both once.
     QByteArray youtubeUa;
     QByteArray genericUa;
+    QByteArray signInUa;
     std::shared_ptr<const core::BlockList> list;
     {
         const std::lock_guard<std::mutex> lock(m_mutex);
         list = m_list;
         youtubeUa = m_youtubeUa;
         genericUa = m_genericUa;
+        signInUa = m_signInUa;
     }
     if (!youtubeUa.isEmpty()) {
         info.setHttpHeader("User-Agent",
                            host == QLatin1StringView("www.youtube.com") ? youtubeUa : genericUa);
+    } else if (!signInUa.isEmpty() && isGoogleSignInHost(host)) {
+        // Google rejects embedded Chrome on its sign-in pages (ADR-008).
+        info.setHttpHeader("User-Agent", signInUa);
     }
     if (list->isEmpty() || url.scheme() == u"data"_s || url.scheme() == u"blob"_s) {
         return;

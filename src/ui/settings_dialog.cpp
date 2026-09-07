@@ -609,13 +609,17 @@ QWidget* SettingsDialog::buildAdvanced()
     auto* identity = new QWidget(this);
     auto* i = form(identity);
     m_signInUa = new QComboBox(identity);
-    m_signInUa->addItem(tr("Chrome (default)"), static_cast<int>(core::SignInUserAgent::Chrome));
-    m_signInUa->addItem(tr("Firefox (if Google refuses sign-in)"),
+    m_signInUa->addItem(tr("Firefox on Google sign-in pages (default)"),
                         static_cast<int>(core::SignInUserAgent::Firefox));
+    m_signInUa->addItem(tr("Same as the app (Chrome)"), static_cast<int>(core::SignInUserAgent::Chrome));
     connect(m_signInUa, &QComboBox::currentIndexChanged, this, [this](int) {
         m_settings.setSignInUserAgent(static_cast<core::SignInUserAgent>(m_signInUa->currentData().toInt()));
     });
-    i->addRow(tr("Browser identity"), m_signInUa);
+    i->addRow(tr("Sign-in identity"), m_signInUa);
+    i->addRow(QString(),
+              mutedLabel(tr("Google refuses to sign in from embedded Chrome (\"This browser or app "
+                            "may not be secure\"); only the sign-in pages see Firefox."),
+                         identity));
     m_uaOverride = new QLineEdit(identity);
     m_uaOverride->setPlaceholderText(tr("Custom user agent (leave empty for the default)"));
     connect(m_uaOverride, &QLineEdit::editingFinished, this,

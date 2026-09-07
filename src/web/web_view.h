@@ -90,6 +90,7 @@ private:
     void handleMediaState(const QJsonObject& state);
     void showLoadError(const QWebEngineLoadingInfo& info);
     void handleUrlChanged(const QUrl& url);
+    void recoverFromSignInRejection(const QUrl& url);
     [[nodiscard]] QUrl startUrl() const;
 
     core::Settings& m_settings;
@@ -103,6 +104,7 @@ private:
     QUrl m_hoveredLink;
     bool m_showingError = false;
     bool m_downloadable = false;
+    bool m_signInRecoveryTried = false;
     QString m_errorTitle;
     QString m_errorDetail;
 };
