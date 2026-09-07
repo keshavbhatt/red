@@ -960,6 +960,15 @@ void DownloadDialog::selectWholePlaylist()
     updateScopeChooser();
 }
 
+void DownloadDialog::selectPlaylistRange(int from, int to)
+{
+    if (!m_isPlaylist || m_entries->count() == 0) {
+        return;
+    }
+    m_rangeFrom->setValue(from);
+    m_rangeTo->setValue(to);
+}
+
 core::DownloadOptions::Kind DownloadDialog::kind() const
 {
     switch (m_kinds->checkedId()) {
@@ -1053,7 +1062,11 @@ core::DownloadJob DownloadDialog::job() const
         j.thumbnail = core::thumbnailUrl(j.videoId).toString();
     }
     if (m_isPlaylist) {
-        j.itemCount = m_info.entryCount;
+        int selected = 0;
+        for (int i = 0; i < m_entries->count(); ++i) {
+            selected += m_entries->item(i)->checkState() == Qt::Checked ? 1 : 0;
+        }
+        j.itemCount = selected > 0 ? selected : m_info.entryCount;
     }
     return j;
 }

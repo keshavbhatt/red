@@ -304,15 +304,16 @@ QStringList downloadArguments(const DownloadOptions& options, const EnginePaths&
                u"\"total\":%(progress.total_bytes|0)j,\"estimate\":%(progress.total_bytes_estimate|0)j,"
                u"\"speed\":%(progress.speed|0)j,\"eta\":%(progress.eta|0)j,\"filename\":%(progress.filename|)"
                u"j,"
-               u"\"index\":%(info.playlist_index|0)j,\"id\":%(info.id|)j,\"count\":%(info.playlist_count|0)j}"_s;
+               // autonumber / n_entries count the *selected* entries, not the whole playlist.
+               u"\"index\":%(info.playlist_autonumber|0)j,\"id\":%(info.id|)j,\"count\":%(info.n_entries|0)j}"_s;
     args << u"--progress-template"_s
          << u"postprocess:"_s + kPostprocessPrefix +
                 u"{\"status\":%(progress.status|)j,\"postprocessor\":%(progress.postprocessor|)j,"
                 u"\"id\":%(info.id|)j}"_s;
     args << u"--print"_s
          << u"before_dl:"_s + kItemPrefix +
-                u"{\"id\":%(id)j,\"title\":%(title)j,\"index\":%(playlist_index|0)j,"
-                u"\"count\":%(playlist_count|0)j,\"thumbnail\":%(thumbnail|)j,\"duration\":%(duration|0)j,"
+                u"{\"id\":%(id)j,\"title\":%(title)j,\"index\":%(playlist_autonumber|0)j,"
+                u"\"count\":%(n_entries|0)j,\"thumbnail\":%(thumbnail|)j,\"duration\":%(duration|0)j,"
                 u"\"uploader\":%(uploader|)j,\"url\":%(webpage_url|)j}"_s;
     args << u"--print"_s << u"after_move:"_s + kFilePrefix + u"%(filepath)s"_s;
 

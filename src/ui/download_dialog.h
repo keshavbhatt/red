@@ -55,6 +55,8 @@ public:
     /// Picks "Whole playlist" for a video-in-playlist link (as soon as the
     /// playlist has been read); no-op for plain videos.
     void selectWholePlaylist();
+    /// Limits a playlist download to entries from..to (1-based); no-op otherwise.
+    void selectPlaylistRange(int from, int to);
 
 private:
     void setupUi();

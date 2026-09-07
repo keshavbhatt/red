@@ -190,19 +190,29 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     });
     dialog->show();
     // Developer aid (headless verification): accept the dialog with its
-    // defaults as soon as the probe has filled it in.
+    // defaults as soon as the probe has filled it in. Values: video | audio |
+    // advanced, with "-playlist" to pick the whole playlist and ":from-to" to
+    // limit the entries (e.g. audio-playlist:1-2); advanced and unbounded
+    // playlists are left open for inspection.
     if (qEnvironmentVariableIsSet("RED_DEBUG_AUTODOWNLOAD")) {
-        const QString kind = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
+        const QString spec = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
+        const QString kind = spec.section(u':', 0, 0);
+        const QString range = spec.section(u':', 1, 1);
         connect(m_probe, &services::MediaProbe::finished, dialog,
-                [dialog, kind](quint64, const core::MediaInfo&) {
+                [dialog, kind, range](quint64, const core::MediaInfo&) {
                     if (kind.endsWith(u"-playlist"_s)) {
                         dialog->selectWholePlaylist();
                     }
                     dialog->selectKind(kind.startsWith(u"audio"_s)      ? core::DownloadOptions::Kind::Audio
                                        : kind.startsWith(u"advanced"_s) ? core::DownloadOptions::Kind::Custom
                                                                         : core::DownloadOptions::Kind::Video);
-                    if (!kind.startsWith(u"advanced"_s) && !kind.endsWith(u"-playlist"_s)) {
-                        // advanced needs a pick and playlists are for inspection: leave those open
+                    if (!range.isEmpty()) {
+                        dialog->selectPlaylistRange(range.section(u'-', 0, 0).toInt(),
+                                                    range.section(u'-', 1, 1).toInt());
+                    }
+                    const bool inspectOnly =
+                        kind.startsWith(u"advanced"_s) || (kind.endsWith(u"-playlist"_s) && range.isEmpty());
+                    if (!inspectOnly) {
                         QTimer::singleShot(1500, dialog, &QDialog::accept);
                     }
                 });
