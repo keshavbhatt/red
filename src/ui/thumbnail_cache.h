@@ -35,8 +35,9 @@ public:
     [[nodiscard]] QString keep(const QString& url, quint64 jobId);
     /// Deletes the keepsake of a download.
     void forget(quint64 jobId);
-    /// Shrinks a keepsake yt-dlp wrote at full size down to card size.
-    void compact(const QString& path);
+    /// Turns the full-size "<id>-full.jpg" yt-dlp wrote into the card-size
+    /// "<id>.jpg" keepsake and returns that path (or `path` unchanged).
+    [[nodiscard]] QString compact(const QString& path);
     [[nodiscard]] static QString keepsakeDirectory();
 
 Q_SIGNALS:

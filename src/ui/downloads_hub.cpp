@@ -347,7 +347,9 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
 void DownloadsHub::handleJobFinished(quint64 id, core::DownloadState state)
 {
     if (const auto finished = m_queue->job(id); finished && finished->thumbnail.startsWith(u'/')) {
-        m_thumbnails->compact(finished->thumbnail);
+        if (const QString card = m_thumbnails->compact(finished->thumbnail); card != finished->thumbnail) {
+            m_queue->setThumbnail(id, card);
+        }
     }
     if (!m_settings.notifyOnDownloadFinish() || state == core::DownloadState::Cancelled) {
         return;

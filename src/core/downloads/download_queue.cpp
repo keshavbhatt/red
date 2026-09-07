@@ -348,7 +348,9 @@ void DownloadQueue::startJob(DownloadJob& job)
     QString thumbnailTemplate;
     if (!m_thumbnailDir.isEmpty() && !job.isPlaylist()) {
         QDir().mkpath(m_thumbnailDir);
-        thumbnailTemplate = m_thumbnailDir + u"/%1.%(ext)s"_s.arg(job.id);
+        // "-full": the UI keeps its own "<id>.jpg" and must not race yt-dlp
+        // for the same name (--no-overwrites would strand the file).
+        thumbnailTemplate = m_thumbnailDir + u"/%1-full.%(ext)s"_s.arg(job.id);
     }
     const QStringList args = downloadArguments(job.options, paths, job.url, thumbnailTemplate);
     auto* runner = new DownloadRunner(job.id, m_paths.ytdlp, args, std::move(cookies), this);
@@ -498,9 +500,9 @@ void DownloadQueue::handleFinished(quint64 id, bool ok, int exitCode, const QStr
                 j->totalBytes = onDisk;
             }
             j->downloadedBytes = j->totalBytes;
-            if (const QString kept = m_thumbnailDir + u"/%1.jpg"_s.arg(id);
+            if (const QString kept = m_thumbnailDir + u"/%1-full.jpg"_s.arg(id);
                 !m_thumbnailDir.isEmpty() && QFileInfo::exists(kept)) {
-                j->thumbnail = kept; // the session-fetched picture beats the URL
+                j->thumbnail = kept; // the session-fetched picture beats the URL; the UI compacts it
             }
         } else {
             j->state = DownloadState::Failed;

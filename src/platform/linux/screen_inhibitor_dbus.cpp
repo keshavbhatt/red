@@ -75,8 +75,7 @@ class PortalInhibitor : public ScreenInhibitor
 public:
     explicit PortalInhibitor(QObject* parent)
         : ScreenInhibitor(parent)
-    {
-    }
+    {}
     ~PortalInhibitor() override { release(); }
 
     void setInhibited(bool inhibited, const QString& reason) override

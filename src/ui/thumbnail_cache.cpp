@@ -121,26 +121,34 @@ QString ThumbnailCache::keep(const QString& url, quint64 jobId)
     return path;
 }
 
-void ThumbnailCache::compact(const QString& path)
+QString ThumbnailCache::compact(const QString& path)
 {
-    if (!path.startsWith(keepsakeDirectory())) {
-        return;
+    if (!path.startsWith(keepsakeDirectory()) || !path.endsWith(u"-full.jpg"_s)) {
+        return path;
     }
     QPixmap pm(path);
-    if (pm.isNull() || pm.width() <= kKeepsakeWidth) {
-        return;
+    if (pm.isNull()) {
+        return path;
     }
-    const QPixmap scaled = pm.scaledToWidth(kKeepsakeWidth, Qt::SmoothTransformation);
-    if (scaled.save(path, "JPEG", 85)) {
-        m_cache.insert(path, scaled);
+    const QPixmap scaled =
+        pm.width() > kKeepsakeWidth ? pm.scaledToWidth(kKeepsakeWidth, Qt::SmoothTransformation) : pm;
+    const QString card = path.chopped(9) + u".jpg"_s; // "-full.jpg" → ".jpg"
+    if (!scaled.save(card, "JPEG", 85)) {
+        return path;
     }
+    QFile::remove(path);
+    m_cache.insert(card, scaled);
+    return card;
 }
 
 void ThumbnailCache::forget(quint64 jobId)
 {
-    const QString path = keepsakeDirectory() + u"/%1.jpg"_s.arg(jobId);
-    m_cache.remove(path);
-    QFile::remove(path);
+    const QStringList paths{QString(keepsakeDirectory() + u"/%1.jpg"_s.arg(jobId)),
+                            QString(keepsakeDirectory() + u"/%1-full.jpg"_s.arg(jobId))};
+    for (const QString& path : paths) {
+        m_cache.remove(path);
+        QFile::remove(path);
+    }
 }
 
 } // namespace red::ui
