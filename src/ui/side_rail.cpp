@@ -45,7 +45,12 @@ QToolButton* SideRail::makeButton(QAction* action, const QString& icon)
     button->setCursor(Qt::PointingHandCursor);
     button->setFocusPolicy(Qt::NoFocus);
     const QString shortcut = action->shortcut().toString(QKeySequence::NativeText);
-    button->setToolTip(shortcut.isEmpty() ? action->text() : u"%1  (%2)"_s.arg(action->text(), shortcut));
+    // On the action, not the button: the button re-copies the action's tooltip
+    // on every action change and would otherwise drop the shortcut hint.
+    if (action->toolTip().isEmpty() || action->toolTip() == action->text()) {
+        action->setToolTip(shortcut.isEmpty() ? action->text() : u"%1  (%2)"_s.arg(action->text(), shortcut));
+    }
+    button->setToolTip(action->toolTip());
     return button;
 }
 
@@ -152,10 +157,10 @@ void SideRail::setDownloadable(bool downloadable)
         return;
     }
     m_downloadable = downloadable;
-    m_download->setToolTip(downloadable
-                               ? tr("Download this video  (%1)")
-                                     .arg(m_actions.download->shortcut().toString(QKeySequence::NativeText))
-                               : tr("Open a video, playlist or channel to download it"));
+    m_actions.download->setToolTip(
+        downloadable ? tr("Download this video  (%1)")
+                           .arg(m_actions.download->shortcut().toString(QKeySequence::NativeText))
+                     : tr("Open a video, playlist or channel to download it"));
     applyIcons();
 }
 

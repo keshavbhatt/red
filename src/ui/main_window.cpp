@@ -223,6 +223,8 @@ void MainWindow::connectActions()
 
     connect(m_tray, &TrayController::toggleRequested, this, &MainWindow::toggleVisibility);
     connect(m_media, &MediaController::stateChanged, m_tray, &TrayController::setMediaState);
+    connect(m_media, &MediaController::stateChanged, this,
+            [this](const core::MediaState&) { applyChrome(); });
     connect(m_media, &MediaController::raiseRequested, this, &MainWindow::showAndRaise);
     connect(m_downloads, &DownloadsHub::activeCountChanged, m_rail, &SideRail::setActiveDownloads);
     connect(m_downloads, &DownloadsHub::showPanelRequested, this, [this] {
@@ -411,7 +413,15 @@ void MainWindow::applyChrome()
     m_rail->setVisible(!bare && m_settings.showRail());
     m_downloads->panel()->setVisible(!bare && m_panelVisible && width() >= kPanelFoldWidth);
     m_actions->downloads->setEnabled(!tv && !m_miniPlayer);
-    m_actions->miniPlayer->setEnabled(!tv);
+    // The mini player only makes sense with a video on screen (FEATURES D6);
+    // while it is on it stays enabled so it can always be turned off.
+    const bool hasVideo = m_media->state().hasMedia() && !m_media->state().videoId.isEmpty();
+    m_actions->miniPlayer->setEnabled(!tv && (m_miniPlayer || hasVideo));
+    m_actions->miniPlayer->setToolTip(
+        m_actions->miniPlayer->isEnabled()
+            ? tr("Mini player  (%1)")
+                  .arg(m_actions->miniPlayer->shortcut().toString(QKeySequence::NativeText))
+            : tr("Play a video to use the mini player"));
 }
 
 void MainWindow::setDownloadsPanelVisible(bool visible)
