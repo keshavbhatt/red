@@ -32,13 +32,40 @@
   </description>
 
   <launchable type="desktop-id">com.ktechpit.red.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Desktop mode with a video playing, dislike count and SponsorBlock markers</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/desktop.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>TV mode: YouTube's living-room interface, driven by keyboard or gamepad</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/tv.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The downloads panel beside the page</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/downloads.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Download dialog: video, audio only or exact streams, with playlist detection</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/download-dialog.png</image>
+    </screenshot>
+  </screenshots>
   <url type="homepage">https://github.com/keshavbhatt/red</url>
   <url type="bugtracker">https://github.com/keshavbhatt/red/issues</url>
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="10.0.0" date="2026-09-06">
-      <description><p>Complete rewrite on Qt 6: two modes, new ad blocking, yt-dlp downloads, MPRIS, mini player, new design.</p></description>
+    <release version="10.0.0" date="2026-09-07">
+      <description>
+        <p>Red 10 is a complete rewrite on Qt 6 and Qt WebEngine.</p>
+        <ul>
+          <li>Desktop and TV modes in one window, switchable at any time</li>
+          <li>Ad and tracker blocking that never touches playback; SponsorBlock; Return YouTube Dislike; Hide Shorts</li>
+          <li>Downloads: video, audio only or exact streams, playlists and channels, subtitles, thumbnails and chapters embedded, sign-in reused for restricted videos</li>
+          <li>Media keys, MPRIS, tray controls, mini player, screen kept awake while playing</li>
+          <li>A new design that follows YouTube's light and dark themes</li>
+        </ul>
+      </description>
     </release>
   </releases>
 </component>

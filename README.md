@@ -6,7 +6,23 @@
   real download manager — lightweight and open source, built with Qt&nbsp;6.
 </p>
 
+<p align="center">
+  <img src="screenshots/desktop.png" alt="Red in desktop mode: a video playing, dislike count and SponsorBlock markers on the progress bar" width="720">
+</p>
+
 ---
+
+## Install
+
+**Snap** (amd64 and arm64):
+
+```sh
+sudo snap install red-app --edge
+```
+
+**Flatpak**: bundles for x86_64 and aarch64 are attached to each
+[GitHub release](https://github.com/keshavbhatt/red/releases); install with
+`flatpak install red-x86_64.flatpak`. A Flathub listing follows the first release.
 
 ## Why Red
 
@@ -42,6 +58,14 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
 - Media keys and desktop media controls (MPRIS), tray icon with playback controls,
   keeps the screen awake while playing, mini player (Ctrl+Shift+M), single instance with
   `red <youtube-link>` and `red --download <link>`.
+
+## Screenshots
+
+| TV mode | Downloads |
+|---|---|
+| ![TV mode](screenshots/tv.png) | ![Downloads panel](screenshots/downloads.png) |
+
+<p align="center"><img src="screenshots/download-dialog.png" alt="Download dialog: Video / Audio only / Advanced, playlist detection" width="520"></p>
 
 ## Build from source
 
