@@ -50,6 +50,7 @@ DownloadsHub::DownloadsHub(core::Settings& settings, core::ThemeService& theme,
 
     m_queue->load(core::DownloadQueue::defaultFilePath());
     m_queue->setMaxConcurrent(settings.concurrentDownloads());
+    m_queue->setThumbnailDirectory(ThumbnailCache::keepsakeDirectory());
     connect(&settings, &core::Settings::concurrentDownloadsChanged, m_queue,
             &core::DownloadQueue::setMaxConcurrent);
 
@@ -64,6 +65,11 @@ DownloadsHub::DownloadsHub(core::Settings& settings, core::ThemeService& theme,
 
     wireEngine();
     wireQueue();
+    // Cards restored from disk may still point at YouTube's URLs (older
+    // entries): keep local copies while those URLs still work.
+    for (const core::DownloadJob& job : m_queue->jobs()) {
+        keepThumbnail(job.id);
+    }
 
     connect(m_panel, &DownloadsPanel::newDownloadRequested, this, &DownloadsHub::promptForUrl);
     connect(m_panel, &DownloadsPanel::cardAction, this, &DownloadsHub::handleCardAction);
@@ -144,7 +150,30 @@ void DownloadsHub::wireQueue()
     connect(m_queue, &core::DownloadQueue::changed, this, &DownloadsHub::schedulePersist);
     connect(m_queue, &core::DownloadQueue::activeCountChanged, this, &DownloadsHub::activeCountChanged);
     connect(m_queue, &core::DownloadQueue::jobFinished, this, &DownloadsHub::handleJobFinished);
-    connect(m_queue, &core::DownloadQueue::jobAdded, this, [this](quint64) { Q_EMIT showPanelRequested(); });
+    connect(m_queue, &core::DownloadQueue::jobAdded, this, [this](quint64 id) {
+        keepThumbnail(id);
+        Q_EMIT showPanelRequested();
+    });
+    connect(m_queue, &core::DownloadQueue::jobRemoved, m_thumbnails, &ThumbnailCache::forget);
+    connect(m_thumbnails, &ThumbnailCache::ready, this, [this](const QString& url) {
+        for (const quint64 id : m_awaitingThumbnail.take(url)) {
+            keepThumbnail(id);
+        }
+    });
+}
+
+void DownloadsHub::keepThumbnail(quint64 id)
+{
+    const auto job = m_queue->job(id);
+    if (!job || job->thumbnail.isEmpty() || job->thumbnail.startsWith(u'/')) {
+        return;
+    }
+    const QString local = m_thumbnails->keep(job->thumbnail, id);
+    if (local.isEmpty()) {
+        m_awaitingThumbnail[job->thumbnail].append(id); // ready(url) will call again
+        return;
+    }
+    m_queue->setThumbnail(id, local);
 }
 
 void DownloadsHub::requestDownload(const QUrl& url, bool audioOnly)
@@ -314,6 +343,9 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
 
 void DownloadsHub::handleJobFinished(quint64 id, core::DownloadState state)
 {
+    if (const auto finished = m_queue->job(id); finished && finished->thumbnail.startsWith(u'/')) {
+        m_thumbnails->compact(finished->thumbnail);
+    }
     if (!m_settings.notifyOnDownloadFinish() || state == core::DownloadState::Cancelled) {
         return;
     }

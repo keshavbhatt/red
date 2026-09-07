@@ -38,6 +38,13 @@ private Q_SLOTS:
         QVERIFY(args.contains(u"--embed-metadata"_s));
         QCOMPARE(args.at(args.indexOf(u"-o"_s) + 1), u"/tmp/out/%(title)s.%(ext)s"_s);
         QCOMPARE(args.last(), u"https://www.youtube.com/watch?v=abc"_s);
+        QVERIFY(!args.contains(u"--write-thumbnail"_s));
+        // A kept thumbnail: written as JPEG next to the job id, not deleted by the embed step.
+        const QStringList kept = downloadArguments(o, paths, u"https://www.youtube.com/watch?v=abc"_s,
+                                                   u"/data/thumbs/7.%(ext)s"_s);
+        QVERIFY(kept.contains(u"--write-thumbnail"_s));
+        QCOMPARE(kept.at(kept.indexOf(u"--convert-thumbnails"_s) + 1), u"jpg"_s);
+        QVERIFY(kept.contains(u"thumbnail:/data/thumbs/7.%(ext)s"_s));
         QCOMPARE(args.at(args.size() - 2), u"--"_s);
         const QString joined = args.join(u'\n');
         QVERIFY(joined.contains(u"download:RED:{"_s));

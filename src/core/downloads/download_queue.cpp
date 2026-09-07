@@ -101,6 +101,22 @@ void DownloadQueue::setMaxConcurrent(int count)
 
 // ---- commands --------------------------------------------------------------
 
+void DownloadQueue::setThumbnailDirectory(const QString& dir)
+{
+    m_thumbnailDir = dir;
+}
+
+void DownloadQueue::setThumbnail(quint64 id, const QString& path)
+{
+    const int row = rowOf(id);
+    if (row < 0 || m_jobs[row].thumbnail == path) {
+        return;
+    }
+    m_jobs[row].thumbnail = path;
+    updateRow(row, {ThumbnailRole});
+    Q_EMIT changed();
+}
+
 quint64 DownloadQueue::add(DownloadJob job)
 {
     for (const DownloadJob& existing : m_jobs) {
@@ -119,9 +135,11 @@ quint64 DownloadQueue::add(DownloadJob job)
         // Drop the oldest finished entry; never an active one.
         for (int i = static_cast<int>(m_jobs.size()) - 1; i >= 0; --i) {
             if (m_jobs.at(i).isFinished()) {
+                const quint64 dropped = m_jobs.at(i).id;
                 beginRemoveRows({}, i, i);
                 m_jobs.removeAt(i);
                 endRemoveRows();
+                Q_EMIT jobRemoved(dropped);
                 break;
             }
         }
@@ -203,6 +221,7 @@ void DownloadQueue::remove(quint64 id)
     beginRemoveRows({}, row, row);
     m_jobs.removeAt(row);
     endRemoveRows();
+    Q_EMIT jobRemoved(id);
     Q_EMIT changed();
     notifyActive();
     schedule();
@@ -232,9 +251,11 @@ void DownloadQueue::clearFinished()
 {
     for (int i = static_cast<int>(m_jobs.size()) - 1; i >= 0; --i) {
         if (m_jobs.at(i).isFinished()) {
+            const quint64 id = m_jobs.at(i).id;
             beginRemoveRows({}, i, i);
             m_jobs.removeAt(i);
             endRemoveRows();
+            Q_EMIT jobRemoved(id);
         }
     }
     Q_EMIT changed();
@@ -324,7 +345,12 @@ void DownloadQueue::startJob(DownloadJob& job)
         }
     }
     QDir().mkpath(job.options.outputDirectory);
-    const QStringList args = downloadArguments(job.options, paths, job.url);
+    QString thumbnailTemplate;
+    if (!m_thumbnailDir.isEmpty() && !job.isPlaylist()) {
+        QDir().mkpath(m_thumbnailDir);
+        thumbnailTemplate = m_thumbnailDir + u"/%1.%(ext)s"_s.arg(job.id);
+    }
+    const QStringList args = downloadArguments(job.options, paths, job.url, thumbnailTemplate);
     auto* runner = new DownloadRunner(job.id, m_paths.ytdlp, args, std::move(cookies), this);
     connect(runner, &DownloadRunner::progress, this, &DownloadQueue::handleProgress);
     connect(runner, &DownloadRunner::postprocess, this, &DownloadQueue::handlePostprocess);
@@ -472,6 +498,10 @@ void DownloadQueue::handleFinished(quint64 id, bool ok, int exitCode, const QStr
                 j->totalBytes = onDisk;
             }
             j->downloadedBytes = j->totalBytes;
+            if (const QString kept = m_thumbnailDir + u"/%1.jpg"_s.arg(id);
+                !m_thumbnailDir.isEmpty() && QFileInfo::exists(kept)) {
+                j->thumbnail = kept; // the session-fetched picture beats the URL
+            }
         } else {
             j->state = DownloadState::Failed;
             j->error = friendlyError(stderrTail, exitCode);

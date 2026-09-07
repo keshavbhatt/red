@@ -291,7 +291,8 @@ QStringList probeArguments(const EnginePaths& paths, const QString& url, bool fl
     return args;
 }
 
-QStringList downloadArguments(const DownloadOptions& options, const EnginePaths& paths, const QString& url)
+QStringList downloadArguments(const DownloadOptions& options, const EnginePaths& paths, const QString& url,
+                              const QString& thumbnailTemplate)
 {
     QStringList args = baseArguments(paths);
     args << u"--newline"_s << u"--no-quiet"_s << u"--progress"_s << u"--continue"_s << u"--no-overwrites"_s;
@@ -351,6 +352,11 @@ QStringList downloadArguments(const DownloadOptions& options, const EnginePaths&
     }
     if (options.embedThumbnail) {
         args << u"--embed-thumbnail"_s;
+    }
+    if (!thumbnailTemplate.isEmpty()) {
+        // --write-thumbnail also stops --embed-thumbnail from deleting the file.
+        args << u"--write-thumbnail"_s << u"--convert-thumbnails"_s << u"jpg"_s << u"-o"_s
+             << u"thumbnail:"_s + thumbnailTemplate;
     }
     if (options.embedMetadata) {
         args << u"--embed-metadata"_s << u"--embed-chapters"_s;

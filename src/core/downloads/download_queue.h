@@ -56,6 +56,9 @@ public:
     [[nodiscard]] bool hasEngine() const { return !m_paths.ytdlp.isEmpty(); }
     void setCookiesProvider(CookiesProvider provider);
     void setMaxConcurrent(int count);
+    /// Directory where each single-video job keeps "<id>.jpg" (its thumbnail,
+    /// fetched by yt-dlp with the session); empty = off.
+    void setThumbnailDirectory(const QString& dir);
     [[nodiscard]] int maxConcurrent() const { return m_maxConcurrent; }
 
     /// Adds and schedules. Returns the id. A job for the same url+kind that is
@@ -66,6 +69,8 @@ public:
     void cancel(quint64 id);
     void retry(quint64 id);
     void remove(quint64 id);
+    /// Points the card at a local copy of the thumbnail (kept by the UI).
+    void setThumbnail(quint64 id, const QString& path);
     void pauseAll();
     void resumeAll();
     void clearFinished();
@@ -85,6 +90,7 @@ public:
 Q_SIGNALS:
     void jobFinished(quint64 id, red::core::DownloadState state);
     void jobAdded(quint64 id);
+    void jobRemoved(quint64 id); ///< removed by the user, cleared, or aged out
     void activeCountChanged(int count);
     void changed(); ///< anything worth persisting happened
 
@@ -104,6 +110,7 @@ private:
     QList<DownloadJob> m_jobs;
     QHash<quint64, DownloadRunner*> m_runners;
     EnginePaths m_paths;
+    QString m_thumbnailDir;
     CookiesProvider m_cookies;
     int m_maxConcurrent = 2;
     quint64 m_nextId = 1;

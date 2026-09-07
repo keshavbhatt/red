@@ -67,9 +67,13 @@ struct EnginePaths
 [[nodiscard]] QString previewFileName(const DownloadOptions& options, const QString& title, const QString& id,
                                       const QString& uploader);
 
-/// The full argv (without the program) for one download of `url`.
+/// The full argv (without the program) for one download of `url`. With
+/// `thumbnailTemplate` (an output template such as "/dir/42.%(ext)s") the
+/// thumbnail yt-dlp fetches anyway is written there as JPEG and kept — the
+/// only way to get the picture of a private video, which the CDN does not
+/// serve anonymously.
 [[nodiscard]] QStringList downloadArguments(const DownloadOptions& options, const EnginePaths& paths,
-                                            const QString& url);
+                                            const QString& url, const QString& thumbnailTemplate = {});
 /// The argv for probing `url` with -J (flat for playlists/channels).
 [[nodiscard]] QStringList probeArguments(const EnginePaths& paths, const QString& url, bool flatPlaylist);
 

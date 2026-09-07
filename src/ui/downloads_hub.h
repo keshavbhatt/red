@@ -73,6 +73,10 @@ private:
     void wireQueue();
     void handleCardAction(quint64 jobId, DownloadCardDelegate::Action action);
     void handleJobFinished(quint64 id, core::DownloadState state);
+    /// Saves a local copy of the job's thumbnail (ThumbnailCache::keep) as
+    /// soon as the picture is available, so the card never depends on YouTube
+    /// still serving it (private or removed videos).
+    void keepThumbnail(quint64 id);
     void openDialog(const QUrl& url, bool audioOnly = false);
     void schedulePersist();
     void persist();
@@ -89,8 +93,10 @@ private:
     DownloadsPanel* m_panel = nullptr;
     QPointer<EngineSetupDialog> m_engineDialog;
     QTimer* m_persistTimer = nullptr;
-    QList<QUrl> m_pendingUrls;                              ///< waiting for the engine
-    QHash<quint64, quint64> m_notificationJobs;             ///< notification id → job id
+    QList<QUrl> m_pendingUrls; ///< waiting for the engine
+    QHash<quint64, quint64> m_notificationJobs;
+    QHash<QString, QList<quint64>>
+        m_awaitingThumbnail; ///< url → jobs waiting for keep()             ///< notification id → job id
     QHash<QString, QPointer<DownloadDialog>> m_openDialogs; ///< one dialog per URL
 };
 
