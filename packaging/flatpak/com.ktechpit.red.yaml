@@ -19,7 +19,7 @@ finish-args:
   - --own-name=org.mpris.MediaPlayer2.red
 
   # default download folder; others are picked through the portal
-  - --filesystem=xdg-videos
+  - --filesystem=xdg-download
 
 cleanup:
   - /include

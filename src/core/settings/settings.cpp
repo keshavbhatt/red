@@ -516,10 +516,8 @@ QString Settings::downloadDirectory() const
     if (!stored.isEmpty() && QDir(stored).isAbsolute()) {
         return stored;
     }
-    QString base = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
-    if (base.isEmpty()) {
-        base = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-    }
+    // ~/Downloads/Red: the folder every desktop shows for downloads.
+    QString base = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     if (base.isEmpty()) {
         base = QDir::homePath();
     }

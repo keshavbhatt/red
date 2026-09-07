@@ -34,7 +34,7 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
   engine has its JavaScript runtime without fetching QuickJS. yt-dlp itself is still
   fetched into the app's data directory at first use and kept up to date (ADR-004).
 - **Permissions** are the minimum: network, the sockets, GPU, `/dev/input` (gamepads in TV
-  mode), the status notifier for the tray, the MPRIS bus name, and the Videos folder for the
+  mode), the status notifier for the tray, the MPRIS bus name, and the Downloads folder for the
   default download location. Notifications, screen inhibit, opening files and folders and
   choosing another download folder all go through portals inside the sandbox
   (`FLATPAK_ID` / `SNAP` select the portal backends).
