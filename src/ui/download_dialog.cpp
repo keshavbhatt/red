@@ -306,8 +306,8 @@ QWidget* DownloadDialog::buildVideoTab()
     m_container->addItem(u"WebM"_s, static_cast<int>(core::Container::Webm));
     m_subtitles = new QComboBox(tab);
     m_subtitles->addItem(tr("None"), QString());
-    m_autoSubs = new QCheckBox(tr("Include auto-generated"), tab);
-    m_embedSubs = new QCheckBox(tr("Embed in file"), tab);
+    m_autoSubs = new QCheckBox(tr("Include auto-generated subtitles"), tab);
+    m_embedSubs = new QCheckBox(tr("Embed subtitles in the file"), tab);
     m_embedThumb = new QCheckBox(tr("Embed thumbnail"), tab);
     m_embedMeta = new QCheckBox(tr("Embed metadata and chapters"), tab);
     m_removeSponsors = new QCheckBox(tr("Remove sponsor segments (SponsorBlock)"), tab);
@@ -317,15 +317,13 @@ QWidget* DownloadDialog::buildVideoTab()
     grid->addWidget(label(tr("Container")), 0, 2);
     grid->addWidget(m_container, 0, 3);
     grid->addWidget(label(tr("Subtitles")), 1, 0);
-    grid->addWidget(m_subtitles, 1, 1);
-    auto* subsRow = new QHBoxLayout;
-    subsRow->addWidget(m_autoSubs);
-    subsRow->addWidget(m_embedSubs);
-    subsRow->addStretch(1);
-    grid->addLayout(subsRow, 1, 2, 1, 2);
-    grid->addWidget(m_embedThumb, 2, 0, 1, 2);
-    grid->addWidget(m_embedMeta, 2, 2, 1, 2);
-    grid->addWidget(m_removeSponsors, 3, 0, 1, 4);
+    grid->addWidget(m_subtitles, 1, 1, 1, 3);
+    // Toggles sit in two aligned columns under the pickers.
+    grid->addWidget(m_autoSubs, 2, 0, 1, 2);
+    grid->addWidget(m_embedSubs, 2, 2, 1, 2);
+    grid->addWidget(m_embedThumb, 3, 0, 1, 2);
+    grid->addWidget(m_embedMeta, 3, 2, 1, 2);
+    grid->addWidget(m_removeSponsors, 4, 0, 1, 4);
     grid->setColumnStretch(1, 1);
     grid->setColumnStretch(3, 1);
 
