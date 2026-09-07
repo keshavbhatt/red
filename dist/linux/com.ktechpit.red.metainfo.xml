@@ -35,19 +35,23 @@
   <screenshots>
     <screenshot type="default">
       <caption>Desktop mode with a video playing, dislike count and SponsorBlock markers</caption>
-      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/desktop.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/store/00-hero.png</image>
     </screenshot>
     <screenshot>
       <caption>TV mode: YouTube's living-room interface, driven by keyboard or gamepad</caption>
-      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/tv.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/store/01-tv.png</image>
     </screenshot>
     <screenshot>
       <caption>The downloads panel beside the page</caption>
-      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/downloads.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/store/02-downloads.png</image>
     </screenshot>
     <screenshot>
       <caption>Download dialog: video, audio only or exact streams, with playlist detection</caption>
-      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/download-dialog.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/store/03-download-dialog.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Blocking: ads, trackers, SponsorBlock categories, dislikes and Shorts</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/red/main/screenshots/store/04-blocking.png</image>
     </screenshot>
   </screenshots>
   <url type="homepage">https://github.com/keshavbhatt/red</url>

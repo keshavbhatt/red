@@ -1,13 +1,14 @@
-<h1 align="center">Red</h1>
+<p align="center">
+  <img src="screenshots/banner.png" alt="Red — YouTube, in a real desktop app" width="100%">
+</p>
 
 <p align="center">
-  <b>YouTube, in a real desktop app.</b><br>
   A living-room TV mode, ad and tracker blocking, SponsorBlock, media keys, a mini player and a
   real download manager — lightweight and open source, built with Qt&nbsp;6.
 </p>
 
 <p align="center">
-  <img src="screenshots/desktop.png" alt="Red in desktop mode: a video playing, dislike count and SponsorBlock markers on the progress bar" width="720">
+  <img src="screenshots/00-hero.png" alt="Red in desktop mode: a video playing, dislike count and SponsorBlock markers" width="100%">
 </p>
 
 ---
@@ -61,11 +62,18 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
 
 ## Screenshots
 
-| TV mode | Downloads |
-|---|---|
-| ![TV mode](screenshots/tv.png) | ![Downloads panel](screenshots/downloads.png) |
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/01-tv.png" alt="TV mode"></td>
+    <td width="50%"><img src="screenshots/02-downloads.png" alt="Downloads panel beside the page"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/03-download-dialog.png" alt="Download dialog"></td>
+    <td width="50%"><img src="screenshots/04-blocking.png" alt="Blocking settings"></td>
+  </tr>
+</table>
 
-<p align="center"><img src="screenshots/download-dialog.png" alt="Download dialog: Video / Audio only / Advanced, playlist detection" width="520"></p>
+Regenerate the set from raw window grabs with `scripts/screenshots.py <raw-dir>`.
 
 ## Build from source
 
