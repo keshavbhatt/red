@@ -28,9 +28,9 @@ apps:
       # ffmpeg for the download engine comes from the ffmpeg-2404 content snap
       # (ADR-004): nothing is staged, nothing is downloaded.
       PATH: $SNAP/ffmpeg-platform/usr/bin:$PATH
-      # Both triplets are listed so the recipe needs no build-time expansion;
-      # the one that does not exist is ignored by the loader.
-      LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/x86_64-linux-gnu:$SNAP/ffmpeg-platform/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
+      # CRAFT_ARCH_TRIPLET_BUILD_FOR is expanded at pack time (as in the
+      # ultimate-media-downloader snap).
+      LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$LD_LIBRARY_PATH
     plugs:
       - ffmpeg-2404
       - home
@@ -77,7 +77,7 @@ parts:
       esac
       curl -fsSL -o deno.zip "https://github.com/denoland/deno/releases/download/v2.7.7/${asset}"
       echo "${sum}  deno.zip" | sha256sum -c -
-      unzip -o deno.zip
+      unzip -o deno.zip deno
     override-build: |
       install -Dm755 "${CRAFT_PART_SRC}/deno" "${CRAFT_PART_INSTALL}/usr/bin/deno"
     prime:
@@ -106,13 +106,19 @@ parts:
       - -DRED_BUILD_TESTS=OFF
     override-build: |
       craftctl default
-      mkdir -p ${CRAFT_PART_INSTALL}/meta/gui
-      cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/com.ktechpit.red.png \
-        ${CRAFT_PART_INSTALL}/meta/gui/icon.png
-      sed -i "s|^Icon=.*|Icon=\${SNAP}/meta/gui/icon.png|" \
-        ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.red.desktop
+      # One source of truth for the version: the CMake project, not the
+      # metainfo release list (parse-info still supplies summary/description).
+      VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2)
+      craftctl set version="${VER}"
+      # Store icon; the desktop file keeps its stock Icon name, which the
+      # kde-neon-6 extension resolves from the snap's hicolor tree.
+      mkdir -p "${CRAFT_PART_INSTALL}/meta/gui"
+      cp "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/512x512/apps/com.ktechpit.red.png" \
+         "${CRAFT_PART_INSTALL}/meta/gui/icon.png"
     prime:
       - -usr/include
       - -usr/lib/*/cmake
+      - -usr/share/ECM
       - -usr/share/man
       - -usr/share/doc
+      - -usr/share/lintian

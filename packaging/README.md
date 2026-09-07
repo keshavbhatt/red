@@ -10,7 +10,8 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
 
 - **App id** `com.ktechpit.red`; desktop file, AppStream metainfo and hicolor icons are
   installed by CMake from `dist/linux/` and `src/resources/icons/hicolor/`; `adopt-info`
-  reads the version from the metainfo.
+  takes summary and description from the metainfo, and the version is set from the CMake
+  project (one source of truth), as in the ultimate-media-downloader snap.
 - **ffmpeg** comes from the `ffmpeg-2404` content snap (plug with default-provider, on
   PATH and LD_LIBRARY_PATH in the app environment); nothing is staged or downloaded
   (ADR-004). The kf6 runtime ships only the libav* libraries, not the program.
