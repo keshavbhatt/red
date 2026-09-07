@@ -6,23 +6,19 @@ runtime-version: '6.11'
 sdk: org.kde.Sdk
 command: red
 finish-args:
-  - --device=all
   - --share=network
   - --share=ipc
   - --socket=fallback-x11
   - --socket=wayland
   - --socket=pulseaudio
+  - --device=dri
+  # gamepads in TV mode
+  - --device=input
 
-  - --talk-name=org.freedesktop.Notifications
-  - --talk-name=org.freedesktop.ScreenSaver
   - --talk-name=org.kde.StatusNotifierWatcher
-  - --talk-name=com.canonical.indicator.application
-  - --talk-name=org.ayatana.indicator.application
   - --own-name=org.mpris.MediaPlayer2.red
 
-  # download directories for convenience
-  - --filesystem=xdg-download
-  - --filesystem=xdg-music
+  # default download folder; others are picked through the portal
   - --filesystem=xdg-videos
 
 cleanup:

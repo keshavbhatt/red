@@ -33,9 +33,11 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
 - **ffmpeg** is in the KDE runtime; **Deno** is bundled (`deno.yaml`) so the download
   engine has its JavaScript runtime without fetching QuickJS. yt-dlp itself is still
   fetched into the app's data directory at first use and kept up to date (ADR-004).
-- **Permissions**: network, GPU and `/dev/input` (`--device=all`, gamepads), notifications,
-  status notifier (tray), MPRIS bus name, screen saver, and the Videos / Music / Downloads
-  folders; anything else goes through the file chooser portal.
+- **Permissions** are the minimum: network, the sockets, GPU, `/dev/input` (gamepads in TV
+  mode), the status notifier for the tray, the MPRIS bus name, and the Videos folder for the
+  default download location. Notifications, screen inhibit, opening files and folders and
+  choosing another download folder all go through portals inside the sandbox
+  (`FLATPAK_ID` / `SNAP` select the portal backends).
 - **CI**: `.github/workflows/flatpak.yml` builds x86_64 and aarch64 bundles on manual runs
   and attaches them to the GitHub Release on a version tag. Flathub builds from its own
   repository (`flathub/com.ktechpit.red`, same manifest with a `type: git` source pinned
