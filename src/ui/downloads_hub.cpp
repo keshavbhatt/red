@@ -103,6 +103,16 @@ DownloadsHub::DownloadsHub(core::Settings& settings, core::ThemeService& theme,
             [this](quint64 id) { m_notificationJobs.remove(id); });
 
     m_engine->initialize();
+    // Developer aid (headless verification): open the engine sheet, optionally
+    // pressing "Check for updates" (RED_DEBUG_ENGINE_DIALOG=check).
+    if (qEnvironmentVariableIsSet("RED_DEBUG_ENGINE_DIALOG")) {
+        QTimer::singleShot(600, this, [this] {
+            showEngineDialog();
+            if (qEnvironmentVariable("RED_DEBUG_ENGINE_DIALOG") == u"check"_s) {
+                QTimer::singleShot(600, m_engine, [this] { m_engine->checkForUpdates(true); });
+            }
+        });
+    }
 }
 
 DownloadsHub::~DownloadsHub() = default;

@@ -3,6 +3,7 @@
 #include "core/downloads/download_options.h"
 #include "core/downloads/engine_spec.h"
 
+#include <QDateTime>
 #include <QObject>
 #include <QString>
 #include <QUrl>
@@ -54,6 +55,9 @@ public:
         double progress = -1; ///< 0..1 of the current step, -1 indeterminate
         QString error;
         bool systemYtdlp = false;
+        bool checkingForUpdates = false; ///< a release lookup is in flight
+        QDateTime lastCheck;             ///< when the release lookup last succeeded (UTC)
+        QString checkError;              ///< why the last lookup failed, if it did
 
         [[nodiscard]] bool isReady() const { return state == State::Ready; }
         [[nodiscard]] bool isBusy() const { return state == State::Installing || state == State::Updating; }

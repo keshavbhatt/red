@@ -5,8 +5,10 @@
 #include "ui/icons.h"
 #include "ui/red_style.h"
 
+#include <QDateTime>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLocale>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QStyle>
@@ -133,7 +135,28 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     m_ffmpegText->setText(s.ffmpegPath.isEmpty() ? tr("not installed — %1").arg(core::ffmpegInstallHint())
                                                  : s.ffmpegPath);
 
-    m_step->setText(busy ? s.stepLabel : (s.isReady() ? tr("Everything is ready.") : QString()));
+    QString step;
+    if (busy) {
+        step = s.stepLabel;
+    } else if (s.checkingForUpdates) {
+        step = tr("Checking for updates…");
+    } else if (!s.checkError.isEmpty()) {
+        step = tr("Could not check for updates: %1").arg(s.checkError);
+    } else if (s.isReady() && s.updateAvailable) {
+        step = tr("yt-dlp %1 is available.").arg(s.latestVersion);
+    } else if (s.isReady() && s.lastCheck.isValid() && !s.systemYtdlp) {
+        const QDateTime local = s.lastCheck.toLocalTime();
+        const qint64 age = local.secsTo(QDateTime::currentDateTime());
+        const QString when =
+            age < 90 ? tr("just now")
+            : local.date() == QDate::currentDate()
+                ? tr("today at %1").arg(QLocale().toString(local.time(), QLocale::ShortFormat))
+                : QLocale().toString(local.date(), QLocale::LongFormat);
+        step = tr("Everything is ready. yt-dlp is up to date (checked %1).").arg(when);
+    } else if (s.isReady()) {
+        step = tr("Everything is ready.");
+    }
+    m_step->setText(step);
     m_progress->setVisible(busy);
     if (busy) {
         if (s.progress >= 0) {
@@ -148,10 +171,11 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     m_error->setText(s.error);
     m_error->setStyleSheet(u"color:%1;"_s.arg(t.danger.name()));
 
-    m_action->setEnabled(!busy);
+    m_action->setEnabled(!busy && !s.checkingForUpdates);
     if (s.isReady()) {
-        m_action->setText(s.updateAvailable ? tr("Update to %1").arg(s.latestVersion)
-                                            : tr("Check for updates"));
+        m_action->setText(s.updateAvailable      ? tr("Update to %1").arg(s.latestVersion)
+                          : s.checkingForUpdates ? tr("Checking…")
+                                                 : tr("Check for updates"));
         m_action->setProperty("redPrimary", s.updateAvailable);
     } else {
         const bool onlyFfmpeg = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && s.ffmpegMissing;

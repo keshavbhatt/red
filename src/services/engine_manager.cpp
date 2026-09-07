@@ -134,6 +134,7 @@ void EngineManager::detect()
     Status s;
     s.latestVersion = m_status.latestVersion;
     s.updateAvailable = m_status.updateAvailable;
+    s.lastCheck = m_settings.engineLastCheck();
 
     // yt-dlp: system binary when the user asked for it, else ours.
     if (m_settings.engineUseSystem()) {
@@ -432,20 +433,29 @@ void EngineManager::checkForUpdates(bool force)
     QNetworkRequest request(core::latestReleaseUrl(core::ytdlpComponent(m_os, m_cpu).repo));
     request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+    m_status.checkingForUpdates = true;
+    m_status.checkError.clear();
+    Q_EMIT statusChanged(m_status);
     QNetworkReply* reply = m_network->head(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply] {
         reply->deleteLater();
+        m_status.checkingForUpdates = false;
         if (reply->error() != QNetworkReply::NoError) {
             qCInfo(lcServices) << "update check failed:" << reply->errorString();
+            m_status.checkError = reply->errorString();
+            Q_EMIT statusChanged(m_status);
             return;
         }
         const QString latest =
             core::tagFromReleaseUrl(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         if (latest.isEmpty()) {
             qCInfo(lcServices) << "update check: no tag in the release redirect";
+            m_status.checkError = tr("The release page gave no version.");
+            Q_EMIT statusChanged(m_status);
             return;
         }
-        m_settings.setEngineLastCheck(QDateTime::currentDateTimeUtc());
+        m_status.lastCheck = QDateTime::currentDateTimeUtc();
+        m_settings.setEngineLastCheck(m_status.lastCheck);
         m_status.latestVersion = latest;
         m_status.updateAvailable = core::isNewerVersion(latest, m_status.ytdlpVersion);
         qCInfo(lcServices) << "yt-dlp latest" << latest << "installed" << m_status.ytdlpVersion
