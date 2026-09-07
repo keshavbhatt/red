@@ -13,6 +13,7 @@
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QGuiApplication>
+#include <QMenu>
 #include <QProcess>
 #include <QSettings>
 #include <QStandardPaths>
@@ -173,7 +174,9 @@ int main(int argc, char* argv[])
             // Dialogs are separate top-level windows: grab those too.
             int extra = 0;
             for (QWidget* top : QApplication::topLevelWidgets()) {
-                if (top != &window && top->isVisible() && top->isWindow() && !top->windowTitle().isEmpty()) {
+                const bool popup = qobject_cast<QMenu*>(top) != nullptr; // tray / context menus
+                if (top != &window && top->isVisible() && top->isWindow() &&
+                    (popup || !top->windowTitle().isEmpty())) {
                     const QString dialogPath = path.chopped(4) + u"-dialog%1.png"_s.arg(++extra);
                     top->grab().save(dialogPath);
                     qInfo("debug grab saved to %s (%s)", qPrintable(dialogPath),

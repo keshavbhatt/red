@@ -1,5 +1,7 @@
 #include "core/downloads/media_info.h"
 
+#include "core/youtube_url.h"
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLocale>
@@ -136,6 +138,12 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
         if (!thumbs.isEmpty()) {
             info.thumbnail = thumbs.last().toObject().value(u"url"_s).toString();
         }
+    }
+    // yt-dlp's pick is often i9.ytimg.com/…/maxresdefault.jpg, which is not
+    // served for every video; the standard i.ytimg.com frame always is.
+    if (!info.id.isEmpty() && (info.thumbnail.contains(u"i9.ytimg.com"_s) || info.thumbnail.isEmpty()) &&
+        o.value(u"_type"_s).toString() != u"playlist"_s) {
+        info.thumbnail = thumbnailUrl(info.id).toString();
     }
     info.duration = o.value(u"duration"_s).toDouble();
     // yt-dlp prints "19" for sub-minute videos; keep the m:ss shape everywhere.

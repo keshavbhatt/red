@@ -50,6 +50,14 @@ void TrayController::buildMenu()
     m_menu->addAction(m_actions.about);
     m_menu->addSeparator();
     m_menu->addAction(m_actions.quit);
+    // Text only: the rail gives icons to a handful of these actions and a
+    // half-iconed menu looks broken. Media keys have no readable chord.
+    for (QAction* action : m_menu->actions()) {
+        action->setIconVisibleInMenu(false);
+    }
+    for (QAction* action : {m_actions.playPause, m_actions.previous, m_actions.next}) {
+        action->setShortcutVisibleInContextMenu(false);
+    }
 }
 
 void TrayController::applyTrayVisibility()
