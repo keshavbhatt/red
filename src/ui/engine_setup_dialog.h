@@ -36,8 +36,6 @@ private:
     core::ThemeService& m_theme;
     QLabel* m_ytdlpGlyph = nullptr;
     QLabel* m_ytdlpText = nullptr;
-    QLabel* m_jsGlyph = nullptr;
-    QLabel* m_jsText = nullptr;
     QLabel* m_ffmpegGlyph = nullptr;
     QLabel* m_ffmpegText = nullptr;
     QLabel* m_step = nullptr;

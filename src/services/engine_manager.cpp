@@ -162,7 +162,8 @@ void EngineManager::detect()
     const bool complete = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && !s.ffmpegMissing;
     s.state = complete ? State::Ready : State::NotInstalled;
     if (s.ffmpegMissing) {
-        s.error = tr("ffmpeg is not installed. Red needs it to merge video and audio: %1, then try again.")
+        s.error = tr("The media converter (ffmpeg) is not installed. Red needs it to merge video and audio. "
+                     "Install it with: %1, then check again.")
                       .arg(core::ffmpegInstallHint());
     }
     m_status = s;
@@ -233,7 +234,7 @@ void EngineManager::update()
     m_steps.clear();
     queueComponent(core::ytdlpComponent(m_os, m_cpu), true);
     m_steps.append([this] { finishInstall(); });
-    setState(State::Updating, tr("Updating yt-dlp…"));
+    setState(State::Updating, tr("Updating the download engine…"));
     runNextStep();
 }
 
@@ -249,8 +250,9 @@ void EngineManager::runNextStep()
 void EngineManager::queueComponent(const core::EngineComponent& component, bool verifySums)
 {
     m_steps.append([this, component, verifySums] {
-        const QString label =
-            component.kind == core::EngineComponent::Kind::YtDlp ? tr("yt-dlp") : tr("JavaScript runtime");
+        // User-facing: the engine and its parts, never the tool names.
+        const QString label = component.kind == core::EngineComponent::Kind::YtDlp ? tr("the download engine")
+                                                                                   : tr("engine components");
         setState(m_status.state, tr("Looking up %1…").arg(label));
         fetchRelease(component, verifySums, [this, component, label](const QUrl& asset, const QUrl& sums) {
             if (asset.isEmpty()) {

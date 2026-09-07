@@ -167,7 +167,7 @@ QString friendlyError(const QString& stderrTail, int exitCode)
     }
     if (probe.contains(u"ffmpeg"_s, Qt::CaseInsensitive) &&
         probe.contains(u"not found"_s, Qt::CaseInsensitive)) {
-        return u"ffmpeg is missing. Reinstall the download engine in Settings → Downloads."_s;
+        return u"The media converter (ffmpeg) is missing. Install it, then check the download engine in Settings → Downloads."_s;
     }
     if (probe.contains(u"Requested format is not available"_s)) {
         return u"The chosen quality is not available for this video."_s;

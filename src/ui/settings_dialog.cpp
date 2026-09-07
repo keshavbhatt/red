@@ -509,11 +509,12 @@ QWidget* SettingsDialog::buildDownloads()
     connect(m_engineButton, &QPushButton::clicked, this, &SettingsDialog::engineDialogRequested);
     engineRow->addWidget(m_engineButton);
     e->addLayout(engineRow);
-    m_engineAutoUpdate = new QCheckBox(tr("Keep yt-dlp up to date automatically (checked daily)"), engine);
+    m_engineAutoUpdate =
+        new QCheckBox(tr("Keep the download engine up to date automatically (checked daily)"), engine);
     connect(m_engineAutoUpdate, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setEngineAutoUpdate(on); });
     e->addWidget(m_engineAutoUpdate);
-    m_engineUseSystem = new QCheckBox(tr("Use the yt-dlp installed on this system instead"), engine);
+    m_engineUseSystem = new QCheckBox(tr("Use an engine already installed on this system (yt-dlp)"), engine);
     connect(m_engineUseSystem, &QCheckBox::toggled, this, [this](bool on) {
         m_settings.setEngineUseSystem(on);
         m_engineSystemPath->setEnabled(on);
@@ -727,8 +728,8 @@ void SettingsDialog::refreshEngine(const services::EngineManager::Status& s)
 {
     QString text;
     if (s.isReady()) {
-        text = tr("yt-dlp %1 · %2 · ffmpeg ready")
-                   .arg(s.systemYtdlp ? tr("(system)") : s.ytdlpVersion, core::jsRuntimeLabel(s.jsRuntime));
+        text = s.systemYtdlp ? tr("Engine from this system · media converter ready")
+                             : tr("Engine %1 · media converter ready").arg(s.ytdlpVersion);
         if (s.updateAvailable) {
             text += tr(" · update %1 available").arg(s.latestVersion);
         }

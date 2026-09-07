@@ -225,7 +225,7 @@ void DownloadsPanel::setEngineStatus(const services::EngineManager::Status& stat
     case State::Ready:
         text = status.updateAvailable
                    ? tr("Update available")
-                   : (status.systemYtdlp ? tr("yt-dlp (system)") : u"yt-dlp "_s + status.ytdlpVersion);
+                   : (status.systemYtdlp ? tr("Engine (system)") : tr("Engine %1").arg(status.ytdlpVersion));
         color = status.updateAvailable ? t.warning : t.success;
         icon = status.updateAvailable ? u"warning"_s : u"check"_s;
         break;
@@ -238,10 +238,8 @@ void DownloadsPanel::setEngineStatus(const services::EngineManager::Status& stat
     m_engineChip->setText(text);
     m_engineChip->setIcon(icons::themed(icon, color));
     m_engineChip->setToolTip(
-        status.error.isEmpty() ? tr("Download engine: yt-dlp %1 · %2 · ffmpeg %3")
+        status.error.isEmpty() ? tr("Download engine %1 · media converter %2")
                                      .arg(status.ytdlpVersion.isEmpty() ? tr("missing") : status.ytdlpVersion,
-                                          status.jsRuntime.isEmpty() ? tr("no JavaScript runtime")
-                                                                     : core::jsRuntimeLabel(status.jsRuntime),
                                           status.ffmpegPath.isEmpty() ? tr("missing") : tr("ready"))
                                : status.error);
     m_engineChip->setStyleSheet(

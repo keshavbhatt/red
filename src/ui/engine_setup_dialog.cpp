@@ -62,8 +62,8 @@ void EngineSetupDialog::setupUi()
     heading->setProperty("redHeading", true);
     root->addWidget(heading);
     auto* intro =
-        new QLabel(tr("Red downloads with yt-dlp. It is fetched once from its official releases and kept "
-                      "up to date automatically; ffmpeg comes from your system."),
+        new QLabel(tr("Red fetches a small download engine once and keeps it up to date automatically. "
+                      "Merging and converting media uses your system's media converter."),
                    this);
     intro->setProperty("redMuted", true);
     intro->setWordWrap(true);
@@ -74,9 +74,8 @@ void EngineSetupDialog::setupUi()
     auto* cardLayout = new QVBoxLayout(card);
     cardLayout->setContentsMargins(16, 14, 16, 14);
     cardLayout->setSpacing(10);
-    cardLayout->addWidget(makeRow(&m_ytdlpGlyph, &m_ytdlpText, u"yt-dlp"_s));
-    cardLayout->addWidget(makeRow(&m_jsGlyph, &m_jsText, tr("JavaScript runtime")));
-    cardLayout->addWidget(makeRow(&m_ffmpegGlyph, &m_ffmpegText, u"ffmpeg"_s));
+    cardLayout->addWidget(makeRow(&m_ytdlpGlyph, &m_ytdlpText, tr("Download engine")));
+    cardLayout->addWidget(makeRow(&m_ffmpegGlyph, &m_ffmpegText, tr("Media converter")));
     root->addWidget(card);
 
     m_step = new QLabel(this);
@@ -124,16 +123,19 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
                                        ok ? t.success : (busy ? t.link : t.warning), 20, dpr));
     };
     const bool busy = s.isBusy();
-    glyph(m_ytdlpGlyph, !s.ytdlpPath.isEmpty(), busy);
-    glyph(m_jsGlyph, !s.jsRuntime.isEmpty(), busy);
+    // The engine is yt-dlp plus its script runtime; the user sees one thing.
+    const bool engineReady = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty();
+    glyph(m_ytdlpGlyph, engineReady, busy);
     glyph(m_ffmpegGlyph, !s.ffmpegPath.isEmpty(), busy);
-    m_ytdlpText->setText(s.ytdlpPath.isEmpty()
-                             ? tr("will be downloaded (~40 MB)")
-                             : (s.systemYtdlp ? tr("system installation") : s.ytdlpVersion));
-    m_jsText->setText(s.jsRuntime.isEmpty() ? tr("QuickJS will be downloaded (~3 MB)")
-                                            : core::jsRuntimeLabel(s.jsRuntime));
-    m_ffmpegText->setText(s.ffmpegPath.isEmpty() ? tr("not installed — %1").arg(core::ffmpegInstallHint())
-                                                 : s.ffmpegPath);
+    m_ytdlpText->setText(s.ytdlpPath.isEmpty()   ? tr("will be downloaded (~45 MB)")
+                         : s.jsRuntime.isEmpty() ? tr("a component will be downloaded (~3 MB)")
+                         : s.systemYtdlp         ? tr("from this system")
+                                                 : tr("version %1").arg(s.ytdlpVersion));
+    m_ffmpegText->setText(
+        s.ffmpegPath.isEmpty()
+            ? tr("not installed — install the ffmpeg package: %1").arg(core::ffmpegInstallHint())
+            : tr("ready"));
+    m_ffmpegText->setToolTip(s.ffmpegPath);
 
     QString step;
     if (busy) {
@@ -143,7 +145,7 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     } else if (!s.checkError.isEmpty()) {
         step = tr("Could not check for updates: %1").arg(s.checkError);
     } else if (s.isReady() && s.updateAvailable) {
-        step = tr("yt-dlp %1 is available.").arg(s.latestVersion);
+        step = tr("Engine update %1 is available.").arg(s.latestVersion);
     } else if (s.isReady() && s.lastCheck.isValid() && !s.systemYtdlp) {
         const QDateTime local = s.lastCheck.toLocalTime();
         const qint64 age = local.secsTo(QDateTime::currentDateTime());
@@ -152,7 +154,7 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
             : local.date() == QDate::currentDate()
                 ? tr("today at %1").arg(QLocale().toString(local.time(), QLocale::ShortFormat))
                 : QLocale().toString(local.date(), QLocale::LongFormat);
-        step = tr("Everything is ready. yt-dlp is up to date (checked %1).").arg(when);
+        step = tr("Everything is ready. The engine is up to date (checked %1).").arg(when);
     } else if (s.isReady()) {
         step = tr("Everything is ready.");
     }
