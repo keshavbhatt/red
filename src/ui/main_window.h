@@ -55,7 +55,7 @@ public Q_SLOTS:
     void showShortcuts();
     void showAbout();
     /// Headless verification aid (ADR-010): opens a screen by name —
-    /// "about", "shortcuts", "tray" (the tray menu, popped up over the window).
+    /// "about", "shortcuts", "link", "tray" (the tray menu, popped up over the window).
     void debugOpen(const QString& what);
     void quit();
 
@@ -79,6 +79,7 @@ private:
     void applyChrome();
     void handleRenderProcessGaveUp();
     void handlePermissionPrompt(const QWebEnginePermission& permission);
+    void installScriptDialogs();
     void handleTvSignal(const QString& signal, const QString& argument);
     void clearCache();
     void confirmClearSession();

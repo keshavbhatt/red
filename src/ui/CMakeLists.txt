@@ -14,6 +14,8 @@ qt_add_library(red_ui STATIC
     download_dialog.h
     kind_card.cpp
     kind_card.h
+    message_sheet.cpp
+    message_sheet.h
     downloads_hub.cpp
     downloads_hub.h
     downloads_panel.cpp

@@ -55,4 +55,30 @@ void WebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, cons
     }
 }
 
+void WebPage::javaScriptAlert(const QUrl& securityOrigin, const QString& msg)
+{
+    if (m_dialogs.alert) {
+        m_dialogs.alert(securityOrigin, msg);
+        return;
+    }
+    QWebEnginePage::javaScriptAlert(securityOrigin, msg);
+}
+
+bool WebPage::javaScriptConfirm(const QUrl& securityOrigin, const QString& msg)
+{
+    if (m_dialogs.confirm) {
+        return m_dialogs.confirm(securityOrigin, msg);
+    }
+    return QWebEnginePage::javaScriptConfirm(securityOrigin, msg);
+}
+
+bool WebPage::javaScriptPrompt(const QUrl& securityOrigin, const QString& msg, const QString& defaultValue,
+                               QString* result)
+{
+    if (m_dialogs.prompt) {
+        return m_dialogs.prompt(securityOrigin, msg, defaultValue, result);
+    }
+    return QWebEnginePage::javaScriptPrompt(securityOrigin, msg, defaultValue, result);
+}
+
 } // namespace red::web

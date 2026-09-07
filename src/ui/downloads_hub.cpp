@@ -11,6 +11,7 @@
 #include "ui/downloads_panel.h"
 #include "ui/engine_setup_dialog.h"
 #include "ui/logging.h"
+#include "ui/message_sheet.h"
 #include "ui/thumbnail_cache.h"
 #include "web/cookie_exporter.h"
 
@@ -19,7 +20,6 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QInputDialog>
 #include <QTemporaryFile>
 #include <QTimer>
 #include <QtEnvironmentVariables>
@@ -255,21 +255,24 @@ void DownloadsHub::promptForUrl()
     if (core::isDownloadable(QUrl(clip))) {
         initial = clip;
     }
-    bool ok = false;
-    const QString text = QInputDialog::getText(m_dialogParent, tr("Download from link"),
-                                               tr("Paste a YouTube video, playlist or channel link:"),
-                                               QLineEdit::Normal, initial, &ok);
-    if (!ok || text.trimmed().isEmpty()) {
-        return;
+    // Re-asks with the typed text kept until it is a YouTube link or cancelled.
+    QString body = tr("Paste a YouTube video, playlist or channel link.");
+    QString text = initial;
+    for (;;) {
+        bool ok = false;
+        text = MessageSheet::askText(m_dialogParent, tr("Download from link"), body,
+                                     u"https://www.youtube.com/watch?v=…"_s, text, tr("Continue"), &ok)
+                   .trimmed();
+        if (!ok || text.isEmpty()) {
+            return;
+        }
+        const QUrl url = QUrl::fromUserInput(text);
+        if (core::isDownloadable(url)) {
+            requestDownload(url);
+            return;
+        }
+        body = tr("That does not look like a YouTube video, playlist or channel link. Try another one.");
     }
-    const QUrl url = QUrl::fromUserInput(text.trimmed());
-    if (!core::isDownloadable(url)) {
-        QInputDialog::getText(m_dialogParent, tr("Download from link"),
-                              tr("That does not look like a YouTube video, playlist or channel link."),
-                              QLineEdit::Normal, text.trimmed());
-        return;
-    }
-    requestDownload(url);
 }
 
 void DownloadsHub::showEngineDialog()

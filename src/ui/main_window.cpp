@@ -17,6 +17,7 @@
 #include "ui/icons.h"
 #include "ui/logging.h"
 #include "ui/media_controller.h"
+#include "ui/message_sheet.h"
 #include "ui/permission_prompt.h"
 #include "ui/settings_dialog.h"
 #include "ui/shortcuts_dialog.h"
@@ -28,6 +29,7 @@
 #include "web/full_screen_hint.h"
 #include "web/permission_controller.h"
 #include "web/request_interceptor.h"
+#include "web/web_page.h"
 #include "web/web_profile.h"
 #include "web/web_view.h"
 
@@ -40,7 +42,6 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QMenu>
-#include <QMessageBox>
 #include <QResizeEvent>
 #include <QSessionManager>
 #include <QShortcut>
@@ -113,6 +114,7 @@ void MainWindow::setupUi()
     m_themeApplier = new ThemeApplier(m_theme, this);
     m_actions = new Actions(this);
     m_webView = new web::WebView(m_settings, m_theme, m_appVersion, this);
+    installScriptDialogs();
     m_rail = new SideRail(*m_actions, m_theme, this);
 
     m_notifier = platform::createPlatformNotifier(this).release();
@@ -616,6 +618,8 @@ void MainWindow::debugOpen(const QString& what)
         showAbout();
     } else if (what == u"shortcuts"_s) {
         showShortcuts();
+    } else if (what == u"link"_s) {
+        m_actions->downloadUrl->trigger();
     } else if (what == u"tray"_s) {
         if (QMenu* menu = m_tray->menu(); menu != nullptr) {
             menu->popup(mapToGlobal(QPoint(width() / 2, height() / 2)));
@@ -643,19 +647,18 @@ void MainWindow::clearCache()
 
 void MainWindow::confirmClearSession()
 {
-    const auto choice = QMessageBox::warning(
-        this, tr("Sign out and clear session?"),
-        tr("This removes your YouTube sign-in and all cached data from this computer. Red will quit; "
-           "start it again to sign in afresh.\n\nDownloaded files and settings are kept."),
-        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
-    if (choice != QMessageBox::Yes) {
+    if (!MessageSheet::confirm(this, MessageSheet::Tone::Danger, tr("Sign out and clear session?"),
+                               tr("This removes your YouTube sign-in and all cached data from this computer. "
+                                  "Red will quit; start it again to sign in afresh. Downloaded files and "
+                                  "settings are kept."),
+                               tr("Sign out and quit"))) {
         return;
     }
     const QString marker =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/clear-session"_s;
     QFile file(marker);
     if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::critical(this, tr("Cannot clear session"), tr("Could not write %1.").arg(marker));
+        MessageSheet::info(this, tr("Cannot clear session"), tr("Could not write %1.").arg(marker));
         return;
     }
     file.close();
@@ -669,26 +672,59 @@ void MainWindow::maybeShowGpuFallbackNotice()
         return;
     }
     m_settings.setGpuFallbackNotice(false);
-    QMessageBox::information(
-        this, tr("Hardware acceleration turned off"),
-        tr("Red hit a graphics-driver problem and switched to software rendering so it stays "
-           "stable.\n\nEverything still works; you can turn hardware acceleration back on in "
-           "Settings → Advanced."));
+    MessageSheet::info(this, tr("Hardware acceleration turned off"),
+                       tr("Red hit a graphics-driver problem and switched to software rendering so it stays "
+                          "stable. Everything still works; you can turn hardware acceleration back on in "
+                          "Settings → Advanced."));
 }
 
 void MainWindow::handleRenderProcessGaveUp()
 {
     showAndRaise();
-    const auto choice = QMessageBox::critical(
-        this, tr("YouTube keeps crashing"),
-        tr("The page's render process has crashed several times in a row.\n\nReload to try again, or quit. "
+    const bool reload = MessageSheet::confirm(
+        this, MessageSheet::Tone::Warning, tr("YouTube keeps crashing"),
+        tr("The page's render process has crashed several times in a row. Reload to try again, or quit. "
            "If this keeps happening, try Settings → Advanced → Hardware acceleration: Off."),
-        QMessageBox::Retry | QMessageBox::Close, QMessageBox::Retry);
-    if (choice == QMessageBox::Retry) {
+        tr("Reload"), tr("Quit"));
+    if (reload) {
         m_webView->reload();
     } else {
         quit();
     }
+}
+
+/// The page's alert / confirm / prompt boxes as Red sheets. The "leave this
+/// page?" guard is Chromium's own text; it gets Stay / Leave instead of a
+/// raw URL in the title bar.
+void MainWindow::installScriptDialogs()
+{
+    web::WebPage::ScriptDialogs dialogs;
+    auto siteName = [](const QUrl& origin) {
+        const QString host = origin.host();
+        return host.isEmpty() ? tr("This page") : host;
+    };
+    dialogs.alert = [this, siteName](const QUrl& origin, const QString& message) {
+        MessageSheet::info(this, tr("%1 says").arg(siteName(origin)), message);
+    };
+    dialogs.confirm = [this, siteName](const QUrl& origin, const QString& message) {
+        if (message.contains(u"leave this page"_s, Qt::CaseInsensitive)) {
+            return MessageSheet::confirm(this, MessageSheet::Tone::Question, tr("Leave this page?"),
+                                         tr("Changes you made may not be saved."), tr("Leave"), tr("Stay"));
+        }
+        return MessageSheet::confirm(this, MessageSheet::Tone::Question, tr("%1 asks").arg(siteName(origin)),
+                                     message, tr("OK"));
+    };
+    dialogs.prompt = [this, siteName](const QUrl& origin, const QString& message, const QString& defaultValue,
+                                      QString* result) {
+        bool ok = false;
+        const QString text = MessageSheet::askText(this, tr("%1 asks").arg(siteName(origin)), message,
+                                                   QString(), defaultValue, tr("OK"), &ok);
+        if (ok && result != nullptr) {
+            *result = text;
+        }
+        return ok;
+    };
+    m_webView->webPage().setScriptDialogs(std::move(dialogs));
 }
 
 void MainWindow::handlePermissionPrompt(const QWebEnginePermission& permission)

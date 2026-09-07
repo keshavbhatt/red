@@ -5,6 +5,7 @@
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "ui/icons.h"
+#include "ui/message_sheet.h"
 #include "ui/red_style.h"
 #include "web/request_interceptor.h"
 
@@ -22,7 +23,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -657,10 +657,10 @@ QWidget* SettingsDialog::buildAdvanced()
     su->addWidget(diag);
     auto* reset = new QPushButton(tr("Reset all settings…"), support);
     connect(reset, &QPushButton::clicked, this, [this] {
-        const auto answer = QMessageBox::question(
-            this, tr("Reset settings"),
-            tr("Reset every setting to its default? Your sign-in and downloads are kept."));
-        if (answer == QMessageBox::Yes) {
+        if (MessageSheet::confirm(
+                this, MessageSheet::Tone::Warning, tr("Reset all settings?"),
+                tr("Every setting goes back to its default. Your sign-in and downloads are kept."),
+                tr("Reset"))) {
             m_settings.resetToDefaults();
             loadValues();
         }

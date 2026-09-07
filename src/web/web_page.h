@@ -2,6 +2,8 @@
 
 #include <QWebEnginePage>
 
+#include <functional>
+
 namespace red::web {
 
 class WebProfile;
@@ -22,6 +24,19 @@ public:
     /// Parent for pop-up windows and dialogs (the main window's view).
     void setHostWidget(QWidget* host) { m_host = host; }
 
+    /// The UI's replacements for the engine's stock alert / confirm / prompt
+    /// boxes (the "leave this page?" guard included). Each runs modally;
+    /// `prompt` returns false when cancelled. Unset ones fall back to Qt's.
+    struct ScriptDialogs
+    {
+        std::function<void(const QUrl& origin, const QString& message)> alert;
+        std::function<bool(const QUrl& origin, const QString& message)> confirm;
+        std::function<bool(const QUrl& origin, const QString& message, const QString& defaultValue,
+                           QString* result)>
+            prompt;
+    };
+    void setScriptDialogs(ScriptDialogs dialogs) { m_dialogs = std::move(dialogs); }
+
 Q_SIGNALS:
     void popupOpened(QWidget* window);
 
@@ -30,10 +45,15 @@ protected:
     QWebEnginePage* createWindow(WebWindowType type) override;
     void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber,
                                   const QString& sourceId) override;
+    void javaScriptAlert(const QUrl& securityOrigin, const QString& msg) override;
+    bool javaScriptConfirm(const QUrl& securityOrigin, const QString& msg) override;
+    bool javaScriptPrompt(const QUrl& securityOrigin, const QString& msg, const QString& defaultValue,
+                          QString* result) override;
 
 private:
     WebProfile& m_profile;
     QWidget* m_host = nullptr;
+    ScriptDialogs m_dialogs;
 };
 
 } // namespace red::web
