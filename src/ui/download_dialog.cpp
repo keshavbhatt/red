@@ -7,9 +7,11 @@
 #include "core/youtube_url.h"
 #include "services/media_probe.h"
 #include "ui/icons.h"
+#include "ui/kind_card.h"
 #include "ui/red_style.h"
 #include "ui/thumbnail_cache.h"
 
+#include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDate>
@@ -24,8 +26,8 @@
 #include <QLocale>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QStackedWidget>
 #include <QStandardItemModel>
-#include <QTabWidget>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -67,6 +69,17 @@ DownloadDialog::DownloadDialog(const QUrl& url, core::Settings& settings, core::
     setMinimumWidth(680);
     setupUi();
     applyDefaults();
+    selectKind(m_settings.lastDownloadKind() == core::DownloadKind::Audio ? core::DownloadOptions::Kind::Audio
+               : m_settings.lastDownloadKind() == core::DownloadKind::Custom
+                   ? core::DownloadOptions::Kind::Custom
+                   : core::DownloadOptions::Kind::Video);
+    connect(this, &QDialog::accepted, this, [this] {
+        const core::DownloadOptions::Kind k = kind();
+        m_settings.setLastDownloadKind(k == core::DownloadOptions::Kind::Audio ? core::DownloadKind::Audio
+                                       : k == core::DownloadOptions::Kind::Custom
+                                           ? core::DownloadKind::Custom
+                                           : core::DownloadKind::Video);
+    });
     connect(&m_probe, &services::MediaProbe::finished, this, &DownloadDialog::handleProbeFinished);
     connect(&m_probe, &services::MediaProbe::failed, this, &DownloadDialog::handleProbeFailed);
     connect(&m_thumbnails, &ThumbnailCache::ready, this, [this](const QString&) { updateHero(); });
@@ -89,19 +102,61 @@ void DownloadDialog::setupUi()
     root->setSpacing(14);
     root->addWidget(buildHero());
 
-    m_tabs = new QTabWidget(this);
-    m_tabs->setDocumentMode(true);
-    m_tabs->addTab(buildVideoTab(), tr("Video"));
-    m_tabs->addTab(buildAudioTab(), tr("Audio"));
-    m_tabs->addTab(buildAdvancedTab(), tr("Advanced"));
-    connect(m_tabs, &QTabWidget::currentChanged, this, [this](int) { updatePreview(); });
-    root->addWidget(m_tabs);
+    root->addWidget(buildKindChooser());
+    m_pages = new QStackedWidget(this);
+    m_pages->addWidget(buildVideoTab());
+    m_pages->addWidget(buildAudioTab());
+    m_pages->addWidget(buildAdvancedTab());
+    root->addWidget(m_pages);
+    connect(m_kinds, &QButtonGroup::idToggled, this, [this](int id, bool on) {
+        if (!on) {
+            return;
+        }
+        m_pages->setCurrentIndex(id);
+        // Let the dialog shrink to the page shown instead of the tallest one.
+        for (int i = 0; i < m_pages->count(); ++i) {
+            m_pages->widget(i)->setSizePolicy(QSizePolicy::Preferred,
+                                              i == id ? QSizePolicy::Preferred : QSizePolicy::Ignored);
+        }
+        m_pages->adjustSize();
+        updatePreview();
+        adjustSize();
+    });
 
     m_playlistSection = buildPlaylistSection();
     m_playlistSection->setVisible(false);
     root->addWidget(m_playlistSection);
 
     root->addWidget(buildFooter());
+}
+
+QWidget* DownloadDialog::buildKindChooser()
+{
+    // The first decision, made unmissable: what comes out of this download.
+    auto* row = new QWidget(this);
+    auto* layout = new QHBoxLayout(row);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+    m_kinds = new QButtonGroup(this);
+    m_kinds->setExclusive(true);
+    const struct
+    {
+        QString icon;
+        QString title;
+        QString hint;
+    } cards[] = {
+        {u"video"_s, tr("Video"), tr("Picture and sound")},
+        {u"music"_s, tr("Audio only"), tr("Just the sound, for music")},
+        {u"sliders"_s, tr("Advanced"), tr("Pick the exact streams")},
+    };
+    int id = 0;
+    for (const auto& card : cards) {
+        auto* button = new KindCard(card.icon, card.title, card.hint, m_theme, row);
+        m_kinds->addButton(button, id++);
+        layout->addWidget(button, 1);
+    }
+    m_kinds->button(0)->setChecked(true);
+    return row;
 }
 
 QWidget* DownloadDialog::buildHero()
@@ -556,7 +611,10 @@ void DownloadDialog::populateFromInfo()
         populateEntries();
     }
     m_playlistSection->setVisible(m_isPlaylist);
-    m_tabs->setTabEnabled(2, !m_isPlaylist && !m_info.formats.isEmpty());
+    m_kinds->button(2)->setEnabled(!m_isPlaylist && !m_info.formats.isEmpty());
+    if (!m_kinds->button(2)->isEnabled() && m_kinds->checkedId() == 2) {
+        m_kinds->button(0)->setChecked(true);
+    }
     updateHero();
     updatePreview();
     adjustSize();
@@ -690,8 +748,12 @@ void DownloadDialog::updatePreview()
     }
     m_preview->setText(m_preview->fontMetrics().elidedText(preview, Qt::ElideMiddle, 300));
     m_preview->setToolTip(preview);
-    const bool advanced = m_tabs->currentIndex() == 2;
-    if (advanced) {
+    const core::DownloadOptions::Kind current = kind();
+    m_download->setText(current == core::DownloadOptions::Kind::Audio ? tr("Download audio")
+                        : current == core::DownloadOptions::Kind::Video
+                            ? (m_isPlaylist ? tr("Download videos") : tr("Download video"))
+                            : tr("Download"));
+    if (current == core::DownloadOptions::Kind::Custom) {
         const bool picked = !opts.customVideoFormat.isEmpty() || !opts.customAudioFormat.isEmpty();
         m_download->setEnabled(picked && !m_probing);
     } else if (!m_probing) {
@@ -725,9 +787,24 @@ void DownloadDialog::chooseFolder()
 
 void DownloadDialog::selectKind(core::DownloadOptions::Kind kind)
 {
-    m_tabs->setCurrentIndex(kind == core::DownloadOptions::Kind::Audio    ? 1
-                            : kind == core::DownloadOptions::Kind::Custom ? 2
-                                                                          : 0);
+    const int id = kind == core::DownloadOptions::Kind::Audio    ? 1
+                   : kind == core::DownloadOptions::Kind::Custom ? 2
+                                                                 : 0;
+    if (QAbstractButton* button = m_kinds->button(id); button && button->isEnabled()) {
+        button->setChecked(true);
+    }
+}
+
+core::DownloadOptions::Kind DownloadDialog::kind() const
+{
+    switch (m_kinds->checkedId()) {
+    case 1:
+        return core::DownloadOptions::Kind::Audio;
+    case 2:
+        return core::DownloadOptions::Kind::Custom;
+    default:
+        return core::DownloadOptions::Kind::Video;
+    }
 }
 
 // ---- result ----------------------------------------------------------------
@@ -749,10 +826,7 @@ QString DownloadDialog::playlistItemsSpec() const
 core::DownloadOptions DownloadDialog::options() const
 {
     core::DownloadOptions o;
-    const int tab = m_tabs->currentIndex();
-    o.kind = tab == 1   ? core::DownloadOptions::Kind::Audio
-             : tab == 2 ? core::DownloadOptions::Kind::Custom
-                        : core::DownloadOptions::Kind::Video;
+    o.kind = kind();
     o.quality = static_cast<core::VideoQuality>(m_quality->currentData().toInt());
     o.container = static_cast<core::Container>(m_container->currentData().toInt());
     o.audioFormat = static_cast<core::AudioFormat>(m_audioFormat->currentData().toInt());

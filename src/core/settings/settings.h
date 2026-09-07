@@ -95,6 +95,15 @@ enum class AudioFormat
     Wav,
 };
 
+/// What the download dialog offers first (its "Video / Audio only / Advanced"
+/// choice); remembered from the last download so audio-only users stay there.
+enum class DownloadKind
+{
+    Video,
+    Audio,
+    Custom,
+};
+
 enum class FilenamePattern
 {
     Title,        ///< Title.ext
@@ -208,6 +217,8 @@ public:
     void setDefaultContainer(Container container);
     [[nodiscard]] AudioFormat defaultAudioFormat() const;
     void setDefaultAudioFormat(AudioFormat format);
+    [[nodiscard]] DownloadKind lastDownloadKind() const;
+    void setLastDownloadKind(DownloadKind kind);
     [[nodiscard]] int concurrentDownloads() const;
     void setConcurrentDownloads(int count);
     static constexpr int kMaxConcurrentDownloads = 5;
@@ -324,6 +335,7 @@ Q_DECLARE_METATYPE(red::core::HardwareAcceleration)
 Q_DECLARE_METATYPE(red::core::VideoQuality)
 Q_DECLARE_METATYPE(red::core::Container)
 Q_DECLARE_METATYPE(red::core::AudioFormat)
+Q_DECLARE_METATYPE(red::core::DownloadKind)
 Q_DECLARE_METATYPE(red::core::FilenamePattern)
 Q_DECLARE_METATYPE(red::core::SponsorAction)
 Q_DECLARE_METATYPE(red::core::SignInUserAgent)

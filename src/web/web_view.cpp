@@ -378,6 +378,9 @@ void WebView::contextMenuEvent(QContextMenuEvent* event)
         download->setFont(bold);
         connect(download, &QAction::triggered, this,
                 [this, downloadTarget] { Q_EMIT downloadRequested(downloadTarget); });
+        QAction* audio = menu->addAction(QIcon::fromTheme(u"audio-x-generic"_s), tr("Download audio only…"));
+        connect(audio, &QAction::triggered, this,
+                [this, downloadTarget] { Q_EMIT audioDownloadRequested(downloadTarget); });
         menu->addSeparator();
     }
     if (!link.isEmpty()) {

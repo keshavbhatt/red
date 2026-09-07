@@ -50,6 +50,7 @@ inline constexpr QLatin1StringView kFilenamePattern{"downloads/filenamePattern"}
 inline constexpr QLatin1StringView kDefaultQuality{"downloads/defaultQuality"};
 inline constexpr QLatin1StringView kDefaultContainer{"downloads/defaultContainer"};
 inline constexpr QLatin1StringView kDefaultAudioFormat{"downloads/defaultAudioFormat"};
+inline constexpr QLatin1StringView kLastDownloadKind{"downloads/lastKind"};
 inline constexpr QLatin1StringView kConcurrentDownloads{"downloads/concurrent"};
 inline constexpr QLatin1StringView kSpeedLimitKbps{"downloads/speedLimitKbps"};
 inline constexpr QLatin1StringView kUseSessionCookies{"downloads/useSessionCookies"};

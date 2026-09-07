@@ -42,6 +42,7 @@ constexpr FilenamePattern kDefaultFilenamePattern = FilenamePattern::Title;
 constexpr VideoQuality kDefaultQuality = VideoQuality::Best;
 constexpr Container kDefaultContainer = Container::Mp4;
 constexpr AudioFormat kDefaultAudioFormat = AudioFormat::Best;
+constexpr DownloadKind kDefaultDownloadKind = DownloadKind::Video;
 constexpr int kDefaultConcurrent = 2;
 constexpr int kDefaultSpeedLimit = 0;
 constexpr bool kDefaultUseSessionCookies = true;
@@ -584,6 +585,18 @@ void Settings::setDefaultAudioFormat(AudioFormat format)
                  static_cast<int>(format))) {
         Q_EMIT downloadDefaultsChanged();
     }
+}
+
+DownloadKind Settings::lastDownloadKind() const
+{
+    return enumFromInt(intValue(keys::kLastDownloadKind, static_cast<int>(kDefaultDownloadKind)),
+                       kDefaultDownloadKind, 3);
+}
+
+void Settings::setLastDownloadKind(DownloadKind kind)
+{
+    // Not a "default" the dialog re-reads live: it is only consulted on open.
+    storeInt(keys::kLastDownloadKind, static_cast<int>(kDefaultDownloadKind), static_cast<int>(kind));
 }
 
 int Settings::concurrentDownloads() const

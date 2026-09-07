@@ -27,6 +27,7 @@ class CookieExporter;
 
 namespace red::ui {
 
+class DownloadDialog;
 class DownloadsPanel;
 class EngineSetupDialog;
 class ThumbnailCache;
@@ -52,7 +53,9 @@ public:
     [[nodiscard]] ThumbnailCache& thumbnails() { return *m_thumbnails; }
 
     /// Opens the download dialog for a YouTube URL (sets the engine up first if needed).
-    void requestDownload(const QUrl& url);
+    /// Opens the download dialog for a video/playlist/channel URL. With
+    /// `audioOnly` the dialog opens on "Audio only" (context menu entry).
+    void requestDownload(const QUrl& url, bool audioOnly = false);
     /// Asks for a URL (prefilled from the clipboard when it is a YouTube link).
     void promptForUrl();
     void showEngineDialog();
@@ -70,7 +73,7 @@ private:
     void wireQueue();
     void handleCardAction(quint64 jobId, DownloadCardDelegate::Action action);
     void handleJobFinished(quint64 id, core::DownloadState state);
-    void openDialog(const QUrl& url);
+    void openDialog(const QUrl& url, bool audioOnly = false);
     void schedulePersist();
     void persist();
 
@@ -86,9 +89,9 @@ private:
     DownloadsPanel* m_panel = nullptr;
     QPointer<EngineSetupDialog> m_engineDialog;
     QTimer* m_persistTimer = nullptr;
-    QList<QUrl> m_pendingUrls;                       ///< waiting for the engine
-    QHash<quint64, quint64> m_notificationJobs;      ///< notification id → job id
-    QHash<QString, QPointer<QDialog>> m_openDialogs; ///< one dialog per URL
+    QList<QUrl> m_pendingUrls;                              ///< waiting for the engine
+    QHash<quint64, quint64> m_notificationJobs;             ///< notification id → job id
+    QHash<QString, QPointer<DownloadDialog>> m_openDialogs; ///< one dialog per URL
 };
 
 } // namespace red::ui

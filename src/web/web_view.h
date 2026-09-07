@@ -68,6 +68,7 @@ Q_SIGNALS:
     void permissionPromptRequested(QWebEnginePermission permission);
     /// The user asked to download this URL (context menu, Ctrl+D in the page, TV).
     void downloadRequested(const QUrl& url);
+    void audioDownloadRequested(const QUrl& url);
     void mediaStateChanged(const core::MediaState& state);
     /// SponsorBlock segments wanted for a video (answered via profile().bridge()).
     void sponsorSegmentsRequested(const QString& videoId);

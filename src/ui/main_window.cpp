@@ -247,7 +247,10 @@ void MainWindow::connectWebView()
             [this](bool on) { m_actions->fullScreen->setChecked(on); });
     connect(m_webView, &web::WebView::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_webView, &web::WebView::permissionPromptRequested, this, &MainWindow::handlePermissionPrompt);
-    connect(m_webView, &web::WebView::downloadRequested, m_downloads, &DownloadsHub::requestDownload);
+    connect(m_webView, &web::WebView::downloadRequested, m_downloads,
+            [this](const QUrl& url) { m_downloads->requestDownload(url); });
+    connect(m_webView, &web::WebView::audioDownloadRequested, m_downloads,
+            [this](const QUrl& url) { m_downloads->requestDownload(url, true); });
     connect(m_webView, &web::WebView::downloadableChanged, m_rail, &SideRail::setDownloadable);
     connect(m_webView, &web::WebView::tvSignal, this, &MainWindow::handleTvSignal);
     connect(m_webView->page(), &QWebEnginePage::loadingChanged, this,

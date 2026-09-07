@@ -137,15 +137,18 @@ void DownloadsHub::wireQueue()
     connect(m_queue, &core::DownloadQueue::jobAdded, this, [this](quint64) { Q_EMIT showPanelRequested(); });
 }
 
-void DownloadsHub::requestDownload(const QUrl& url)
+void DownloadsHub::requestDownload(const QUrl& url, bool audioOnly)
 {
     if (!core::isDownloadable(url)) {
         qCInfo(lcUi) << "not a downloadable YouTube URL:" << url;
         return;
     }
     if (m_engine->isReady()) {
-        openDialog(url);
+        openDialog(url, audioOnly);
         return;
+    }
+    if (audioOnly) {
+        m_settings.setLastDownloadKind(core::DownloadKind::Audio); // honoured once the engine is ready
     }
     m_pendingUrls << url;
     showEngineDialog();
@@ -154,15 +157,21 @@ void DownloadsHub::requestDownload(const QUrl& url)
     }
 }
 
-void DownloadsHub::openDialog(const QUrl& url)
+void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
 {
     // Ctrl+D can arrive twice (window shortcut + page hotkey): reuse the dialog.
-    if (QDialog* existing = m_openDialogs.value(url.toString()); existing != nullptr) {
+    if (DownloadDialog* existing = m_openDialogs.value(url.toString()); existing != nullptr) {
+        if (audioOnly) {
+            existing->selectKind(core::DownloadOptions::Kind::Audio);
+        }
         existing->raise();
         existing->activateWindow();
         return;
     }
     auto* dialog = new DownloadDialog(url, m_settings, m_theme, *m_probe, *m_thumbnails, m_dialogParent);
+    if (audioOnly) {
+        dialog->selectKind(core::DownloadOptions::Kind::Audio);
+    }
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     m_openDialogs.insert(url.toString(), dialog);
     connect(dialog, &QDialog::accepted, this, [this, dialog] {

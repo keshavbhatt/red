@@ -6,6 +6,7 @@
 #include <QDialog>
 #include <QUrl>
 
+class QButtonGroup;
 class QCheckBox;
 class QComboBox;
 class QLabel;
@@ -45,12 +46,14 @@ public:
 
     /// The job to enqueue after accept().
     [[nodiscard]] core::DownloadJob job() const;
-    /// Switches the Video / Audio / Advanced segment.
+    /// Switches the Video / Audio only / Advanced choice.
     void selectKind(core::DownloadOptions::Kind kind);
+    [[nodiscard]] core::DownloadOptions::Kind kind() const;
 
 private:
     void setupUi();
     QWidget* buildHero();
+    QWidget* buildKindChooser();
     QWidget* buildVideoTab();
     QWidget* buildAudioTab();
     QWidget* buildAdvancedTab();
@@ -87,7 +90,8 @@ private:
     QLabel* m_status = nullptr;
     QPushButton* m_retry = nullptr;
     QCheckBox* m_wholePlaylist = nullptr;
-    QTabWidget* m_tabs = nullptr;
+    QButtonGroup* m_kinds = nullptr;
+    QStackedWidget* m_pages = nullptr;
     QComboBox* m_quality = nullptr;
     QComboBox* m_container = nullptr;
     QComboBox* m_subtitles = nullptr;
