@@ -600,9 +600,22 @@ void MainWindow::showSettings()
 
 void MainWindow::showShortcuts()
 {
-    auto* dialog = new ShortcutsDialog(*m_actions, this);
+    auto* dialog = new ShortcutsDialog(*m_actions, m_theme, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+void MainWindow::debugOpen(const QString& what)
+{
+    if (what == u"about"_s) {
+        showAbout();
+    } else if (what == u"shortcuts"_s) {
+        showShortcuts();
+    } else if (what == u"tray"_s) {
+        if (QMenu* menu = m_tray->menu(); menu != nullptr) {
+            menu->popup(mapToGlobal(QPoint(width() / 2, height() / 2)));
+        }
+    }
 }
 
 void MainWindow::showAbout()

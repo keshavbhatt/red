@@ -45,6 +45,9 @@ private:
     Actions& m_actions;
     QSystemTrayIcon* m_tray = nullptr;
     QMenu* m_menu = nullptr;
+
+public:
+    [[nodiscard]] QMenu* menu() const { return m_menu; }
     QAction* m_nowPlaying = nullptr;
     QIcon m_icon;
     core::MediaState m_media;

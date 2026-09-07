@@ -150,6 +150,13 @@ int main(int argc, char* argv[])
     const red::app::CliOptions& cli = app.cliOptions();
     window.start(cli.tvMode);
 
+    // Developer aid: RED_DEBUG_OPEN=about|shortcuts|tray opens that screen
+    // once the window is up (ADR-010).
+    if (qEnvironmentVariableIsSet("RED_DEBUG_OPEN")) {
+        const QString what = qEnvironmentVariable("RED_DEBUG_OPEN");
+        QTimer::singleShot(1200, &window, [&window, what] { window.debugOpen(what); });
+    }
+
     // Developer aid: RED_DEBUG_GRAB=<png path>[,<seconds>] saves a picture of
     // the window after the delay (headless verification, bug reports on a
     // locked desktop). Repeats every <seconds> if the path contains "%1".

@@ -54,6 +54,9 @@ public Q_SLOTS:
     void showSettings();
     void showShortcuts();
     void showAbout();
+    /// Headless verification aid (ADR-010): opens a screen by name —
+    /// "about", "shortcuts", "tray" (the tray menu, popped up over the window).
+    void debugOpen(const QString& what);
     void quit();
 
 protected:
