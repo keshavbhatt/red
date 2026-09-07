@@ -151,6 +151,11 @@ core::AppMode WebView::mode() const
 void WebView::setMode(core::AppMode mode)
 {
     if (mode == m_profile->mode()) {
+        // The profile already starts in the remembered mode; the first
+        // "switch" into it at startup still has to load the page.
+        if (url().isEmpty()) {
+            loadStart();
+        }
         return;
     }
     // Carry the video across: a watch page becomes the Leanback route and back.

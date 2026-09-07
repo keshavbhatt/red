@@ -62,9 +62,12 @@ WebProfile::WebProfile(core::Settings& settings, const QString& appVersion, QObj
     , m_bridge(std::make_unique<Bridge>())
     , m_scripts(std::make_unique<ScriptBundle>(*this))
     , m_interceptor(std::make_unique<RequestInterceptor>())
-    , m_cookies(std::make_unique<CookieExporter>(cookieStore()))
 {
     configureStorage();
+    // After the storage path: the exporter asks the store to load every
+    // persisted cookie, and before configureStorage() that store is empty
+    // (the sign-in would never reach yt-dlp, ADR-006).
+    m_cookies = std::make_unique<CookieExporter>(cookieStore());
     configureUserAgent();
     configureAttributes();
     configureBlocking();
