@@ -10,18 +10,30 @@ using namespace Qt::StringLiterals;
 
 namespace red::web {
 
-CookieExporter::CookieExporter(QWebEngineCookieStore* store, QObject* parent)
+CookieExporter::CookieExporter(QWebEngineCookieStore* store, QString databasePath, QObject* parent)
     : QObject(parent)
     , m_store(store)
+    , m_databasePath(std::move(databasePath))
 {
     connect(store, &QWebEngineCookieStore::cookieAdded, this, &CookieExporter::handleAdded);
     connect(store, &QWebEngineCookieStore::cookieRemoved, this, &CookieExporter::handleRemoved);
-    store->loadAllCookies();
+    reload();
 }
 
-QString CookieExporter::keyOf(const QNetworkCookie& c)
+QString CookieExporter::keyOf(const QNetworkCookie& cookie)
 {
-    return c.domain() + u'|' + c.path() + u'|' + QString::fromUtf8(c.name());
+    return cookie.domain() + u'|' + cookie.path() + u'|' + QString::fromUtf8(cookie.name());
+}
+
+void CookieExporter::reload()
+{
+    m_persisted.clear();
+    for (const QNetworkCookie& c : services::readChromiumCookieDatabase(m_databasePath)) {
+        if (services::isYouTubeSessionCookie(c)) {
+            m_persisted.insert(keyOf(c), c);
+        }
+    }
+    updateSignedIn();
 }
 
 void CookieExporter::handleAdded(const QNetworkCookie& cookie)
@@ -31,19 +43,21 @@ void CookieExporter::handleAdded(const QNetworkCookie& cookie)
     }
     m_cookies.insert(keyOf(cookie), cookie);
     Q_EMIT cookieChanged(cookie);
-    const bool signedIn = looksSignedIn();
-    if (signedIn != m_signedIn) {
-        m_signedIn = signedIn;
-        qCInfo(lcWeb) << "youtube session:" << (signedIn ? "signed in" : "signed out");
-        Q_EMIT signedInChanged(signedIn);
-    }
+    updateSignedIn();
 }
 
 void CookieExporter::handleRemoved(const QNetworkCookie& cookie)
 {
-    if (m_cookies.remove(keyOf(cookie)) == 0) {
+    const QString key = keyOf(cookie);
+    const bool known = m_cookies.remove(key) > 0 || m_persisted.remove(key) > 0;
+    if (!known) {
         return;
     }
+    updateSignedIn();
+}
+
+void CookieExporter::updateSignedIn()
+{
     const bool signedIn = looksSignedIn();
     if (signedIn != m_signedIn) {
         m_signedIn = signedIn;
@@ -54,7 +68,7 @@ void CookieExporter::handleRemoved(const QNetworkCookie& cookie)
 
 QString CookieExporter::cookieValue(const QString& domainSuffix, const QByteArray& name) const
 {
-    for (const QNetworkCookie& c : m_cookies) {
+    for (const QNetworkCookie& c : sessionCookies()) {
         if (c.name() == name && c.domain().endsWith(domainSuffix)) {
             return QString::fromUtf8(c.value());
         }
@@ -64,36 +78,44 @@ QString CookieExporter::cookieValue(const QString& domainSuffix, const QByteArra
 
 QList<QNetworkCookie> CookieExporter::sessionCookies() const
 {
-    return m_cookies.values();
+    // Persisted first, then whatever changed since (same key wins).
+    QHash<QString, QNetworkCookie> merged = m_persisted;
+    for (auto it = m_cookies.cbegin(); it != m_cookies.cend(); ++it) {
+        merged.insert(it.key(), it.value());
+    }
+    return merged.values();
 }
 
 int CookieExporter::deleteCookies(const QString& domainSuffix)
 {
     int removed = 0;
-    for (const QNetworkCookie& c : m_cookies.values()) {
+    for (const QNetworkCookie& c : sessionCookies()) {
         const QString domain = c.domain().startsWith(u'.') ? c.domain().mid(1) : c.domain();
         if (domain == domainSuffix || domain.endsWith(u'.' + domainSuffix)) {
             m_store->deleteCookie(c);
+            m_persisted.remove(keyOf(c));
+            m_cookies.remove(keyOf(c));
             ++removed;
         }
     }
+    updateSignedIn();
     return removed;
 }
 
 bool CookieExporter::looksSignedIn() const
 {
-    for (const QNetworkCookie& c : m_cookies) {
+    for (const QNetworkCookie& c : sessionCookies()) {
         const QByteArray name = c.name();
-        if ((name == "SAPISID" || name == "__Secure-3PAPISID" || name == "SID") &&
-            c.domain().contains(u"youtube"_s)) {
+        if ((name == "SAPISID" || name == "SID") && c.domain().endsWith(u"youtube.com"_s)) {
             return true;
         }
     }
     return false;
 }
 
-std::unique_ptr<QTemporaryFile> CookieExporter::writeTempFile() const
+std::unique_ptr<QTemporaryFile> CookieExporter::writeTempFile()
 {
+    reload(); // catch what Chromium flushed since the last look
     return services::writeCookiesTempFile(sessionCookies());
 }
 

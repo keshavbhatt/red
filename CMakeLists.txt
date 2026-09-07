@@ -42,6 +42,7 @@ find_package(Qt6 ${RED_QT_MIN_VERSION} REQUIRED COMPONENTS
     WebEngineWidgets
     WebChannel
     Network
+    Sql
     Concurrent
     Svg
 )

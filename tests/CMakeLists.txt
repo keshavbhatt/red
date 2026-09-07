@@ -54,6 +54,7 @@ red_add_test(tst_theme_service       tst_theme_service.cpp       red_core GUI)
 red_add_test(tst_notification_service tst_notification_service.cpp red_core GUI)
 # services
 red_add_test(tst_netscape_cookies    tst_netscape_cookies.cpp    red_services)
+target_link_libraries(tst_netscape_cookies PRIVATE Qt6::Sql)
 red_add_test(tst_dislikes_client     tst_dislikes_client.cpp     red_services)
 red_add_test(tst_engine_manager      tst_engine_manager.cpp      red_services)
 set_tests_properties(tst_engine_manager PROPERTIES TIMEOUT 900)

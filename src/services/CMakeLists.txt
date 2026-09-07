@@ -1,6 +1,6 @@
 # services: network-backed and process-backed services (engine provisioning,
-# yt-dlp probing, SponsorBlock). Links core + Qt6::Network. No widgets, no
-# WebEngine.
+# yt-dlp probing, SponsorBlock). Links core + Qt6::Network (+ Qt6::Sql to read
+# the profile's cookie database). No widgets, no WebEngine.
 
 qt_add_library(red_services STATIC
     engine_manager.cpp
@@ -22,4 +22,6 @@ target_link_libraries(red_services
     PUBLIC
         red_core
         Qt6::Network
+    PRIVATE
+        Qt6::Sql
 )

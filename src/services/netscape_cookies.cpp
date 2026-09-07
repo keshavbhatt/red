@@ -2,7 +2,13 @@
 
 #include <QDateTime>
 #include <QDir>
+#include <QFile>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QTemporaryFile>
+#include <QTimeZone>
+#include <QUuid>
 
 using namespace Qt::StringLiterals;
 
@@ -54,6 +60,52 @@ std::unique_ptr<QTemporaryFile> writeCookiesTempFile(const QList<QNetworkCookie>
     file->write(netscapeCookieText(cookies).toUtf8());
     file->flush();
     return file;
+}
+
+QList<QNetworkCookie> readChromiumCookieDatabase(const QString& path)
+{
+    QList<QNetworkCookie> out;
+    if (!QFile::exists(path)) {
+        return out;
+    }
+    // A private copy: the live file is locked by Chromium and must not be touched.
+    QTemporaryFile copy(QDir::tempPath() + u"/red-cookiedb-XXXXXX"_s);
+    if (!copy.open()) {
+        return out;
+    }
+    copy.close();
+    if (!QFile::remove(copy.fileName()) || !QFile::copy(path, copy.fileName())) {
+        return out;
+    }
+    const QString connection = u"red-cookies-"_s + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase(u"QSQLITE"_s, connection);
+        db.setDatabaseName(copy.fileName());
+        db.setConnectOptions(u"QSQLITE_OPEN_READONLY"_s);
+        if (db.open()) {
+            QSqlQuery query(db);
+            // expires_utc: microseconds since 1601-01-01 (Windows epoch); 0 = session.
+            if (query.exec(u"SELECT host_key, name, value, path, expires_utc, is_secure, is_httponly "
+                           "FROM cookies WHERE length(value) > 0"_s)) {
+                constexpr qint64 kWindowsToUnixSeconds = 11644473600LL;
+                while (query.next()) {
+                    QNetworkCookie c(query.value(1).toString().toUtf8(), query.value(2).toString().toUtf8());
+                    c.setDomain(query.value(0).toString());
+                    c.setPath(query.value(3).toString());
+                    if (const qint64 expires = query.value(4).toLongLong(); expires > 0) {
+                        c.setExpirationDate(QDateTime::fromSecsSinceEpoch(
+                            expires / 1000000 - kWindowsToUnixSeconds, QTimeZone::UTC));
+                    }
+                    c.setSecure(query.value(5).toInt() != 0);
+                    c.setHttpOnly(query.value(6).toInt() != 0);
+                    out.append(c);
+                }
+            }
+            db.close();
+        }
+    }
+    QSqlDatabase::removeDatabase(connection);
+    return out;
 }
 
 } // namespace red::services

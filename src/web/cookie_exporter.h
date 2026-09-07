@@ -21,7 +21,8 @@ class CookieExporter : public QObject
     Q_DISABLE_COPY_MOVE(CookieExporter)
 
 public:
-    explicit CookieExporter(QWebEngineCookieStore* store, QObject* parent = nullptr);
+    /// `databasePath` is the profile's "Cookies" SQLite file (may not exist yet).
+    CookieExporter(QWebEngineCookieStore* store, QString databasePath, QObject* parent = nullptr);
     ~CookieExporter() override = default;
 
     [[nodiscard]] QList<QNetworkCookie> sessionCookies() const;
@@ -29,10 +30,15 @@ public:
     [[nodiscard]] QString cookieValue(const QString& domainSuffix, const QByteArray& name) const;
     [[nodiscard]] bool looksSignedIn() const; ///< a SAPISID/SID cookie for youtube.com exists
     /// A fresh 0600 temp file, or nullptr when there is nothing to export.
-    [[nodiscard]] std::unique_ptr<QTemporaryFile> writeTempFile() const;
+    [[nodiscard]] std::unique_ptr<QTemporaryFile> writeTempFile();
     /// Deletes every cookie whose domain matches the suffix (e.g. "google.com").
     /// Returns how many were removed.
     int deleteCookies(const QString& domainSuffix);
+    /// Re-reads the persisted cookies from the database (Chromium flushes them
+    /// lazily, and QWebEngineCookieStore::loadAllCookies() is broken in Qt
+    /// 6.11); live changes seen through the store stay on top.
+    void reload();
+    [[nodiscard]] int count() const { return static_cast<int>(sessionCookies().size()); }
 
 Q_SIGNALS:
     void signedInChanged(bool signedIn);
@@ -44,8 +50,12 @@ private:
     void handleAdded(const QNetworkCookie& cookie);
     void handleRemoved(const QNetworkCookie& cookie);
 
+    void updateSignedIn();
+
     QWebEngineCookieStore* m_store = nullptr;
-    QHash<QString, QNetworkCookie> m_cookies;
+    QString m_databasePath;
+    QHash<QString, QNetworkCookie> m_persisted; ///< from the database, refreshed by reload()
+    QHash<QString, QNetworkCookie> m_cookies;   ///< live changes from the store
     bool m_signedIn = false;
 };
 
