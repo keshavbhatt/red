@@ -47,6 +47,11 @@ void WebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, cons
         qCDebug(lcWebJs).noquote() << sourceId << lineNumber << message;
         break;
     case WarningMessageLevel:
+        // YouTube preloads generate_204 pings to warm up its media servers and
+        // Chromium complains they were "not used"; Chrome logs the same.
+        if (message.contains(u"was preloaded using link preload"_s)) {
+            break;
+        }
         qCDebug(lcWebJs).noquote() << "warning:" << sourceId << lineNumber << message;
         break;
     case ErrorMessageLevel:

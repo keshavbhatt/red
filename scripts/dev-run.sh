@@ -32,7 +32,9 @@ red_export_runtime_env "$BUILD"
 # a host QT_QPA_PLATFORMTHEME like qt5ct would otherwise force Qt's own dialog).
 # The shipped snap/flatpak get the native theme from their runtime instead.
 export QT_QPA_PLATFORMTHEME="${QT_QPA_PLATFORMTHEME_OVERRIDE:-xdgdesktopportal}"
-export QT_LOGGING_RULES="${QT_LOGGING_RULES:-red.*.debug=true}"
+# Everything of Red's at debug, minus the page's own console (red.web.js), which
+# is chatty; add "red.web.js.debug=true" to QT_LOGGING_RULES when you need it.
+export QT_LOGGING_RULES="${QT_LOGGING_RULES:-red.*.debug=true;red.web.js.debug=false}"
 
 [ "${1:-}" = "--" ] && shift
 cd "$DIR"
