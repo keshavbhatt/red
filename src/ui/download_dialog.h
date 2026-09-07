@@ -6,6 +6,8 @@
 #include <QDialog>
 #include <QUrl>
 
+#include <optional>
+
 class QButtonGroup;
 class QCheckBox;
 class QComboBox;
@@ -13,6 +15,7 @@ class QLabel;
 class QLineEdit;
 class QListWidget;
 class QPushButton;
+class QRadioButton;
 class QSpinBox;
 class QStackedWidget;
 class QTabWidget;
@@ -49,6 +52,9 @@ public:
     /// Switches the Video / Audio only / Advanced choice.
     void selectKind(core::DownloadOptions::Kind kind);
     [[nodiscard]] core::DownloadOptions::Kind kind() const;
+    /// Picks "Whole playlist" for a video-in-playlist link (as soon as the
+    /// playlist has been read); no-op for plain videos.
+    void selectWholePlaylist();
 
 private:
     void setupUi();
@@ -59,8 +65,30 @@ private:
     QWidget* buildAdvancedTab();
     QWidget* buildPlaylistSection();
     QWidget* buildFooter();
+    QWidget* buildScopeChooser();
     void applyDefaults();
-    void startProbe();
+    /// What a link that names both a video and a playlist should download.
+    enum class Scope
+    {
+        Video,
+        Playlist,
+    };
+    /// Everything the dialog learned about one scope, so switching between
+    /// "this video" and "whole playlist" never re-reads or loses state.
+    struct ScopeState
+    {
+        QUrl url;
+        std::optional<core::MediaInfo> info;
+        QString error;
+        quint64 probeId = 0;
+        bool probing = false;
+    };
+    [[nodiscard]] ScopeState& scopeState(Scope scope) { return scope == Scope::Video ? m_video : m_playlist; }
+    void startProbe(Scope scope);
+    void retryProbe();
+    void setScope(Scope scope);
+    void presentScope();
+    void updateScopeChooser();
     void handleProbeFinished(quint64 id, const core::MediaInfo& info);
     void handleProbeFailed(quint64 id, const QString& error);
     void populateFromInfo();
@@ -73,15 +101,18 @@ private:
     [[nodiscard]] core::DownloadOptions options() const;
     [[nodiscard]] QString playlistItemsSpec() const;
 
-    QUrl m_url;
+    QUrl m_url; ///< the URL of the active scope
     core::Settings& m_settings;
     core::ThemeService& m_theme;
     services::MediaProbe& m_probe;
     ThumbnailCache& m_thumbnails;
-    core::MediaInfo m_info;
-    quint64 m_probeId = 0;
+    core::MediaInfo m_info; ///< the info of the active scope (empty while probing)
+    ScopeState m_video;
+    ScopeState m_playlist;
+    Scope m_scope = Scope::Video;
     bool m_probing = false;
     bool m_isPlaylist = false;
+    bool m_wantPlaylist = false;
     QString m_folder;
 
     QLabel* m_thumb = nullptr;
@@ -89,7 +120,11 @@ private:
     QLabel* m_subtitle = nullptr;
     QLabel* m_status = nullptr;
     QPushButton* m_retry = nullptr;
-    QCheckBox* m_wholePlaylist = nullptr;
+    QWidget* m_scopeRow = nullptr;
+    QRadioButton* m_scopeVideo = nullptr;
+    QRadioButton* m_scopePlaylist = nullptr;
+    QLabel* m_scopeHint = nullptr;
+    QPushButton* m_scopeRetry = nullptr;
     QButtonGroup* m_kinds = nullptr;
     QStackedWidget* m_pages = nullptr;
     QComboBox* m_quality = nullptr;

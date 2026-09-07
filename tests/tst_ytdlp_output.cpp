@@ -56,6 +56,11 @@ private Q_SLOTS:
         QVERIFY(friendlyError(u"ERROR: [youtube] x: Sign in to confirm you’re not a bot."_s, 1)
                     .contains(u"Sign in"_s));
         QVERIFY(friendlyError(u"ERROR: Private video"_s, 1).contains(u"private"_s));
+        QVERIFY(
+            friendlyError(u"ERROR: [youtube:tab] RDabc: YouTube said: This playlist type is unviewable."_s, 1)
+                .contains(u"mix"_s));
+        QCOMPARE(friendlyError(u"ERROR: [youtube:tab] PLx: Something odd happened (caused by <X>)"_s, 1),
+                 u"Something odd happened"_s);
         QVERIFY(friendlyError(u"ERROR: Requested format is not available"_s, 1).contains(u"quality"_s));
         QVERIFY(friendlyError(u"WARNING: x\nERROR: [youtube] abc: Video unavailable"_s, 1)
                     .contains(u"unavailable"_s));

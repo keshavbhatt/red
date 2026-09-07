@@ -48,6 +48,17 @@ bool isGoogleServiceHost(const QString& host)
            hostMatches(h, QLatin1StringView("youtube.com"));
 }
 
+QString downloadablePlaylistId(const QString& list)
+{
+    // YouTube mixes ("RD…" radios, incl. RDMM/RDCLAK) are generated per viewer
+    // and "unviewable" as playlists: yt-dlp cannot list them, so a watch link
+    // inside one is just a video.
+    if (list.startsWith(u"RD"_s)) {
+        return {};
+    }
+    return list;
+}
+
 YouTubeUrlInfo classifyYouTubeUrl(const QUrl& url)
 {
     YouTubeUrlInfo info;
@@ -60,7 +71,7 @@ YouTubeUrlInfo classifyYouTubeUrl(const QUrl& url)
         if (looksLikeVideoId(id)) {
             info.kind = YouTubeUrlKind::Video;
             info.videoId = id;
-            info.playlistId = query.queryItemValue(u"list"_s);
+            info.playlistId = downloadablePlaylistId(query.queryItemValue(u"list"_s));
         } else {
             info.kind = YouTubeUrlKind::Other;
         }
@@ -82,7 +93,7 @@ YouTubeUrlInfo classifyYouTubeUrl(const QUrl& url)
         return info;
     }
 
-    const QString list = query.queryItemValue(u"list"_s);
+    const QString list = downloadablePlaylistId(query.queryItemValue(u"list"_s));
     if (path == u"/watch"_s) {
         const QString id = query.queryItemValue(u"v"_s);
         if (looksLikeVideoId(id)) {

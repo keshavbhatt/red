@@ -21,6 +21,10 @@ private Q_SLOTS:
         QTest::newRow("watch+list") << u"https://www.youtube.com/watch?v=aqz-KE-bpKQ&list=PL123"_s
                                     << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s
                                     << u"PL123"_s;
+        QTest::newRow("watch+mix")
+            << u"https://www.youtube.com/watch?v=aqz-KE-bpKQ&list=RDaqz-KE-bpKQ&start_radio=1"_s
+            << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s
+            << QString(); // mixes are unviewable for yt-dlp
         QTest::newRow("youtu.be") << u"https://youtu.be/aqz-KE-bpKQ?t=10"_s
                                   << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s << QString();
         QTest::newRow("shorts") << u"https://www.youtube.com/shorts/aqz-KE-bpKQ"_s

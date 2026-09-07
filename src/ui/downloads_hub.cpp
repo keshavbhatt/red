@@ -185,10 +185,14 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
         const QString kind = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
         connect(m_probe, &services::MediaProbe::finished, dialog,
                 [dialog, kind](quint64, const core::MediaInfo&) {
-                    dialog->selectKind(kind == u"audio"_s      ? core::DownloadOptions::Kind::Audio
-                                       : kind == u"advanced"_s ? core::DownloadOptions::Kind::Custom
-                                                               : core::DownloadOptions::Kind::Video);
-                    if (kind != u"advanced"_s) { // advanced needs a pick; leave it open for inspection
+                    if (kind.endsWith(u"-playlist"_s)) {
+                        dialog->selectWholePlaylist();
+                    }
+                    dialog->selectKind(kind.startsWith(u"audio"_s)      ? core::DownloadOptions::Kind::Audio
+                                       : kind.startsWith(u"advanced"_s) ? core::DownloadOptions::Kind::Custom
+                                                                        : core::DownloadOptions::Kind::Video);
+                    if (!kind.startsWith(u"advanced"_s) && !kind.endsWith(u"-playlist"_s)) {
+                        // advanced needs a pick and playlists are for inspection: leave those open
                         QTimer::singleShot(1500, dialog, &QDialog::accept);
                     }
                 });

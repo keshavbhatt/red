@@ -4,6 +4,7 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
 
 using namespace Qt::StringLiterals;
 
@@ -154,6 +155,13 @@ QString friendlyError(const QString& stderrTail, int exitCode)
     if (probe.contains(u"Video unavailable"_s, Qt::CaseInsensitive)) {
         return u"This video is unavailable."_s;
     }
+    if (probe.contains(u"playlist type is unviewable"_s, Qt::CaseInsensitive)) {
+        return u"This is a YouTube mix, generated per viewer; only its videos can be downloaded one by one."_s;
+    }
+    if (probe.contains(u"playlist does not exist"_s, Qt::CaseInsensitive) ||
+        (probe.contains(u"[youtube:tab]"_s) && probe.contains(u"HTTP Error 400"_s))) {
+        return u"This playlist does not exist or is private."_s;
+    }
     if (probe.contains(u"HTTP Error 403"_s) || probe.contains(u"HTTP Error 429"_s)) {
         return u"YouTube refused the request (rate limited). Try again in a few minutes."_s;
     }
@@ -172,7 +180,14 @@ QString friendlyError(const QString& stderrTail, int exitCode)
         return u"Network error. Check your connection and try again."_s;
     }
     if (!lastError.isEmpty()) {
-        return lastError.left(200);
+        // Drop yt-dlp's "[extractor] id: " prefix and the "(caused by …)" tail.
+        static const QRegularExpression kPrefix(u"^\\[[^\\]]+\\]\\s*(?:[A-Za-z0-9_-]+:\\s*)?"_s);
+        QString cleaned = lastError;
+        cleaned.remove(kPrefix);
+        if (const qsizetype cause = cleaned.indexOf(u" (caused by"_s); cause > 0) {
+            cleaned.truncate(cause);
+        }
+        return cleaned.left(200);
     }
     if (exitCode != 0) {
         return u"The download engine exited with code %1."_s.arg(exitCode);

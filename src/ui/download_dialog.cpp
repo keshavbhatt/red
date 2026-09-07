@@ -25,6 +25,7 @@
 #include <QListWidget>
 #include <QLocale>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QStandardItemModel>
@@ -61,8 +62,26 @@ DownloadDialog::DownloadDialog(const QUrl& url, core::Settings& settings, core::
     , m_thumbnails(thumbnails)
     , m_folder(settings.downloadDirectory())
 {
+    // A link can name a video, a playlist/channel, or both (watch?v=…&list=…).
+    // Both scopes are read up front so the choice is informed and switching
+    // between them is instant.
     const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(url);
-    m_isPlaylist = info.kind == core::YouTubeUrlKind::Playlist || info.kind == core::YouTubeUrlKind::Channel;
+    const bool listOnly =
+        info.kind == core::YouTubeUrlKind::Playlist || info.kind == core::YouTubeUrlKind::Channel;
+    if (!listOnly && !info.videoId.isEmpty()) {
+        m_video.url = QUrl(u"https://www.youtube.com/watch?v="_s + info.videoId);
+    }
+    if (listOnly) {
+        m_playlist.url = url;
+    } else if (!info.playlistId.isEmpty()) {
+        m_playlist.url = QUrl(u"https://www.youtube.com/playlist?list="_s + info.playlistId);
+    }
+    if (m_video.url.isEmpty() && m_playlist.url.isEmpty()) {
+        m_video.url = url; // let yt-dlp have a go at whatever this is
+    }
+    m_scope = m_video.url.isEmpty() ? Scope::Playlist : Scope::Video;
+    m_url = scopeState(m_scope).url;
+    m_isPlaylist = m_scope == Scope::Playlist;
     setWindowTitle(m_isPlaylist ? tr("Download playlist") : tr("Download video"));
     setModal(false);
     setAttribute(Qt::WA_DeleteOnClose, false);
@@ -83,13 +102,22 @@ DownloadDialog::DownloadDialog(const QUrl& url, core::Settings& settings, core::
     connect(&m_probe, &services::MediaProbe::finished, this, &DownloadDialog::handleProbeFinished);
     connect(&m_probe, &services::MediaProbe::failed, this, &DownloadDialog::handleProbeFailed);
     connect(&m_thumbnails, &ThumbnailCache::ready, this, [this](const QString&) { updateHero(); });
-    startProbe();
+    updateScopeChooser();
+    if (!m_video.url.isEmpty()) {
+        startProbe(Scope::Video);
+    }
+    if (!m_playlist.url.isEmpty()) {
+        startProbe(Scope::Playlist);
+    }
+    presentScope();
 }
 
 DownloadDialog::~DownloadDialog()
 {
-    if (m_probing) {
-        m_probe.cancel(m_probeId);
+    for (ScopeState* state : {&m_video, &m_playlist}) {
+        if (state->probing) {
+            m_probe.cancel(state->probeId);
+        }
     }
 }
 
@@ -101,6 +129,9 @@ void DownloadDialog::setupUi()
     root->setContentsMargins(20, 18, 20, 16);
     root->setSpacing(14);
     root->addWidget(buildHero());
+    m_scopeRow = buildScopeChooser();
+    m_scopeRow->setVisible(false);
+    root->addWidget(m_scopeRow);
 
     root->addWidget(buildKindChooser());
     m_pages = new QStackedWidget(this);
@@ -128,6 +159,60 @@ void DownloadDialog::setupUi()
     root->addWidget(m_playlistSection);
 
     root->addWidget(buildFooter());
+}
+
+QWidget* DownloadDialog::buildScopeChooser()
+{
+    // Shown only for links that are a video inside a playlist.
+    auto* card = new QFrame(this);
+    card->setProperty("redCard", true);
+    auto* layout = new QHBoxLayout(card);
+    layout->setContentsMargins(14, 10, 14, 10);
+    layout->setSpacing(12);
+    auto* icon = new QLabel(card);
+    icon->setPixmap(
+        icons::pixmap(u"playlist"_s, Tokens::forScheme(m_theme.isDark()).muted, 20, devicePixelRatioF()));
+    layout->addWidget(icon, 0, Qt::AlignTop);
+    auto* text = new QVBoxLayout;
+    text->setSpacing(4);
+    auto* heading = new QLabel(tr("This video is part of a playlist"), card);
+    QFont f = heading->font();
+    f.setWeight(QFont::DemiBold);
+    heading->setFont(f);
+    text->addWidget(heading);
+    auto* choices = new QHBoxLayout;
+    choices->setSpacing(18);
+    m_scopeVideo = new QRadioButton(tr("Just this video"), card);
+    m_scopeVideo->setChecked(true);
+    m_scopePlaylist = new QRadioButton(tr("Whole playlist"), card);
+    choices->addWidget(m_scopeVideo);
+    choices->addWidget(m_scopePlaylist);
+    choices->addStretch(1);
+    text->addLayout(choices);
+    auto* hintRow = new QHBoxLayout;
+    hintRow->setSpacing(8);
+    m_scopeHint = new QLabel(card);
+    m_scopeHint->setProperty("redMuted", true);
+    m_scopeHint->setWordWrap(true);
+    hintRow->addWidget(m_scopeHint, 1);
+    m_scopeRetry = new QPushButton(tr("Retry"), card);
+    m_scopeRetry->setProperty("redFlat", true);
+    m_scopeRetry->setVisible(false);
+    connect(m_scopeRetry, &QPushButton::clicked, this, [this] { startProbe(Scope::Playlist); });
+    hintRow->addWidget(m_scopeRetry);
+    text->addLayout(hintRow);
+    layout->addLayout(text, 1);
+    connect(m_scopeVideo, &QRadioButton::toggled, this, [this](bool on) {
+        if (on) {
+            setScope(Scope::Video);
+        }
+    });
+    connect(m_scopePlaylist, &QRadioButton::toggled, this, [this](bool on) {
+        if (on) {
+            setScope(Scope::Playlist);
+        }
+    });
+    return card;
 }
 
 QWidget* DownloadDialog::buildKindChooser()
@@ -189,26 +274,10 @@ QWidget* DownloadDialog::buildHero()
     statusRow->addWidget(m_status);
     m_retry = new QPushButton(tr("Retry"), hero);
     m_retry->setVisible(false);
-    connect(m_retry, &QPushButton::clicked, this, &DownloadDialog::startProbe);
+    connect(m_retry, &QPushButton::clicked, this, &DownloadDialog::retryProbe);
     statusRow->addWidget(m_retry);
     statusRow->addStretch(1);
     text->addLayout(statusRow);
-    m_wholePlaylist =
-        new QCheckBox(tr("This link is part of a playlist — download the whole playlist"), hero);
-    m_wholePlaylist->setVisible(false);
-    connect(m_wholePlaylist, &QCheckBox::toggled, this, [this](bool on) {
-        const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(m_url);
-        if (on && !info.playlistId.isEmpty()) {
-            m_url = QUrl(u"https://www.youtube.com/playlist?list="_s + info.playlistId);
-            m_isPlaylist = true;
-        } else if (!on && !info.videoId.isEmpty()) {
-            m_url = QUrl(u"https://www.youtube.com/watch?v="_s + info.videoId);
-            m_isPlaylist = false;
-        }
-        setWindowTitle(m_isPlaylist ? tr("Download playlist") : tr("Download video"));
-        startProbe();
-    });
-    text->addWidget(m_wholePlaylist);
     text->addStretch(1);
     layout->addLayout(text, 1);
     return hero;
@@ -486,56 +555,146 @@ void DownloadDialog::applyDefaults()
 
 // ---- probing ---------------------------------------------------------------
 
-void DownloadDialog::startProbe()
+void DownloadDialog::startProbe(Scope scope)
 {
-    if (m_probing) {
-        m_probe.cancel(m_probeId);
+    ScopeState& state = scopeState(scope);
+    if (state.probing) {
+        m_probe.cancel(state.probeId);
     }
-    m_probing = true;
-    m_info = {};
+    state.probing = true;
+    state.info.reset();
+    state.error.clear();
+    state.probeId = m_probe.probe(state.url, scope == Scope::Playlist);
+    if (scope == m_scope) {
+        presentScope();
+    } else {
+        updateScopeChooser();
+    }
+}
+
+void DownloadDialog::retryProbe()
+{
+    startProbe(m_scope);
+}
+
+void DownloadDialog::setScope(Scope scope)
+{
+    if (scope == m_scope || scopeState(scope).url.isEmpty()) {
+        return;
+    }
+    m_scope = scope;
+    m_url = scopeState(scope).url;
+    m_isPlaylist = scope == Scope::Playlist;
+    setWindowTitle(m_isPlaylist ? tr("Download playlist") : tr("Download video"));
+    presentScope();
+}
+
+/// Renders the active scope from its cached state: probing, failed, or ready.
+void DownloadDialog::presentScope()
+{
+    const ScopeState& state = scopeState(m_scope);
+    m_probing = state.probing;
+    m_status->setStyleSheet({});
     m_retry->setVisible(false);
-    m_download->setEnabled(false);
-    m_status->setText(tr("Reading video info…"));
-    m_title->setText(m_url.toString());
-    m_subtitle->clear();
     m_formats->clear();
     m_entries->clear();
     m_playlistSection->setVisible(false);
-    m_probeId = m_probe.probe(m_url, m_isPlaylist);
-    updateHero();
+    if (!state.info) {
+        m_info = {};
+        m_title->setText(m_url.toString());
+        m_subtitle->clear();
+        if (state.probing || state.error.isEmpty()) {
+            m_status->setText(m_isPlaylist ? tr("Reading playlist…") : tr("Reading video info…"));
+        } else {
+            // The user can still download blind ("Download anyway"): yt-dlp
+            // resolves the title itself.
+            m_status->setText(state.error);
+            m_status->setStyleSheet(u"color:%1;"_s.arg(Tokens::forScheme(m_theme.isDark()).danger.name()));
+            m_retry->setVisible(true);
+        }
+        m_kinds->button(2)->setEnabled(false);
+        if (m_kinds->checkedId() == 2) {
+            m_kinds->button(0)->setChecked(true);
+        }
+        updateHero();
+        updateScopeChooser();
+        updatePreview();
+        return;
+    }
+    m_info = *state.info;
+    m_status->clear();
+    populateFromInfo();
+    if (m_info.isLive) {
+        // FEATURES E14 (LATER): recording a live stream needs its own UI.
+        m_status->setText(tr("This is a live stream. Red can download it once the stream has ended."));
+    }
+}
+
+/// The playlist choice tells what it knows: count and title once read, or
+/// why it could not be read.
+void DownloadDialog::updateScopeChooser()
+{
+    const bool both = !m_video.url.isEmpty() && !m_playlist.url.isEmpty();
+    m_scopeRow->setVisible(both);
+    if (!both) {
+        return;
+    }
+    const ScopeState& pl = m_playlist;
+    m_scopeRetry->setVisible(!pl.probing && !pl.info && !pl.error.isEmpty());
+    m_scopePlaylist->setEnabled(!pl.probing && pl.info.has_value());
+    if (m_wantPlaylist && m_scopePlaylist->isEnabled()) {
+        m_wantPlaylist = false;
+        m_scopePlaylist->setChecked(true);
+    }
+    if (pl.probing) {
+        m_scopeHint->setText(tr("Reading the playlist…"));
+    } else if (pl.info) {
+        const int count =
+            pl.info->entryCount > 0 ? pl.info->entryCount : static_cast<int>(pl.info->entries.size());
+        m_scopePlaylist->setText(tr("Whole playlist (%n videos)", nullptr, count));
+        m_scopeHint->setText(pl.info->title.isEmpty() ? QString() : pl.info->title);
+    } else if (!pl.error.isEmpty()) {
+        m_scopeHint->setText(tr("The playlist could not be read: %1").arg(pl.error));
+    } else {
+        m_scopeHint->clear();
+    }
+    m_scopeHint->setVisible(!m_scopeHint->text().isEmpty());
 }
 
 void DownloadDialog::handleProbeFinished(quint64 id, const core::MediaInfo& info)
 {
-    if (id != m_probeId) {
+    for (Scope scope : {Scope::Video, Scope::Playlist}) {
+        ScopeState& state = scopeState(scope);
+        if (!state.probing || state.probeId != id) {
+            continue;
+        }
+        state.probing = false;
+        state.info = info;
+        if (scope == m_scope) {
+            presentScope();
+        } else {
+            updateScopeChooser();
+        }
         return;
     }
-    m_probing = false;
-    m_info = info;
-    m_isPlaylist = info.isPlaylist();
-    m_status->clear();
-    populateFromInfo();
-    if (info.isLive) {
-        // FEATURES E14 (LATER): recording a live stream needs its own UI.
-        m_status->setText(tr("This is a live stream. Red can download it once the stream has ended."));
-        m_download->setEnabled(false);
-        return;
-    }
-    m_download->setEnabled(true);
 }
 
 void DownloadDialog::handleProbeFailed(quint64 id, const QString& error)
 {
-    if (id != m_probeId) {
+    for (Scope scope : {Scope::Video, Scope::Playlist}) {
+        ScopeState& state = scopeState(scope);
+        if (!state.probing || state.probeId != id) {
+            continue;
+        }
+        state.probing = false;
+        state.error = error.isEmpty() ? tr("Unknown error") : error;
+        if (scope == m_scope) {
+            presentScope();
+        } else {
+            updateScopeChooser();
+        }
         return;
     }
-    m_probing = false;
-    m_status->setText(error);
-    m_status->setStyleSheet(u"color:%1;"_s.arg(Tokens::forScheme(m_theme.isDark()).danger.name()));
-    m_retry->setVisible(true);
-    // The user can still download blind: yt-dlp will resolve the title itself.
-    m_download->setEnabled(true);
-    m_download->setText(tr("Download anyway"));
 }
 
 void DownloadDialog::populateFromInfo()
@@ -564,8 +723,7 @@ void DownloadDialog::populateFromInfo()
         }
     }
     m_subtitle->setText(parts.join(u" · "_s));
-    const core::YouTubeUrlInfo urlInfo = core::classifyYouTubeUrl(m_url);
-    m_wholePlaylist->setVisible(!m_isPlaylist && !urlInfo.playlistId.isEmpty() && !urlInfo.videoId.isEmpty());
+    updateScopeChooser();
 
     // Subtitles.
     m_subtitles->blockSignals(true);
@@ -749,15 +907,18 @@ void DownloadDialog::updatePreview()
     m_preview->setText(m_preview->fontMetrics().elidedText(preview, Qt::ElideMiddle, 300));
     m_preview->setToolTip(preview);
     const core::DownloadOptions::Kind current = kind();
-    m_download->setText(current == core::DownloadOptions::Kind::Audio ? tr("Download audio")
+    const ScopeState& state = scopeState(m_scope);
+    const bool failed = !state.probing && !state.info && !state.error.isEmpty();
+    m_download->setText(failed                                          ? tr("Download anyway")
+                        : current == core::DownloadOptions::Kind::Audio ? tr("Download audio")
                         : current == core::DownloadOptions::Kind::Video
                             ? (m_isPlaylist ? tr("Download videos") : tr("Download video"))
                             : tr("Download"));
     if (current == core::DownloadOptions::Kind::Custom) {
         const bool picked = !opts.customVideoFormat.isEmpty() || !opts.customAudioFormat.isEmpty();
         m_download->setEnabled(picked && !m_probing);
-    } else if (!m_probing) {
-        m_download->setEnabled(true);
+    } else {
+        m_download->setEnabled(!m_probing && !(state.info && state.info->isLive));
     }
 }
 
@@ -793,6 +954,12 @@ void DownloadDialog::selectKind(core::DownloadOptions::Kind kind)
     if (QAbstractButton* button = m_kinds->button(id); button && button->isEnabled()) {
         button->setChecked(true);
     }
+}
+
+void DownloadDialog::selectWholePlaylist()
+{
+    m_wantPlaylist = true;
+    updateScopeChooser();
 }
 
 core::DownloadOptions::Kind DownloadDialog::kind() const

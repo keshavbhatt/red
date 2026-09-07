@@ -23,7 +23,7 @@ struct YouTubeUrlInfo
 {
     YouTubeUrlKind kind = YouTubeUrlKind::NotYouTube;
     QString videoId;    ///< 11-char id when kind == Video
-    QString playlistId; ///< when present
+    QString playlistId; ///< when present and downloadable (mixes are dropped)
     bool isShorts = false;
     bool isLive = false;
     bool isTv = false; ///< youtube.com/tv (Leanback)
@@ -34,6 +34,8 @@ struct YouTubeUrlInfo
 [[nodiscard]] bool isYouTubeHost(const QString& host);
 [[nodiscard]] bool isGoogleServiceHost(const QString& host);
 
+/// The `list=` value if yt-dlp can read it as a playlist, else empty.
+[[nodiscard]] QString downloadablePlaylistId(const QString& list);
 [[nodiscard]] YouTubeUrlInfo classifyYouTubeUrl(const QUrl& url);
 
 /// A canonical https://www.youtube.com/watch?v=<id> URL, or nullopt.

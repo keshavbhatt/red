@@ -168,7 +168,9 @@ QCheckBox::indicator:hover { border-color: {{text}}; }
 QCheckBox::indicator:checked { background: {{accent}}; border-color: {{accent}}; image: url({{checkWhite}}); }
 QCheckBox::indicator:disabled { border-color: {{border}}; }
 QCheckBox::indicator:checked:disabled { background: {{hover}}; border-color: {{hover}}; }
-QRadioButton::indicator { border: 2px solid {{muted}}; border-radius: 9px; background: transparent; }
+/* Both radio states add up to 18px: QSS sizes the indicator per state and a
+   toggle would otherwise shift the label. */
+QRadioButton::indicator { width: 14px; height: 14px; border: 2px solid {{muted}}; border-radius: 9px; background: transparent; }
 QListView::indicator, QTreeView::indicator, QTableView::indicator {
     width: 16px; height: 16px; border: 2px solid {{muted}}; border-radius: 4px; background: transparent;
 }
