@@ -38,6 +38,7 @@ QWidget* EngineSetupDialog::makeRow(QLabel** glyph, QLabel** text, const QString
     auto* layout = new QHBoxLayout(row);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(10);
+    row->setMinimumHeight(24);
     *glyph = new QLabel(row);
     (*glyph)->setFixedSize(20, 20);
     layout->addWidget(*glyph);
@@ -189,6 +190,9 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     m_action->style()->unpolish(m_action);
     m_action->style()->polish(m_action);
     m_close->setText(s.isReady() ? tr("Done") : tr("Close"));
+    // The progress bar and error line come and go: let the sheet follow.
+    layout()->activate();
+    adjustSize();
 }
 
 } // namespace red::ui

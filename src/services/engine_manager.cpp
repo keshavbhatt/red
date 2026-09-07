@@ -253,8 +253,8 @@ void EngineManager::queueComponent(const core::EngineComponent& component, bool 
 {
     m_steps.append([this, component, verifySums] {
         // User-facing: the engine and its parts, never the tool names.
-        const QString label = component.kind == core::EngineComponent::Kind::YtDlp ? tr("the download engine")
-                                                                                   : tr("engine components");
+        const QString label =
+            component.kind == core::EngineComponent::Kind::YtDlp ? tr("the engine") : tr("engine components");
         setState(m_status.state, tr("Looking up %1…").arg(label));
         fetchRelease(component, verifySums, [this, component, label](const QUrl& asset, const QUrl& sums) {
             if (asset.isEmpty()) {
