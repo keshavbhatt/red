@@ -51,6 +51,7 @@ public:
 
 Q_SIGNALS:
     void clearCacheRequested();
+    void resetPermissionsRequested();
     void clearSessionRequested();
     void openLogFolderRequested();
     void copyDiagnosticsRequested();

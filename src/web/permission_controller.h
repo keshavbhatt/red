@@ -43,7 +43,9 @@ public:
 
     /// The UI's answer to `promptRequested`: applies it to the request and
     /// stores it for `type` and its related types.
-    void answer(const QWebEnginePermission& permission, bool allow);
+    void answer(const QWebEnginePermission& permission, bool allow, bool remember = true);
+    /// Forgets every stored decision; sites ask again. Returns how many.
+    int resetAll();
 
     /// Stored decisions for `origin`, family-aware (pure over the store).
     [[nodiscard]] static QWebEnginePermission::State

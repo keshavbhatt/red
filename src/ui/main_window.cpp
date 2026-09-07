@@ -586,6 +586,11 @@ void MainWindow::showSettings()
                                           m_webView->profile().interceptor(), m_tray->isAvailable(), this);
     m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(m_settingsDialog, &SettingsDialog::clearCacheRequested, this, &MainWindow::clearCache);
+    connect(m_settingsDialog, &SettingsDialog::resetPermissionsRequested, this, [this] {
+        const int n = m_webView->permissions().resetAll();
+        m_hint->showHint(n > 0 ? tr("%n site permission(s) reset", nullptr, n)
+                               : tr("No site permissions stored"));
+    });
     connect(m_settingsDialog, &SettingsDialog::clearSessionRequested, this, &MainWindow::confirmClearSession);
     connect(m_settingsDialog, &SettingsDialog::openLogFolderRequested, m_actions->openLogFolder,
             &QAction::trigger);
@@ -688,8 +693,9 @@ void MainWindow::handleRenderProcessGaveUp()
 
 void MainWindow::handlePermissionPrompt(const QWebEnginePermission& permission)
 {
-    askPermission(this, permission,
-                  [this, permission](bool allow) { m_webView->permissions().answer(permission, allow); });
+    askPermission(this, permission, [this, permission](bool allow, bool remember) {
+        m_webView->permissions().answer(permission, allow, remember);
+    });
 }
 
 } // namespace red::ui

@@ -113,7 +113,7 @@ void PermissionController::store(QWebEngineProfile& profile, const QUrl& origin,
     }
 }
 
-void PermissionController::answer(const QWebEnginePermission& permission, bool allow)
+void PermissionController::answer(const QWebEnginePermission& permission, bool allow, bool remember)
 {
     QWebEnginePermission request = permission;
     if (allow) {
@@ -121,11 +121,25 @@ void PermissionController::answer(const QWebEnginePermission& permission, bool a
     } else {
         request.deny();
     }
-    if (m_profile != nullptr) {
+    if (m_profile != nullptr && remember) {
         store(*m_profile, permission.origin(), permission.permissionType(), allow);
     }
     qCInfo(lcWeb) << (allow ? "user allowed" : "user denied") << permission.permissionType()
-                  << permission.origin() << "(stored)";
+                  << permission.origin() << (remember ? "(stored)" : "(this time)");
+}
+
+int PermissionController::resetAll()
+{
+    if (m_profile == nullptr) {
+        return 0;
+    }
+    int count = 0;
+    for (QWebEnginePermission permission : m_profile->listAllPermissions()) {
+        permission.reset();
+        ++count;
+    }
+    qCInfo(lcWeb) << "site permissions reset:" << count;
+    return count;
 }
 
 void PermissionController::handle(QWebEnginePermission permission)

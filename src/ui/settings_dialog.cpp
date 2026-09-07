@@ -638,6 +638,11 @@ QWidget* SettingsDialog::buildAdvanced()
     auto* clearSession = new QPushButton(tr("Sign out and clear session…"), storage);
     connect(clearSession, &QPushButton::clicked, this, &SettingsDialog::clearSessionRequested);
     s->addWidget(clearSession);
+    auto* resetPermissions = new QPushButton(tr("Reset site permissions"), storage);
+    resetPermissions->setToolTip(
+        tr("Forget the microphone, camera and location answers; YouTube asks again."));
+    connect(resetPermissions, &QPushButton::clicked, this, &SettingsDialog::resetPermissionsRequested);
+    s->addWidget(resetPermissions);
     s->addStretch(1);
 
     auto* support = new QWidget(this);
