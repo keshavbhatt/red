@@ -77,6 +77,7 @@ QFrame[redCard="true"] {
 QFrame[redPanel="true"] { background: {{panel}}; border-left: 1px solid {{border}}; }
 QFrame[redRail="true"] { background: {{rail}}; border-right: 1px solid {{border}}; }
 QFrame[redSeparator="true"] { background: {{border}}; max-height: 1px; min-height: 1px; border: none; }
+QFrame[redVSeparator="true"] { background: {{border}}; max-width: 1px; min-width: 1px; border: none; }
 
 /* Tabs: YouTube underlines the active section. */
 QTabWidget::pane { border: none; background: transparent; }

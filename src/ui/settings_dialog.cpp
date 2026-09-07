@@ -135,9 +135,8 @@ void SettingsDialog::setupUi()
     root->addWidget(m_nav);
 
     auto* line = new QFrame(this);
-    line->setFrameShape(QFrame::VLine);
-    line->setFixedWidth(1);
-    line->setStyleSheet(u"background:%1;"_s.arg(Tokens::forScheme(m_theme.isDark()).border.name()));
+    line->setFrameShape(QFrame::NoFrame); // a VLine paints Fusion's bright bevel; a flat hairline instead
+    line->setProperty("redVSeparator", true);
     root->addWidget(line);
 
     m_pages = new QStackedWidget(this);

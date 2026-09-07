@@ -123,12 +123,21 @@ void SideRail::applyIcons()
     const Tokens t = Tokens::forScheme(m_theme.isDark());
     const QList<QToolButton*> buttons{m_back,       m_forward, m_reload,   m_downloads,
                                       m_miniPlayer, m_tv,      m_settings, m_menu};
+    // A QToolButton re-syncs icon and text from its default action on every
+    // action change (checked, enabled…) — so the icon has to live on the action,
+    // or a toggle turns the button into its text label.
+    const auto setIcon = [](QToolButton* b, const QIcon& icon) {
+        if (QAction* action = b->defaultAction(); action != nullptr) {
+            action->setIcon(icon);
+        }
+        b->setIcon(icon);
+    };
     for (QToolButton* b : buttons) {
-        b->setIcon(icons::themed(b->property("redIcon").toString(), t.text, t.muted));
+        setIcon(b, icons::themed(b->property("redIcon").toString(), t.text, t.muted));
     }
-    m_logo->setIcon(icons::brand());
-    m_reload->setIcon(icons::themed(m_loading ? u"stop"_s : u"reload"_s, t.text, t.muted));
-    m_download->setIcon(icons::themed(u"download"_s, m_downloadable ? t.accentText : t.text, t.muted));
+    setIcon(m_logo, icons::brand());
+    setIcon(m_reload, icons::themed(m_loading ? u"stop"_s : u"reload"_s, t.text, t.muted));
+    setIcon(m_download, icons::themed(u"download"_s, m_downloadable ? t.accentText : t.text, t.muted));
     m_download->setProperty("redAccent", m_downloadable);
     m_download->style()->unpolish(m_download);
     m_download->style()->polish(m_download);
