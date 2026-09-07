@@ -58,6 +58,31 @@ plugs:
     default-provider: ffmpeg-2404
 
 parts:
+  # JavaScript runtime for the download engine (yt-dlp needs one since 2025,
+  # ADR-004). Deno is yt-dlp's recommended runtime; with it in $SNAP/usr/bin
+  # the app never downloads QuickJS. Same release and checksums as the
+  # Flatpak manifest (packaging/flatpak/deno.yaml).
+  deno:
+    plugin: nil
+    build-packages:
+      - curl
+      - unzip
+    override-pull: |
+      case "${CRAFT_ARCH_BUILD_FOR}" in
+        amd64) asset=deno-x86_64-unknown-linux-gnu.zip
+               sum=0cd918870657ccc3d96ac682290e894dda374e2a742424aae9118b258a6cf7a3 ;;
+        arm64) asset=deno-aarch64-unknown-linux-gnu.zip
+               sum=e654ef4b41d8f1369dfe7d69374c8f226660153d077e0ac25353d454e03ef798 ;;
+        *) echo "no deno build for ${CRAFT_ARCH_BUILD_FOR}" >&2; exit 1 ;;
+      esac
+      curl -fsSL -o deno.zip "https://github.com/denoland/deno/releases/download/v2.7.7/${asset}"
+      echo "${sum}  deno.zip" | sha256sum -c -
+      unzip -o deno.zip
+    override-build: |
+      install -Dm755 "${CRAFT_PART_SRC}/deno" "${CRAFT_PART_INSTALL}/usr/bin/deno"
+    prime:
+      - usr/bin/deno
+
   red:
     plugin: cmake
     source: .

@@ -14,6 +14,9 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
 - **ffmpeg** comes from the `ffmpeg-2404` content snap (plug with default-provider, on
   PATH and LD_LIBRARY_PATH in the app environment); nothing is staged or downloaded
   (ADR-004). The kf6 runtime ships only the libav* libraries, not the program.
+- **Deno** is bundled by the `deno` part (per-architecture release zip, checksum-checked,
+  same release as the Flatpak) so the download engine has its JavaScript runtime without
+  fetching QuickJS; only yt-dlp itself is fetched at first use.
 - **Plugs** each have a reason: `joystick` (gamepads in TV mode), `screen-inhibit-control`,
   `audio-record` (voice search), `removable-media` (downloads to external drives),
   `browser-support` and the network plugs (WebEngine).
