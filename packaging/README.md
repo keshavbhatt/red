@@ -43,12 +43,18 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
 
 ### Submitting to Flathub
 
-Red is closed source, so the Flathub manifest cannot build from a git tag. Follow the
-ultimate-media-downloader pattern: a `simple` module that downloads the published snap for
-each architecture (`https://api.snapcraft.io/api/v1/snaps/download/<id>_<rev>.snap`, sha256
-pinned), `unsquashfs` it, and installs the binary, icons, desktop file and metainfo from
-`squashfs-root/usr/`. `deno.yaml` stays as is; ffmpeg comes from the runtime. The metainfo
-declares `LicenseRef-proprietary`; screenshots must be served from a public URL.
+Red is closed source, so the Flathub manifest cannot build from a git tag. The submission lives
+in the fork clone at `/home/commander/DCode/other/flathub-repositories/flathub`, branch
+`add-red` (from upstream `new-pr`): `com.ktechpit.red.yaml` plus the `shared-modules`
+submodule, following ultimate-media-downloader. A `simple` module downloads the published snap
+for each architecture (`https://api.snapcraft.io/api/v1/snaps/download/<id>_<rev>.snap`,
+sha256 pinned), `unsquashfs` it, and installs the binary, Deno, icons, desktop file and
+metainfo from `squashfs-root/usr/`; ffmpeg comes from the runtime. The snap URLs and checksums
+are filled in by hand (the store info endpoint lists them:
+`curl -H 'Snap-Device-Series: 16' 'https://api.snapcraft.io/v2/snaps/info/red-app?fields=download,revision'`).
+Lint without building: `flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.ktechpit.red.yaml`.
+The PR targets `flathub/flathub` branch `new-pr`, title `Add com.ktechpit.red`, and needs a
+short video of the Flatpak build attached. Flathub builds it in their CI; never build locally.
 
 ## Before tagging a release
 
