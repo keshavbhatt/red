@@ -214,9 +214,11 @@ current page; System follows the OS as before. Unit-tested bit handling.
 
 The owner's desktop was locked for the whole first session, so two developer aids exist and are
 documented rather than hidden: `RED_DEBUG_GRAB=<png>[,<seconds>]` saves `QWidget::grab()` of the
-window and every visible dialog on a timer, and `RED_DEBUG_AUTODOWNLOAD=1` accepts the download
-dialog with its defaults once the probe finishes; `RED_DEBUG_SETTINGS_PAGE=<n>` opens Settings on
-a page. Together with `scripts/cdp-eval.mjs` (remote debugging on port 9422) they let a headless
+window, every visible dialog and any open popup (menus, combo lists) on a timer, and
+`RED_DEBUG_AUTODOWNLOAD=video|audio|advanced[-playlist][:from-to]` fills the download dialog once
+the probe finishes and accepts it (`advanced`, unbounded playlists and `video-subtitles`, which
+drops the subtitle picker open, stay open for a grab); `RED_DEBUG_SETTINGS_PAGE=<n>` opens
+Settings on a page and `RED_DEBUG_OPEN=<dialog>` opens one of the app's dialogs. Together with `scripts/cdp-eval.mjs` (remote debugging on port 9422) they let a headless
 session exercise the real UI end to end. They read environment variables only, cost nothing when
 unset, and ship (they are harmless and useful for bug reports).
 
