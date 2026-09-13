@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>com.ktechpit.red</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>LicenseRef-proprietary</project_license>
+  <project_license>LicenseRef-proprietary=https://raw.githubusercontent.com/keshavbhatt/red/master/LICENSE</project_license>
 
   <developer id="com.ktechpit">
     <name>Keshav Bhatt</name>
