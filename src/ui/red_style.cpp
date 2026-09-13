@@ -115,6 +115,9 @@ QComboBox::drop-down, QComboBox::drop-down:editable {
     width: 26px; border: none; background: transparent;
 }
 QComboBox::down-arrow { image: url({{chevronDown}}); width: 14px; height: 14px; }
+/* List-style popup: the menu-style one shows every row and overflows the screen
+   when the list is long (subtitle languages); this one scrolls past maxVisibleItems. */
+QComboBox { combobox-popup: 0; }
 QComboBox QAbstractItemView {
     background: {{elevated}}; color: {{text}};
     border: 1px solid {{border}}; border-radius: 8px; padding: 4px;

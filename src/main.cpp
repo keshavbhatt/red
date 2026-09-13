@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
             // Dialogs are separate top-level windows: grab those too.
             int extra = 0;
             for (QWidget* top : QApplication::topLevelWidgets()) {
-                const bool popup = qobject_cast<QMenu*>(top) != nullptr; // tray / context menus
+                const bool popup = top->windowType() == Qt::Popup; // menus, combo lists
                 if (top != &window && top->isVisible() && top->isWindow() &&
                     (popup || !top->windowTitle().isEmpty())) {
                     const QString dialogPath = path.chopped(4) + u"-dialog%1.png"_s.arg(++extra);

@@ -305,6 +305,8 @@ QWidget* DownloadDialog::buildVideoTab()
     m_container->addItem(u"MKV"_s, static_cast<int>(core::Container::Mkv));
     m_container->addItem(u"WebM"_s, static_cast<int>(core::Container::Webm));
     m_subtitles = new QComboBox(tab);
+    m_subtitles->setObjectName(u"subtitles"_s);
+    m_subtitles->setMaxVisibleItems(12);
     m_subtitles->addItem(tr("None"), QString());
     m_autoSubs = new QCheckBox(tr("Include auto-generated subtitles"), tab);
     m_embedSubs = new QCheckBox(tr("Embed subtitles in the file"), tab);

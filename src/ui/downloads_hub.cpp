@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QComboBox>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -229,7 +230,8 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     // defaults as soon as the probe has filled it in. Values: video | audio |
     // advanced, with "-playlist" to pick the whole playlist and ":from-to" to
     // limit the entries (e.g. audio-playlist:1-2); advanced and unbounded
-    // playlists are left open for inspection.
+    // playlists are left open for inspection; video-subtitles stays open with
+    // the subtitle picker dropped down.
     if (qEnvironmentVariableIsSet("RED_DEBUG_AUTODOWNLOAD")) {
         const QString spec = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
         const QString kind = spec.section(u':', 0, 0);
@@ -246,10 +248,15 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
                         dialog->selectPlaylistRange(range.section(u'-', 0, 0).toInt(),
                                                     range.section(u'-', 1, 1).toInt());
                     }
-                    const bool inspectOnly =
-                        kind.startsWith(u"advanced"_s) || (kind.endsWith(u"-playlist"_s) && range.isEmpty());
+                    const bool inspectOnly = kind.startsWith(u"advanced"_s) ||
+                                             kind.endsWith(u"-subtitles"_s) ||
+                                             (kind.endsWith(u"-playlist"_s) && range.isEmpty());
                     if (!inspectOnly) {
                         QTimer::singleShot(1500, dialog, &QDialog::accept);
+                    } else if (kind.endsWith(u"-subtitles"_s)) {
+                        if (auto* picker = dialog->findChild<QComboBox*>(u"subtitles"_s)) {
+                            QTimer::singleShot(1500, picker, &QComboBox::showPopup);
+                        }
                     }
                 });
     }
