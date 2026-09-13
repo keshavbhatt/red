@@ -12,7 +12,15 @@ QAction* make(QWidget* owner, const QString& text, const QList<QKeySequence>& sh
 {
     auto* action = new QAction(text, owner);
     if (!shortcuts.isEmpty()) {
-        action->setShortcuts(shortcuts);
+        // A standard key can resolve to the same keys as an explicit one (F11
+        // on most desktops); keep each binding once, in the given order.
+        QList<QKeySequence> unique;
+        for (const QKeySequence& sequence : shortcuts) {
+            if (!sequence.isEmpty() && !unique.contains(sequence)) {
+                unique << sequence;
+            }
+        }
+        action->setShortcuts(unique);
         action->setShortcutContext(Qt::WindowShortcut);
     }
     // Registered on the window so shortcuts work while the web view has focus.
@@ -42,7 +50,10 @@ Actions::Actions(QWidget* owner)
     zoomIn = make(owner, tr("Zoom in"), {QKeySequence::ZoomIn, QKeySequence(Qt::CTRL | Qt::Key_Equal)});
     zoomOut = make(owner, tr("Zoom out"), {QKeySequence::ZoomOut});
     zoomReset = make(owner, tr("Reset zoom"), {QKeySequence(Qt::CTRL | Qt::Key_0)});
-    fullScreen = make(owner, tr("Full screen"), {QKeySequence::FullScreen});
+    // F11 everywhere, plus the desktop's own binding: the KDE platform theme
+    // (the Flatpak and snap runtimes) maps QKeySequence::FullScreen to
+    // Ctrl+Shift+F, and the sheet, guide and store text all say F11.
+    fullScreen = make(owner, tr("Full screen"), {QKeySequence(Qt::Key_F11), QKeySequence::FullScreen});
     showHide = make(owner, tr("Hide window"), {QKeySequence(Qt::CTRL | Qt::Key_W)});
     settings = make(owner, tr("Settings…"), {QKeySequence(Qt::CTRL | Qt::Key_Comma)});
     shortcuts = make(owner, tr("Keyboard shortcuts"), {QKeySequence(Qt::Key_F1)});
