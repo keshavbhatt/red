@@ -38,8 +38,8 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
   default download location. Notifications, screen inhibit, opening files and folders and
   choosing another download folder all go through portals inside the sandbox
   (`FLATPAK_ID` / `SNAP` select the portal backends).
-- **CI**: `.github/workflows/flatpak.yml` builds x86_64 and aarch64 bundles on manual runs
-  and attaches them to the GitHub Release on a version tag.
+- No CI build: like whatsie, only the snap is built in CI. The manifest is the base for the
+  Flathub repository.
 
 ### Submitting to Flathub
 
