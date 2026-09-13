@@ -5,8 +5,7 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [10.0.0] — unreleased
 
-Red 10 is a complete rewrite of Red on Qt 6.11 and Qt WebEngine (C++20, CMake), replacing the
-Qt 5 code base of Red 9. Nothing of the old code was kept.
+Red 10 is a redesigned Red on Qt 6.11 and Qt WebEngine, taking over from the Qt 5 based Red 9.
 
 ### Added
 - **Two modes in one window**: the desktop site and YouTube's living-room TV interface
@@ -24,7 +23,7 @@ Qt 5 code base of Red 9. Nothing of the old code was kept.
   awake while playing, a mini player, single instance (`red <link>`, `red --download <link>`),
   desktop actions for TV mode, downloads and settings.
 - **Sign-in** through Google's page inside the app, with the identity Google accepts.
-- **Design** from scratch: a side rail, a downloads panel, and dialogs that follow YouTube's
+- **New design**: a side rail, a downloads panel, and dialogs that follow YouTube's
   light and dark themes (system, light or dark, applied to the page too).
 - **TV mode extras**: gamepad support, keyboard shortcuts for volume, speed and captions,
   4K unlock on smaller displays, low-memory mode, voice search.
