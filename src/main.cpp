@@ -127,9 +127,18 @@ int main(int argc, char* argv[])
     auto* gpuWatch = new red::platform::GpuStderrWatch(&app);
     if (gpuWatch->install()) {
         QObject::connect(gpuWatch, &red::platform::GpuStderrWatch::gpuContextLostStorm, &app, [&app] {
-            qWarning("GPU context-loss storm detected; disabling hardware acceleration and relaunching");
-            app.settings().setGpuAutoDisabled(true);
-            app.settings().setGpuFallbackNotice(true);
+            // The experimental GPU video decoder is the usual culprit (no
+            // VA-API driver): back that out first and keep the rest of the
+            // GPU; only a storm without it costs hardware acceleration.
+            if (app.settings().hardwareVideoDecode()) {
+                qWarning("GPU context-loss storm with GPU video decoding on; turning it off and relaunching");
+                app.settings().setHardwareVideoDecode(false);
+                app.settings().setVideoDecodeFallbackNotice(true);
+            } else {
+                qWarning("GPU context-loss storm detected; disabling hardware acceleration and relaunching");
+                app.settings().setGpuAutoDisabled(true);
+                app.settings().setGpuFallbackNotice(true);
+            }
             app.settings().sync();
             relaunch(app, nullptr);
         });

@@ -858,6 +858,16 @@ void Settings::setGpuFallbackNotice(bool pending)
     storeBool(keys::kGpuFallbackNotice, false, pending);
 }
 
+bool Settings::videoDecodeFallbackNotice() const
+{
+    return boolValue(keys::kVideoDecodeFallbackNotice, false);
+}
+
+void Settings::setVideoDecodeFallbackNotice(bool pending)
+{
+    storeBool(keys::kVideoDecodeFallbackNotice, false, pending);
+}
+
 QString Settings::userAgentOverride() const
 {
     return stringValue(keys::kUserAgentOverride).trimmed();

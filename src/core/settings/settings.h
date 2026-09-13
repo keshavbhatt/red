@@ -273,6 +273,10 @@ public:
     void setGpuProbeStrikes(int strikes);
     [[nodiscard]] bool gpuFallbackNotice() const;
     void setGpuFallbackNotice(bool pending);
+    /// Pending "hardware video decoding was turned off" notice (GPU storm
+    /// with the experimental decoder on: that switch is backed out first).
+    [[nodiscard]] bool videoDecodeFallbackNotice() const;
+    void setVideoDecodeFallbackNotice(bool pending);
     [[nodiscard]] QString userAgentOverride() const;
     void setUserAgentOverride(const QString& userAgent);
     [[nodiscard]] SignInUserAgent signInUserAgent() const;

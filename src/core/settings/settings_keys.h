@@ -78,6 +78,7 @@ inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAccel
 inline constexpr QLatin1StringView kGpuAutoDisabled{"advanced/gpuAutoDisabled"};
 inline constexpr QLatin1StringView kGpuProbeStrikes{"advanced/gpuProbeStrikes"};
 inline constexpr QLatin1StringView kGpuFallbackNotice{"advanced/gpuFallbackNotice"};
+inline constexpr QLatin1StringView kVideoDecodeFallbackNotice{"playback/videoDecodeFallbackNotice"};
 inline constexpr QLatin1StringView kUserAgentOverride{"advanced/userAgentOverride"};
 inline constexpr QLatin1StringView kSignInUserAgent{"advanced/signInUserAgent"};
 

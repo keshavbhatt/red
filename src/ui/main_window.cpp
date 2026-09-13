@@ -668,6 +668,14 @@ void MainWindow::confirmClearSession()
 
 void MainWindow::maybeShowGpuFallbackNotice()
 {
+    if (m_settings.videoDecodeFallbackNotice()) {
+        m_settings.setVideoDecodeFallbackNotice(false);
+        MessageSheet::info(this, tr("GPU video decoding turned off"),
+                           tr("The graphics driver could not decode video on the GPU, so Red switched that "
+                              "back off and kept everything else as it was. It usually means no VA-API "
+                              "driver is installed for this GPU. You can try again in Settings → Playback."));
+        return;
+    }
     if (!m_settings.gpuFallbackNotice()) {
         return;
     }
