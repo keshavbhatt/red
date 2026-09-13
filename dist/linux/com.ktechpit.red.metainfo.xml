@@ -3,12 +3,18 @@
   <id>com.ktechpit.red</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>LicenseRef-proprietary</project_license>
-  <name>Red</name>
-  <summary>YouTube, in a real desktop app</summary>
 
   <developer id="com.ktechpit">
     <name>Keshav Bhatt</name>
   </developer>
+
+  <name>Red</name>
+  <summary>YouTube client with TV mode, no ads</summary>
+  <summary xml:lang="de">YouTube-Client mit TV-Modus, ohne Werbung</summary>
+  <summary xml:lang="es">Cliente de YouTube con modo TV, sin anuncios</summary>
+  <summary xml:lang="fr">Client YouTube avec mode TV, sans publicité</summary>
+  <summary xml:lang="it">Client YouTube con modalità TV, senza pubblicità</summary>
+  <summary xml:lang="pt_BR">Cliente do YouTube com modo TV, sem anúncios</summary>
 
   <branding>
     <color type="primary" scheme_preference="light">#ffd6d6</color>
@@ -17,49 +23,160 @@
 
   <description>
     <p>
-      Red puts YouTube in a native window built on Qt 6 and Qt WebEngine — lightweight, fast,
-      and free of the browser tab. It adds what a browser cannot: a living-room TV mode, ad and
-      tracker blocking, SponsorBlock, media keys, a mini player, and a real download manager.
+      Red is a YouTube client for the Linux desktop: a native app to watch YouTube without ads,
+      with a smart TV mode, SponsorBlock, media keys, a mini player and a built-in YouTube
+      downloader. Sign in with your Google account and your subscriptions, history and
+      recommendations work as on the website, in a lightweight window instead of a browser tab.
     </p>
+    <p xml:lang="de">
+      Red ist ein YouTube-Client für den Linux-Desktop: YouTube ohne Werbung ansehen, mit
+      Smart-TV-Modus, SponsorBlock, Medientasten, Mini-Player und eingebautem YouTube-Downloader
+      für Videos, Playlists und Musik als MP4 oder MP3.
+    </p>
+    <p xml:lang="es">
+      Red es un cliente de YouTube para el escritorio Linux: ver YouTube sin anuncios, con modo
+      Smart TV, SponsorBlock, teclas multimedia, mini reproductor y un descargador de YouTube
+      integrado para vídeos, listas de reproducción y música en MP4 o MP3.
+    </p>
+    <p xml:lang="fr">
+      Red est un client YouTube pour le bureau Linux : regarder YouTube sans publicité, avec un
+      mode Smart TV, SponsorBlock, les touches multimédia, un mini lecteur et un téléchargeur
+      YouTube intégré pour les vidéos, les playlists et la musique en MP4 ou MP3.
+    </p>
+    <p xml:lang="it">
+      Red è un client YouTube per il desktop Linux: guardare YouTube senza pubblicità, con
+      modalità Smart TV, SponsorBlock, tasti multimediali, mini player e un downloader YouTube
+      integrato per video, playlist e musica in MP4 o MP3.
+    </p>
+    <p xml:lang="pt_BR">
+      Red é um cliente do YouTube para o desktop Linux: assista ao YouTube sem anúncios, com
+      modo Smart TV, SponsorBlock, teclas de mídia, mini player e um downloader de YouTube
+      integrado para vídeos, playlists e músicas em MP4 ou MP3.
+    </p>
+    <p>Two ways to watch, one window:</p>
     <ul>
-      <li>Desktop mode: the full YouTube site, signed in, with light/dark/system themes</li>
-      <li>TV mode: YouTube's smart-TV interface with keyboard, mouse and gamepad control</li>
-      <li>Ad and tracker blocking that never touches playback; SponsorBlock segment skipping</li>
-      <li>Downloads powered by yt-dlp: any video, playlist or channel, video or audio, with subtitles, thumbnails and chapters embedded</li>
-      <li>Media keys and desktop media controls (MPRIS); keeps the screen awake while playing</li>
-      <li>Mini player that floats above other windows; tray icon with playback controls</li>
+      <li>Desktop mode: the full YouTube website, signed in, in light, dark or system theme, with picture-in-picture style mini player</li>
+      <li>TV mode: the YouTube Leanback interface from smart TVs and consoles, full screen, driven by keyboard, mouse or gamepad controller, ideal for a media center, living room PC or handheld</li>
     </ul>
+    <p>Watch without interruptions:</p>
+    <ul>
+      <li>Ad blocker built in: video ads, banners and sponsored feed items are removed before the page renders, and playback is never touched</li>
+      <li>Tracker blocking, SponsorBlock to skip sponsor segments, intros and reminders, Return YouTube Dislike counts, and a switch to hide Shorts</li>
+    </ul>
+    <p>Download what you watch:</p>
+    <ul>
+      <li>YouTube video downloader for any video, playlist or channel, as MP4, MKV or WebM up to 4K</li>
+      <li>YouTube to MP3: save audio only as MP3, M4A, Opus, FLAC or WAV for music</li>
+      <li>Subtitles, thumbnail, metadata and chapters embedded; sponsor segments cut out on request</li>
+      <li>Playlists detected from any link, entries picked one by one, a queue with pause, resume and retry</li>
+      <li>Your YouTube sign-in is reused, so age-restricted videos and anything your account can watch download too</li>
+    </ul>
+    <p>Made for the desktop:</p>
+    <ul>
+      <li>Media keys and MPRIS media controls, a tray icon with play, pause and skip, the screen kept awake while a video plays</li>
+      <li>Hardware video decoding, native Wayland and X11, notifications when a download finishes, single instance that opens YouTube links from the command line</li>
+    </ul>
+    <p>
+      Red is a lightweight alternative to the browser tab, to Electron YouTube apps and to a
+      separate downloader. Everything works on any Linux distribution.
+    </p>
   </description>
 
   <launchable type="desktop-id">com.ktechpit.red.desktop</launchable>
+
   <screenshots>
-    <screenshot type="default">
-      <caption>Desktop mode with a video playing, dislike count and SponsorBlock markers</caption>
+    <screenshot type="default" xml:lang="en">
+      <caption>Watch YouTube without ads in desktop mode, with dislike counts and SponsorBlock markers</caption>
       <image>https://raw.githubusercontent.com/keshavbhatt/red/master/screenshots/store/00-hero.png</image>
     </screenshot>
-    <screenshot>
-      <caption>TV mode: YouTube's living-room interface, driven by keyboard or gamepad</caption>
+    <screenshot xml:lang="en">
+      <caption>TV mode: the smart TV YouTube interface on your PC, with keyboard or gamepad</caption>
       <image>https://raw.githubusercontent.com/keshavbhatt/red/master/screenshots/store/01-tv.png</image>
     </screenshot>
-    <screenshot>
-      <caption>The downloads panel beside the page</caption>
+    <screenshot xml:lang="en">
+      <caption>YouTube downloader: the download queue beside the page</caption>
       <image>https://raw.githubusercontent.com/keshavbhatt/red/master/screenshots/store/02-downloads.png</image>
     </screenshot>
-    <screenshot>
-      <caption>Download dialog: video, audio only or exact streams, with playlist detection</caption>
+    <screenshot xml:lang="en">
+      <caption>Download a video as MP4, audio as MP3, or pick the exact streams; playlists are detected</caption>
       <image>https://raw.githubusercontent.com/keshavbhatt/red/master/screenshots/store/03-download-dialog.png</image>
     </screenshot>
-    <screenshot>
-      <caption>Blocking: ads, trackers, SponsorBlock categories, dislikes and Shorts</caption>
+    <screenshot xml:lang="en">
+      <caption>Ad blocker, tracker blocking, SponsorBlock categories, dislikes and Shorts</caption>
       <image>https://raw.githubusercontent.com/keshavbhatt/red/master/screenshots/store/04-blocking.png</image>
     </screenshot>
   </screenshots>
+
+  <keywords>
+    <keyword>youtube</keyword>
+    <keyword>downloader</keyword>
+    <keyword>adblock</keyword>
+    <keyword>youtube client</keyword>
+    <keyword>youtube tv</keyword>
+    <keyword>youtube downloader</keyword>
+    <keyword>youtube to mp3</keyword>
+    <keyword>youtube without ads</keyword>
+    <keyword>ad blocker</keyword>
+    <keyword>sponsorblock</keyword>
+    <keyword>tv mode</keyword>
+    <keyword>leanback</keyword>
+    <keyword>smart tv</keyword>
+    <keyword>video downloader</keyword>
+    <keyword>playlist downloader</keyword>
+    <keyword>mini player</keyword>
+    <keyword>media keys</keyword>
+    <keyword>gamepad</keyword>
+    <keyword>video</keyword>
+    <keyword>player</keyword>
+    <keyword>music</keyword>
+    <keyword xml:lang="de">youtube ohne werbung</keyword>
+    <keyword xml:lang="de">youtube downloader</keyword>
+    <keyword xml:lang="de">werbeblocker</keyword>
+    <keyword xml:lang="es">youtube sin anuncios</keyword>
+    <keyword xml:lang="es">descargar youtube</keyword>
+    <keyword xml:lang="es">bloqueador de anuncios</keyword>
+    <keyword xml:lang="fr">youtube sans pub</keyword>
+    <keyword xml:lang="fr">télécharger youtube</keyword>
+    <keyword xml:lang="fr">bloqueur de publicité</keyword>
+    <keyword xml:lang="it">youtube senza pubblicità</keyword>
+    <keyword xml:lang="it">scaricare youtube</keyword>
+    <keyword xml:lang="it">blocco pubblicità</keyword>
+    <keyword xml:lang="pt_BR">youtube sem anúncios</keyword>
+    <keyword xml:lang="pt_BR">baixar youtube</keyword>
+    <keyword xml:lang="pt_BR">bloqueador de anúncios</keyword>
+  </keywords>
+
   <url type="homepage">https://github.com/keshavbhatt/red</url>
+  <url type="help">https://github.com/keshavbhatt/red/blob/master/GUIDE.md</url>
   <url type="bugtracker">https://github.com/keshavbhatt/red/issues</url>
+  <url type="donation">https://www.paypal.com/paypalme/keshavnrj/11</url>
+  <url type="contact">https://ktechpit.com</url>
+
+  <provides>
+    <binary>red</binary>
+  </provides>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+    <internet>always</internet>
+  </requires>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>gamepad</control>
+  </supports>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>Video</category>
+    <category>Player</category>
+    <category>Network</category>
+  </categories>
+
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="10.0.0" date="2026-09-07">
+    <release version="10.0.0" date="2026-09-07" type="stable">
       <description>
         <p>Red 10 is a redesigned Red on Qt 6 and Qt WebEngine.</p>
         <ul>
@@ -72,4 +189,6 @@
       </description>
     </release>
   </releases>
+
+  <update_contact>98378sub@gmail.com</update_contact>
 </component>
