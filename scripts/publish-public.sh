@@ -1,5 +1,5 @@
 #!/bin/bash
-# Refreshes the public repository (github.com/keshavbhatt/red: README, screenshots,
+# Refreshes the public repository (github.com/keshavbhatt/red: README, guide, screenshots,
 # changelog, license, icon — never the source) from this tree.
 #
 #   scripts/publish-public.sh <path-to-public-checkout>
@@ -16,6 +16,7 @@ git -C "$DEST" rm -rqf --ignore-unmatch images snap snap_launcher icon.png
 mkdir -p "$DEST/screenshots"
 cp "$DIR/packaging/public/README.md" "$DEST/README.md"
 cp "$DIR/packaging/public/LICENSE" "$DEST/LICENSE"
+cp "$DIR/packaging/public/GUIDE.md" "$DEST/GUIDE.md"
 cp "$DIR/CHANGELOG.md" "$DEST/CHANGELOG.md"
 cp -r "$DIR/screenshots"/. "$DEST/screenshots/"
 cp "$DIR/src/resources/icons/hicolor/512x512/apps/com.ktechpit.red.png" "$DEST/icon.png"

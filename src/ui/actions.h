@@ -40,6 +40,7 @@ public:
     QAction* showHide = nullptr;
     QAction* settings = nullptr;
     QAction* shortcuts = nullptr;
+    QAction* onlineGuide = nullptr;
     QAction* openLogFolder = nullptr;
     QAction* about = nullptr;
     QAction* account = nullptr;

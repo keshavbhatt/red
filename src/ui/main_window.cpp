@@ -17,6 +17,7 @@
 #include "ui/downloads_hub.h"
 #include "ui/downloads_panel.h"
 #include "ui/icons.h"
+#include "ui/links.h"
 #include "ui/logging.h"
 #include "ui/media_controller.h"
 #include "ui/message_sheet.h"
@@ -156,6 +157,7 @@ void MainWindow::setupUi()
     overflow->addAction(m_actions->zoomReset);
     overflow->addSeparator();
     overflow->addAction(m_actions->shortcuts);
+    overflow->addAction(m_actions->onlineGuide);
     overflow->addAction(m_actions->openLogFolder);
     overflow->addAction(m_actions->account);
     overflow->addAction(m_actions->about);
@@ -224,6 +226,7 @@ void MainWindow::connectActions()
     connect(a.showHide, &QAction::triggered, this, &MainWindow::toggleVisibility);
     connect(a.settings, &QAction::triggered, this, &MainWindow::showSettings);
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
+    connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
     connect(a.openLogFolder, &QAction::triggered, this,
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
     connect(a.about, &QAction::triggered, this, &MainWindow::showAbout);
@@ -638,6 +641,8 @@ void MainWindow::debugOpen(const QString& what)
         maybeShowWhatsNew(true);
     } else if (what == u"link"_s) {
         m_actions->downloadUrl->trigger();
+    } else if (what == u"menu"_s) {
+        m_rail->showMenu();
     } else if (what == u"tray"_s) {
         if (QMenu* menu = m_tray->menu(); menu != nullptr) {
             menu->popup(mapToGlobal(QPoint(width() / 2, height() / 2)));

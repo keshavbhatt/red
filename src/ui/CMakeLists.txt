@@ -42,6 +42,7 @@ qt_add_library(red_ui STATIC
     shortcuts_dialog.h
     side_rail.cpp
     side_rail.h
+    links.h
     theme_applier.cpp
     theme_applier.h
     thumbnail_cache.cpp

@@ -231,7 +231,7 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     // advanced, with "-playlist" to pick the whole playlist and ":from-to" to
     // limit the entries (e.g. audio-playlist:1-2); advanced and unbounded
     // playlists are left open for inspection; video-subtitles stays open with
-    // the subtitle picker dropped down.
+    // the subtitle picker dropped down, and any kind with -inspect stays open.
     if (qEnvironmentVariableIsSet("RED_DEBUG_AUTODOWNLOAD")) {
         const QString spec = qEnvironmentVariable("RED_DEBUG_AUTODOWNLOAD");
         const QString kind = spec.section(u':', 0, 0);
@@ -249,7 +249,7 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
                                                     range.section(u'-', 1, 1).toInt());
                     }
                     const bool inspectOnly = kind.startsWith(u"advanced"_s) ||
-                                             kind.endsWith(u"-subtitles"_s) ||
+                                             kind.endsWith(u"-subtitles"_s) || kind.endsWith(u"-inspect"_s) ||
                                              (kind.endsWith(u"-playlist"_s) && range.isEmpty());
                     if (!inspectOnly) {
                         QTimer::singleShot(1500, dialog, &QDialog::accept);

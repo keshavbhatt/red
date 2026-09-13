@@ -123,6 +123,11 @@ void SideRail::setMenu(QMenu* menu)
     m_menu->setMenu(menu);
 }
 
+void SideRail::showMenu()
+{
+    m_menu->showMenu();
+}
+
 void SideRail::applyIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());

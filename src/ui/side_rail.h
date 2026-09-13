@@ -32,6 +32,8 @@ public:
     /// Reload shows a stop glyph while the page loads.
     void setLoading(bool loading);
     void setMenu(QMenu* menu);
+    /// Drops the overflow menu open (debug grabs).
+    void showMenu();
 
 private:
     void setupUi();

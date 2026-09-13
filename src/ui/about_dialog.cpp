@@ -5,6 +5,7 @@
 #include "platform/file_manager.h"
 #include "ui/diagnostics.h"
 #include "ui/icons.h"
+#include "ui/links.h"
 #include "ui/red_style.h"
 
 #include <QApplication>
@@ -22,7 +23,6 @@ using namespace Qt::StringLiterals;
 namespace red::ui {
 
 namespace {
-const QString kIssuesUrl = u"https://github.com/keshavbhatt/red/issues"_s;
 const QString kDonateUrl = u"https://www.paypal.com/paypalme/keshavnrj/11"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
 } // namespace
@@ -89,7 +89,8 @@ void AboutDialog::setupUi()
         connect(button, &QPushButton::clicked, this, [url] { platform::openUrl(url); });
         return button;
     };
-    links->addWidget(linkButton(tr("Report a bug"), kIssuesUrl));
+    links->addWidget(linkButton(tr("Online guide"), links::kGuide));
+    links->addWidget(linkButton(tr("Report a bug"), links::kIssues));
     links->addWidget(linkButton(tr("Donate"), kDonateUrl));
     links->addStretch(1);
     root->addLayout(links);

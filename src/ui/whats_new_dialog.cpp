@@ -3,6 +3,7 @@
 #include "core/changelog.h"
 #include "platform/file_manager.h"
 #include "ui/icons.h"
+#include "ui/links.h"
 #include "ui/red_style.h"
 
 #include <QFile>
@@ -20,9 +21,7 @@ using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
-namespace {
-const QString kChangelogUrl = u"https://github.com/keshavbhatt/red/blob/master/CHANGELOG.md"_s;
-}
+namespace {}
 
 QString WhatsNewDialog::bundledNotes(const QString& version)
 {
@@ -101,7 +100,7 @@ WhatsNewDialog::WhatsNewDialog(const QString& version, const QString& notesMarkd
     auto* buttons = new QHBoxLayout;
     buttons->addStretch(1);
     auto* full = new QPushButton(tr("Full changelog"), this);
-    connect(full, &QPushButton::clicked, this, [] { platform::openUrl(kChangelogUrl); });
+    connect(full, &QPushButton::clicked, this, [] { platform::openUrl(links::kChangelog); });
     buttons->addWidget(full);
     auto* ok = new QPushButton(tr("Got it"), this);
     ok->setProperty("redPrimary", true);
