@@ -39,18 +39,16 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
   choosing another download folder all go through portals inside the sandbox
   (`FLATPAK_ID` / `SNAP` select the portal backends).
 - **CI**: `.github/workflows/flatpak.yml` builds x86_64 and aarch64 bundles on manual runs
-  and attaches them to the GitHub Release on a version tag. Flathub builds from its own
-  repository (`flathub/com.ktechpit.red`, same manifest with a `type: git` source pinned
-  to the tag) once submitted.
+  and attaches them to the GitHub Release on a version tag.
 
 ### Submitting to Flathub
 
-1. Tag a release (`v10.0.0`) and let the workflows run.
-2. Copy `com.ktechpit.red.yaml` + `deno.yaml` into a `flathub/com.ktechpit.red` repository,
-   replacing the `dir` source with `type: git`, `url`, `tag`, `commit`, and the usual
-   `x-checker-data` block.
-3. The metainfo needs screenshots (`<screenshots>`) and release notes for the Flathub
-   quality guidelines; add them in `dist/linux/com.ktechpit.red.metainfo.xml` first.
+Red is closed source, so the Flathub manifest cannot build from a git tag. Follow the
+ultimate-media-downloader pattern: a `simple` module that downloads the published snap for
+each architecture (`https://api.snapcraft.io/api/v1/snaps/download/<id>_<rev>.snap`, sha256
+pinned), `unsquashfs` it, and installs the binary, icons, desktop file and metainfo from
+`squashfs-root/usr/`. `deno.yaml` stays as is; ffmpeg comes from the runtime. The metainfo
+declares `LicenseRef-proprietary`; screenshots must be served from a public URL.
 
 ## Validation without building
 

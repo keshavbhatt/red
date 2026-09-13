@@ -22,7 +22,6 @@ using namespace Qt::StringLiterals;
 namespace red::ui {
 
 namespace {
-const QString kSourceUrl = u"https://github.com/keshavbhatt/red"_s;
 const QString kIssuesUrl = u"https://github.com/keshavbhatt/red/issues"_s;
 const QString kDonateUrl = u"https://www.paypal.com/paypalme/keshavnrj/11"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
@@ -90,7 +89,6 @@ void AboutDialog::setupUi()
         connect(button, &QPushButton::clicked, this, [url] { platform::openUrl(url); });
         return button;
     };
-    links->addWidget(linkButton(tr("Source code"), kSourceUrl));
     links->addWidget(linkButton(tr("Report a bug"), kIssuesUrl));
     links->addWidget(linkButton(tr("Donate"), kDonateUrl));
     links->addStretch(1);

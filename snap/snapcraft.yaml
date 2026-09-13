@@ -8,9 +8,8 @@ compression: lzo
 title: Red
 summary: YouTube in a real desktop app, with a TV mode, ad blocking and downloads
 website: https://github.com/keshavbhatt/red
-source-code: https://github.com/keshavbhatt/red
 issues: https://github.com/keshavbhatt/red/issues
-license: MIT
+license: Proprietary
 icon: snap/gui/icon.svg
 
 platforms:

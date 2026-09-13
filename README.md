@@ -4,7 +4,7 @@
 
 <p align="center">
   A living-room TV mode, ad and tracker blocking, SponsorBlock, media keys, a mini player and a
-  real download manager — lightweight and open source, built with Qt&nbsp;6.
+  real download manager — lightweight and native, built with Qt&nbsp;6.
 </p>
 
 <p align="center">
@@ -106,7 +106,8 @@ tests/        Qt Test suites (unit + offscreen smoke)
 
 ## License
 
-[MIT](LICENSE) © Keshav Bhatt
+Red is proprietary software. Copyright © 2026 Keshav Bhatt, all rights reserved; see
+[LICENSE](LICENSE).
 
 <sub>YouTube is a trademark of Google LLC. Red is an independent client and is not affiliated
 with, endorsed by, or sponsored by YouTube or Google.</sub>

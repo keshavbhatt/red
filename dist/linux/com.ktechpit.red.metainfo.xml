@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>com.ktechpit.red</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>MIT</project_license>
+  <project_license>LicenseRef-proprietary</project_license>
   <name>Red</name>
   <summary>YouTube in a real desktop app, with a TV mode, ad blocking and downloads</summary>
 

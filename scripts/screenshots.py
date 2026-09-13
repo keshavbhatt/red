@@ -101,7 +101,7 @@ def banner(dialog, size=(2160, 720)):
     img.alpha_composite(logo, (x0, 118))
     d.text((x0 + 180, 96), "Red", font=font(FONT_BOLD, 150), fill=(255, 255, 255))
     d.text((x0, 300), "YouTube, in a real desktop app.", font=font(FONT_REG, 54), fill=(255, 255, 255))
-    d.text((x0, 380), "Native, lightweight and open source — built with Qt 6.",
+    d.text((x0, 380), "Native and lightweight — built with Qt 6.",
            font=font(FONT_REG, 30), fill=(255, 200, 200))
     # Translucent pills need their own layer: ImageDraw writes alpha, it does not blend.
     pf = font(FONT_MED, 27)
