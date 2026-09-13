@@ -8,8 +8,10 @@
 #include "platform/notifier_factory.h"
 #include "services/dislikes_client.h"
 #include "services/engine_manager.h"
+#include "services/licensing/license_service.h"
 #include "services/sponsorblock_client.h"
 #include "ui/about_dialog.h"
+#include "ui/account_dialog.h"
 #include "ui/actions.h"
 #include "ui/diagnostics.h"
 #include "ui/downloads_hub.h"
@@ -122,6 +124,8 @@ void MainWindow::setupUi()
     m_downloads =
         new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(), this, this);
     m_tray = new TrayController(m_settings, *m_actions, this);
+    m_license = new services::LicenseService(this);
+    connect(m_license, &services::LicenseService::upgradeRequested, this, &MainWindow::promptUpgrade);
     m_media = new MediaController(m_settings, *m_webView, QApplication::desktopFileName(), this);
     m_hint = new web::FullScreenHint(this);
 
@@ -152,6 +156,7 @@ void MainWindow::setupUi()
     overflow->addSeparator();
     overflow->addAction(m_actions->shortcuts);
     overflow->addAction(m_actions->openLogFolder);
+    overflow->addAction(m_actions->account);
     overflow->addAction(m_actions->about);
     overflow->addSeparator();
     overflow->addAction(m_actions->quit);
@@ -221,6 +226,7 @@ void MainWindow::connectActions()
     connect(a.openLogFolder, &QAction::triggered, this,
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
     connect(a.about, &QAction::triggered, this, &MainWindow::showAbout);
+    connect(a.account, &QAction::triggered, this, &MainWindow::showAccount);
     connect(a.quit, &QAction::triggered, this, &MainWindow::quit);
 
     connect(m_tray, &TrayController::toggleRequested, this, &MainWindow::toggleVisibility);
@@ -293,6 +299,7 @@ void MainWindow::start(bool tvMode)
     }
     show();
     m_webView->setFocus(); // YouTube's own shortcuts (k, j, l, f, m…) need the page focused
+    m_license->start();
     QTimer::singleShot(600, this, &MainWindow::maybeShowGpuFallbackNotice);
 }
 
@@ -618,12 +625,43 @@ void MainWindow::debugOpen(const QString& what)
         showAbout();
     } else if (what == u"shortcuts"_s) {
         showShortcuts();
+    } else if (what == u"account"_s) {
+        showAccount();
     } else if (what == u"link"_s) {
         m_actions->downloadUrl->trigger();
     } else if (what == u"tray"_s) {
         if (QMenu* menu = m_tray->menu(); menu != nullptr) {
             menu->popup(mapToGlobal(QPoint(width() / 2, height() / 2)));
         }
+    }
+}
+
+void MainWindow::showAccount()
+{
+    if (!m_accountDialog) {
+        m_accountDialog = new AccountDialog(*m_license, m_theme, this);
+        m_accountDialog->setAttribute(Qt::WA_DeleteOnClose);
+    }
+    m_accountDialog->show();
+    m_accountDialog->raise();
+    m_accountDialog->activateWindow();
+}
+
+/// A Pro feature was used without a licence: explain once, offer the plans.
+void MainWindow::promptUpgrade(const QString& feature)
+{
+    const QString title =
+        m_license->evaluationEnded() ? tr("Your evaluation has ended") : tr("Red Pro feature");
+    const QString body =
+        m_license->evaluationEnded()
+            ? tr("%1 was part of your %2-day evaluation. Get Red Pro to keep it and every other Pro feature.")
+                  .arg(feature)
+                  .arg(m_license->evaluationDays())
+            : tr("%1 is part of Red Pro. Get Red Pro to unlock it and every other Pro feature.").arg(feature);
+    if (MessageSheet::confirm(this, MessageSheet::Tone::Question, title, body, tr("View plans"),
+                              tr("Not now"))) {
+        showAccount();
+        m_accountDialog->highlightPurchase();
     }
 }
 

@@ -7,6 +7,7 @@
 # Nothing links to `ui` except the executable (via `app`).
 
 add_subdirectory(core)
+add_subdirectory(modules/AccountAndLicense)
 add_subdirectory(services)
 add_subdirectory(platform)
 add_subdirectory(web)

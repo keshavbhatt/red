@@ -47,6 +47,8 @@ qt_add_library(red_core STATIC
     theme/theme_service.h
     theme/youtube_pref.cpp
     theme/youtube_pref.h
+    licensing/legacy_account.cpp
+    licensing/legacy_account.h
     youtube_url.cpp
     youtube_url.h
     zoom_policy.cpp

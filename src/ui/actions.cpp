@@ -48,6 +48,7 @@ Actions::Actions(QWidget* owner)
     shortcuts = make(owner, tr("Keyboard shortcuts"), {QKeySequence(Qt::Key_F1)});
     openLogFolder = make(owner, tr("Open log folder"));
     about = make(owner, tr("About Red"));
+    account = make(owner, tr("Account & licence…"));
     quit = make(owner, tr("Quit"), {QKeySequence::Quit});
 
     miniPlayer->setCheckable(true);
@@ -63,7 +64,7 @@ QList<QAction*> Actions::all() const
 {
     return {home,       back,     forward,   reload,    download, downloadUrl, downloads, copyLink,
             miniPlayer, tvMode,   playPause, next,      previous, zoomIn,      zoomOut,   zoomReset,
-            fullScreen, showHide, settings,  shortcuts, about,    quit};
+            fullScreen, showHide, settings,  shortcuts, account,  about,       quit};
 }
 
 } // namespace red::ui

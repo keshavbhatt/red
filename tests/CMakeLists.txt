@@ -34,6 +34,7 @@ endfunction()
 
 # core
 red_add_test(tst_settings            tst_settings.cpp            red_core)
+red_add_test(tst_legacy_account      tst_legacy_account.cpp      red_core)
 red_add_test(tst_youtube_url         tst_youtube_url.cpp         red_core)
 red_add_test(tst_navigation_policy   tst_navigation_policy.cpp   red_core)
 red_add_test(tst_block_list          tst_block_list.cpp          red_core)

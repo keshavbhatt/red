@@ -19,6 +19,10 @@ class FullScreenHint;
 class WebView;
 } // namespace red::web
 
+namespace red::services {
+class LicenseService;
+}
+
 namespace red::ui {
 
 class Actions;
@@ -27,6 +31,7 @@ class MediaController;
 class SettingsDialog;
 class SideRail;
 class ThemeApplier;
+class AccountDialog;
 class TrayController;
 
 /// Top-level window (DESIGN.md §2): rail | page | downloads panel. Owns the
@@ -54,6 +59,7 @@ public Q_SLOTS:
     void showSettings();
     void showShortcuts();
     void showAbout();
+    void showAccount();
     /// Headless verification aid (ADR-010): opens a screen by name —
     /// "about", "shortcuts", "link", "tray" (the tray menu, popped up over the window).
     void debugOpen(const QString& what);
@@ -80,6 +86,7 @@ private:
     void handleRenderProcessGaveUp();
     void handlePermissionPrompt(const QWebEnginePermission& permission);
     void installScriptDialogs();
+    void promptUpgrade(const QString& feature);
     void handleTvSignal(const QString& signal, const QString& argument);
     void clearCache();
     void confirmClearSession();
@@ -94,6 +101,8 @@ private:
     SideRail* m_rail = nullptr;
     QSplitter* m_splitter = nullptr;
     TrayController* m_tray = nullptr;
+    services::LicenseService* m_license = nullptr;
+    QPointer<AccountDialog> m_accountDialog;
     MediaController* m_media = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     core::INotifier* m_notifier = nullptr;

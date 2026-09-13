@@ -5,6 +5,9 @@
 qt_add_library(red_services STATIC
     engine_manager.cpp
     engine_manager.h
+    licensing/license_config.h
+    licensing/license_service.cpp
+    licensing/license_service.h
     dislikes_client.cpp
     dislikes_client.h
     logging.cpp
@@ -21,6 +24,7 @@ red_set_warnings(red_services)
 target_link_libraries(red_services
     PUBLIC
         red_core
+        account_license
         Qt6::Network
     PRIVATE
         Qt6::Sql

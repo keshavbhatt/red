@@ -42,6 +42,7 @@ public:
     QAction* shortcuts = nullptr;
     QAction* openLogFolder = nullptr;
     QAction* about = nullptr;
+    QAction* account = nullptr;
     QAction* quit = nullptr;
 
     /// Every action with a shortcut, in sheet order.
