@@ -54,7 +54,8 @@ are filled in by hand (the store info endpoint lists them:
 `curl -H 'Snap-Device-Series: 16' 'https://api.snapcraft.io/v2/snaps/info/red-app?fields=download,revision'`).
 Lint without building: `flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.ktechpit.red.yaml`.
 The PR targets `flathub/flathub` branch `new-pr`, title `Add com.ktechpit.red`, and needs a
-short video of the Flatpak build attached. Flathub builds it in their CI; never build locally.
+short video of the Flatpak build attached. Flathub builds it in their CI; never build locally. The metainfo's licence must be
+`LicenseRef-proprietary=<URL of the public LICENSE>`; Flathub rejects the bare identifier.
 
 ## Before tagging a release
 
