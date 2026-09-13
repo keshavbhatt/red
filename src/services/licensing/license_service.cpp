@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QFile>
 #include <QStandardPaths>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 
@@ -40,6 +41,17 @@ LicenseService::~LicenseService() = default;
 
 void LicenseService::start()
 {
+#ifdef QT_DEBUG
+    // Debug builds only (ADR-010): RED_DEBUG_LICENSE=pro|trial|free|neterr
+    // drives the module's simulated states so the gate can be exercised.
+    if (const QString sim = qEnvironmentVariable("RED_DEBUG_LICENSE"); !sim.isEmpty()) {
+        using S = AccountLicenseManager::DebugLicenseState;
+        m_manager.setDebugLicenseState(sim == u"pro"_s     ? S::Pro
+                                       : sim == u"trial"_s ? S::EvaluationActive
+                                       : sim == u"free"_s  ? S::EvaluationExpired
+                                                           : S::NetworkError);
+    }
+#endif
     // Red 9 users keep their account ID (and with it their licence).
     const QString legacy = core::legacyRedAccountId(core::legacyAccountSearchHomes());
     m_manager.ensureSerial(legacy);

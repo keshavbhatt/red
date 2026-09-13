@@ -121,11 +121,11 @@ void MainWindow::setupUi()
 
     m_notifier = platform::createPlatformNotifier(this).release();
     m_notifications = new core::NotificationService(m_settings, m_notifier, nullptr, this);
-    m_downloads =
-        new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(), this, this);
-    m_tray = new TrayController(m_settings, *m_actions, this);
     m_license = new services::LicenseService(this);
     connect(m_license, &services::LicenseService::upgradeRequested, this, &MainWindow::promptUpgrade);
+    m_downloads = new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(),
+                                   *m_license, this, this);
+    m_tray = new TrayController(m_settings, *m_actions, this);
     m_media = new MediaController(m_settings, *m_webView, QApplication::desktopFileName(), this);
     m_hint = new web::FullScreenHint(this);
 
@@ -654,10 +654,12 @@ void MainWindow::promptUpgrade(const QString& feature)
         m_license->evaluationEnded() ? tr("Your evaluation has ended") : tr("Red Pro feature");
     const QString body =
         m_license->evaluationEnded()
-            ? tr("%1 was part of your %2-day evaluation. Get Red Pro to keep it and every other Pro feature.")
+            ? tr("%1 is part of Red Pro, and your %2-day evaluation of the Pro features is over. Get Red Pro "
+                 "to keep it, and every other Pro feature.")
                   .arg(feature)
                   .arg(m_license->evaluationDays())
-            : tr("%1 is part of Red Pro. Get Red Pro to unlock it and every other Pro feature.").arg(feature);
+            : tr("%1 is part of Red Pro. Get Red Pro to unlock it, and every other Pro feature.")
+                  .arg(feature);
     if (MessageSheet::confirm(this, MessageSheet::Tone::Question, title, body, tr("View plans"),
                               tr("Not now"))) {
         showAccount();

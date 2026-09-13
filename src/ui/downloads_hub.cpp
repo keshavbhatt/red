@@ -6,6 +6,7 @@
 #include "core/youtube_url.h"
 #include "platform/file_manager.h"
 #include "services/engine_manager.h"
+#include "services/licensing/license_service.h"
 #include "services/media_probe.h"
 #include "ui/download_dialog.h"
 #include "ui/downloads_panel.h"
@@ -30,9 +31,10 @@ namespace red::ui {
 
 DownloadsHub::DownloadsHub(core::Settings& settings, core::ThemeService& theme,
                            core::NotificationService& notifications, web::CookieExporter& cookies,
-                           QWidget* dialogParent, QObject* parent)
+                           services::LicenseService& license, QWidget* dialogParent, QObject* parent)
     : QObject(parent)
     , m_settings(settings)
+    , m_license(license)
     , m_theme(theme)
     , m_notifications(notifications)
     , m_cookies(cookies)
@@ -182,6 +184,11 @@ void DownloadsHub::requestDownload(const QUrl& url, bool audioOnly)
         qCInfo(lcUi) << "not a downloadable YouTube URL:" << url;
         return;
     }
+    // Downloads are a Pro feature (free during the evaluation): the gate
+    // prompt takes over when there is no access.
+    if (!m_license.checkAccess(tr("Downloading videos"))) {
+        return;
+    }
     if (m_engine->isReady()) {
         openDialog(url, audioOnly);
         return;
@@ -313,7 +320,9 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
     switch (action) {
     case DownloadCardDelegate::Action::PauseResume:
         if (job->state == core::DownloadState::Paused) {
-            m_queue->resume(jobId);
+            if (m_license.checkAccess(tr("Downloading videos"))) {
+                m_queue->resume(jobId);
+            }
         } else {
             m_queue->pause(jobId);
         }
@@ -322,7 +331,9 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
         m_queue->cancel(jobId);
         break;
     case DownloadCardDelegate::Action::Retry:
-        m_queue->retry(jobId);
+        if (m_license.checkAccess(tr("Downloading videos"))) {
+            m_queue->retry(jobId);
+        }
         break;
     case DownloadCardDelegate::Action::Open:
         if (!job->primaryFile().isEmpty()) {

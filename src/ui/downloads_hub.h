@@ -25,6 +25,10 @@ namespace red::web {
 class CookieExporter;
 }
 
+namespace red::services {
+class LicenseService;
+}
+
 namespace red::ui {
 
 class DownloadDialog;
@@ -44,7 +48,7 @@ class DownloadsHub : public QObject
 public:
     DownloadsHub(core::Settings& settings, core::ThemeService& theme,
                  core::NotificationService& notifications, web::CookieExporter& cookies,
-                 QWidget* dialogParent, QObject* parent = nullptr);
+                 services::LicenseService& license, QWidget* dialogParent, QObject* parent = nullptr);
     ~DownloadsHub() override;
 
     [[nodiscard]] DownloadsPanel* panel() { return m_panel; }
@@ -82,6 +86,7 @@ private:
     void persist();
 
     core::Settings& m_settings;
+    services::LicenseService& m_license;
     core::ThemeService& m_theme;
     core::NotificationService& m_notifications;
     web::CookieExporter& m_cookies;

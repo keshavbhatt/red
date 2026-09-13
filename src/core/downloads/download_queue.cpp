@@ -10,6 +10,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QTemporaryFile>
@@ -529,8 +530,17 @@ bool DownloadQueue::load(const QString& filePath)
     if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
-    const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonParseError parseError{};
+    const QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
     if (!doc.isObject()) {
+        // Never let the next save quietly replace a list we could not read:
+        // keep the bytes next to it for the user (or a bug report).
+        file.close();
+        const QString kept = filePath + u".unreadable"_s;
+        QFile::remove(kept);
+        QFile::copy(filePath, kept);
+        qCWarning(lcDownloads) << "download list unreadable:" << parseError.errorString()
+                               << "- kept a copy at" << kept;
         return false;
     }
     const QJsonObject root = doc.object();
