@@ -639,6 +639,9 @@ void MainWindow::debugOpen(const QString& what)
         showShortcuts();
     } else if (what == u"account"_s) {
         showAccount();
+    } else if (what == u"plans"_s) {
+        showAccount();
+        m_accountDialog->showPlans();
     } else if (what == u"whatsnew"_s) {
         maybeShowWhatsNew(true);
     } else if (what == u"link"_s) {
@@ -680,6 +683,7 @@ void MainWindow::promptUpgrade(const QString& feature)
                               tr("Not now"))) {
         showAccount();
         m_accountDialog->highlightPurchase();
+        m_accountDialog->showPlans(); // the comparison on top: what is free, what Pro adds
     }
 }
 
@@ -709,6 +713,7 @@ void MainWindow::promptDownloadLimit(int requested, int remaining)
                               tr("Not now"))) {
         showAccount();
         m_accountDialog->highlightPurchase();
+        m_accountDialog->showPlans(); // the comparison on top: what is free, what Pro adds
     }
 }
 

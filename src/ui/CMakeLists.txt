@@ -5,6 +5,8 @@ qt_add_library(red_ui STATIC
     about_dialog.cpp
     account_dialog.cpp
     account_dialog.h
+    plans_dialog.cpp
+    plans_dialog.h
     about_dialog.h
     actions.cpp
     actions.h

@@ -29,6 +29,8 @@ public:
 
     /// Draws the eye to the purchase button (after a gate prompt).
     void highlightPurchase();
+    /// The Free / Evaluation / Pro comparison sheet.
+    void showPlans();
 
 private:
     void refresh();

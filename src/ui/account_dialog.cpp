@@ -4,6 +4,7 @@
 #include "platform/file_manager.h"
 #include "services/licensing/license_service.h"
 #include "ui/icons.h"
+#include "ui/plans_dialog.h"
 #include "ui/red_style.h"
 
 #include <QApplication>
@@ -96,6 +97,11 @@ AccountDialog::AccountDialog(services::LicenseService& license, const core::Them
     m_refresh->setToolTip(tr("Check the licence with the server again"));
     connect(m_refresh, &QPushButton::clicked, this, [this] { m_license.refresh(); });
     buttons->addWidget(m_refresh);
+    auto* compare = new QPushButton(tr("Compare plans"), this);
+    compare->setProperty("redFlat", true);
+    compare->setToolTip(tr("What Free, Evaluation and Red Pro include"));
+    connect(compare, &QPushButton::clicked, this, &AccountDialog::showPlans);
+    buttons->addWidget(compare);
     buttons->addStretch(1);
     m_portal = new QPushButton(tr("Manage subscription"), this);
     connect(m_portal, &QPushButton::clicked, this, [this] { platform::openUrl(m_license.portalUrl()); });
@@ -173,6 +179,13 @@ void AccountDialog::refresh()
     m_hint->setText(hint);
     m_purchase->setVisible(m_license.tier() != Tier::Pro);
     m_portal->setVisible(m_license.tier() == Tier::Pro);
+}
+
+void AccountDialog::showPlans()
+{
+    auto* dialog = new PlansDialog(m_license, m_theme, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void AccountDialog::highlightPurchase()

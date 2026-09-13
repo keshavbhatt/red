@@ -244,7 +244,9 @@ arithmetic; `LicenseService::canDownload` / `spendDownloads` are the choke point
 `DownloadsHub::requestDownload` and the download dialog's admission check (`setAdmission`, so
 an oversized playlist keeps the dialog open to pick fewer entries). Resume and retry are never
 counted again. `MainWindow::promptDownloadLimit` explains and offers the plans. Nothing else
-is gated.
+is gated. `ui::PlansDialog` (account sheet → *Compare plans*, the prompts' *View plans*,
+`RED_DEBUG_OPEN=plans`) lists Free / Evaluation / Pro side by side so people see how much is
+free and that Pro is what funds the upkeep (owner's framing, 2026-09-13).
 
 **Never in release builds**: the `RED_DEBUG_LICENSE` override exists under `QT_DEBUG` only
 (a Debug tree lives in `build-debug/`); an env override in a shipped binary would be a bypass.
