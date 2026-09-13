@@ -279,7 +279,8 @@ the *Sound* or *Media* keys also need to be bound in the keyboard settings.
 
 **Something else.** *About Red → Copy* puts the diagnostics (versions, GPU, engine state) on
 the clipboard, and *Open log folder* in the ⋯ menu shows the log. Attach both to an
-[issue](https://github.com/keshavbhatt/red/issues).
+[issue](https://github.com/keshavbhatt/red/issues) or email them to
+[connect@ktechpit.com](mailto:connect@ktechpit.com).
 
 ## Privacy
 

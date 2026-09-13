@@ -150,7 +150,7 @@
   <url type="help">https://github.com/keshavbhatt/red/blob/master/GUIDE.md</url>
   <url type="bugtracker">https://github.com/keshavbhatt/red/issues</url>
   <url type="donation">https://www.paypal.com/paypalme/keshavnrj/11</url>
-  <url type="contact">https://ktechpit.com</url>
+  <url type="contact">mailto:connect@ktechpit.com</url>
 
   <provides>
     <binary>red</binary>
@@ -190,5 +190,5 @@
     </release>
   </releases>
 
-  <update_contact>98378sub@gmail.com</update_contact>
+  <update_contact>connect@ktechpit.com</update_contact>
 </component>
