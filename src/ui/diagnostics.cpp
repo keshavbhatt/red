@@ -2,20 +2,77 @@
 
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
+#include "platform/crash_handler.h"
 #include "platform/platform_info.h"
+#include "ui/links.h"
 
 #include <QCoreApplication>
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTextStream>
+#include <QUrl>
+#include <QUrlQuery>
 #include <QtWebEngineCore/qtwebenginecoreglobal.h>
 
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
 
+namespace {
+
+QString environmentBlock(const QString& userAgent)
+{
+    Q_UNUSED(userAgent)
+    return u"- Red: %1 (%2)\n- OS: %3\n- Chromium: %4\n"_s.arg(
+        QCoreApplication::applicationVersion(), platform::packageType(), platform::describeHost(),
+        qWebEngineChromiumVersion());
+}
+
+QString reportBody(const QString& userAgent, const QString& description, bool markdown)
+{
+    const QString described = description.trimmed().isEmpty()
+                                  ? (markdown ? u"<!-- describe the problem here -->"_s : QString())
+                                  : description.trimmed().left(1500);
+    QString body;
+    body += (markdown ? u"**What happened?**\n\n"_s : u"What happened?\n\n"_s) + described + u"\n\n"_s;
+    body += (markdown ? u"**Steps to reproduce**\n1. \n2. \n3. \n\n"_s
+                      : u"Steps to reproduce\n1. \n2. \n3. \n\n"_s);
+    body += (markdown ? u"**Environment**\n"_s : u"Environment\n"_s) + environmentBlock(userAgent) + u'\n';
+    body += markdown ? u"<!-- Paste the diagnostics from your clipboard below. -->"_s
+                     : u"(Paste the diagnostics from your clipboard below.)"_s;
+    return body;
+}
+
+QString reportTitle(const QString& title)
+{
+    return u"[Bug] "_s + title.trimmed().section(u'\n', 0, 0).left(80);
+}
+
+} // namespace
+
+QString bugReportUrl(const QString& userAgent, const QString& title, const QString& description)
+{
+    QUrl url(links::kIssues + u"/new"_s);
+    QUrlQuery query;
+    query.addQueryItem(u"labels"_s, u"bug"_s);
+    query.addQueryItem(u"title"_s, reportTitle(title));
+    query.addQueryItem(u"body"_s, reportBody(userAgent, description, true));
+    url.setQuery(query);
+    return url.toString(QUrl::FullyEncoded);
+}
+
+QString bugReportMailUrl(const QString& userAgent, const QString& title, const QString& description)
+{
+    QUrl url(links::kContact);
+    QUrlQuery query;
+    query.addQueryItem(u"subject"_s, reportTitle(title));
+    query.addQueryItem(u"body"_s, reportBody(userAgent, description, false));
+    url.setQuery(query);
+    return url.toString(QUrl::FullyEncoded);
+}
+
 QString buildDiagnostics(const core::Settings& settings, const QString& userAgent,
-                         const QString& engineSummary, int logLines)
+                         const QString& engineSummary, int logLines, bool includeCrash)
 {
     QString text;
     QTextStream out(&text);
@@ -41,6 +98,12 @@ QString buildDiagnostics(const core::Settings& settings, const QString& userAgen
         out << lines.at(i) << u'\n';
     }
     out << u"```\n</details>\n"_s;
+    if (includeCrash) {
+        if (const QString crash = platform::lastCrashReport(); !crash.isEmpty()) {
+            out << u"\n<details><summary>Last crash</summary>\n\n```\n"_s << crash
+                << u"\n```\n</details>\n"_s;
+        }
+    }
     return text;
 }
 

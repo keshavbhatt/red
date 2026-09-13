@@ -3,6 +3,7 @@
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "platform/file_manager.h"
+#include "ui/bug_report_dialog.h"
 #include "ui/diagnostics.h"
 #include "ui/icons.h"
 #include "ui/links.h"
@@ -90,7 +91,9 @@ void AboutDialog::setupUi()
         return button;
     };
     links->addWidget(linkButton(tr("Online guide"), links::kGuide));
-    links->addWidget(linkButton(tr("Report a bug"), links::kIssues));
+    auto* report = new QPushButton(tr("Report a bug…"), this);
+    connect(report, &QPushButton::clicked, this, &AboutDialog::reportBug);
+    links->addWidget(report);
     links->addWidget(linkButton(tr("Contact"), links::kContact));
     links->addWidget(linkButton(tr("Donate"), kDonateUrl));
     links->addWidget(linkButton(tr("More apps"), links::kMoreApps));
@@ -125,6 +128,13 @@ void AboutDialog::setupUi()
     connect(close, &QPushButton::clicked, this, &QDialog::accept);
     buttons->addWidget(close);
     root->addLayout(buttons);
+}
+
+void AboutDialog::reportBug()
+{
+    auto* dialog = new BugReportDialog(m_settings, m_theme, m_userAgent, m_engineSummary, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void AboutDialog::copyDiagnostics()

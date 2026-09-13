@@ -165,8 +165,8 @@ int main(int argc, char* argv[])
         window.resize(size.section(u'x', 0, 0).toInt(), size.section(u'x', 1, 1).toInt());
     }
 
-    // Developer aid: RED_DEBUG_OPEN=about|shortcuts|account|plans|link|whatsnew|menu|tray opens that screen
-    // once the window is up (ADR-010).
+    // Developer aid: RED_DEBUG_OPEN=about|bug|shortcuts|account|plans|link|whatsnew|menu|tray opens that
+    // screen once the window is up (ADR-010).
     if (qEnvironmentVariableIsSet("RED_DEBUG_OPEN")) {
         const QString what = qEnvironmentVariable("RED_DEBUG_OPEN");
         QTimer::singleShot(1200, &window, [&window, what] { window.debugOpen(what); });

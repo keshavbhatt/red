@@ -25,6 +25,7 @@ public:
 private:
     void setupUi();
     void copyDiagnostics();
+    void reportBug();
 
     const core::Settings& m_settings;
     core::ThemeService& m_theme;

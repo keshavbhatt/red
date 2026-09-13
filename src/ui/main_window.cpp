@@ -13,6 +13,7 @@
 #include "ui/about_dialog.h"
 #include "ui/account_dialog.h"
 #include "ui/actions.h"
+#include "ui/bug_report_dialog.h"
 #include "ui/diagnostics.h"
 #include "ui/downloads_hub.h"
 #include "ui/downloads_panel.h"
@@ -639,6 +640,11 @@ void MainWindow::debugOpen(const QString& what)
         showShortcuts();
     } else if (what == u"account"_s) {
         showAccount();
+    } else if (what == u"bug"_s) {
+        auto* dialog =
+            new BugReportDialog(m_settings, m_theme, m_webView->userAgent(), engineSummary(), this);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->show();
     } else if (what == u"plans"_s) {
         showAccount();
         m_accountDialog->showPlans();
