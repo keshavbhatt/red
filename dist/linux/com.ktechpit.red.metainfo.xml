@@ -50,10 +50,6 @@
       Red is a lightweight alternative to the browser tab, to Electron YouTube apps and to a
       separate downloader. Everything works on any Linux distribution.
     </p>
-    <p>
-      YouTube is a trademark of Google LLC. Red is an independent client and is not affiliated
-      with, endorsed by, or sponsored by YouTube or Google.
-    </p>
   </description>
 
   <launchable type="desktop-id">com.ktechpit.red.desktop</launchable>
