@@ -76,7 +76,8 @@ issue tracker. Red is closed source; the application's code is not published her
 
 The [user guide](GUIDE.md) covers the window, TV mode, blocking, downloads, every setting,
 the shortcuts and common problems. Bugs and requests go to the
-[issues](https://github.com/keshavbhatt/red/issues); please attach the diagnostics from
+[issues](https://github.com/keshavbhatt/red/issues), or by email to
+[connect@ktechpit.com](mailto:connect@ktechpit.com); please attach the diagnostics from
 *About Red → Copy* when reporting a problem.
 
 ## License
