@@ -61,7 +61,8 @@ public Q_SLOTS:
     void showAbout();
     void showAccount();
     /// Headless verification aid (ADR-010): opens a screen by name —
-    /// "about", "shortcuts", "link", "tray" (the tray menu, popped up over the window).
+    /// "about", "shortcuts", "account", "link", "whatsnew", "tray" (the tray menu,
+    /// popped up over the window).
     void debugOpen(const QString& what);
     void quit();
 
@@ -79,6 +80,8 @@ private:
     void restoreWindowState();
     void saveWindowState();
     void maybeShowGpuFallbackNotice();
+    /// Release notes once per version; `force` shows them regardless.
+    void maybeShowWhatsNew(bool force = false);
     void setFullScreenMode(bool on);
     void setMiniPlayer(bool on);
     void setDownloadsPanelVisible(bool visible);

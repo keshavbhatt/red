@@ -34,6 +34,9 @@ private Q_SLOTS:
         QCOMPARE(m_settings->speedLimitKbps(), 0);
         QVERIFY(m_settings->useSessionCookies());
         QVERIFY(m_settings->downloadDirectory().endsWith(u"/Red"_s));
+        QVERIFY(m_settings->whatsNewSeenVersion().isEmpty());
+        m_settings->setWhatsNewSeenVersion(u" 10.0.0 "_s);
+        QCOMPARE(m_settings->whatsNewSeenVersion(), u"10.0.0"_s);
         QCOMPARE(m_settings->defaultContainer(), Container::Mp4);
         QVERIFY(m_settings->tvFullscreen());
         QVERIFY(m_settings->tvGamepad());

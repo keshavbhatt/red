@@ -14,8 +14,8 @@ Qt 5 code base of Red 9. Nothing of the old code was kept.
 - **Blocking** that never touches playback hosts: ads stripped from player and feed responses
   before YouTube renders them plus a small network-level list; SponsorBlock with per-category
   skip / mark / off; Return YouTube Dislike; Hide Shorts (desktop and TV).
-- **Downloads** on a self-provisioning engine (yt-dlp plus its script runtime, fetched from the
-  official releases, checksum-verified, updated daily; ffmpeg from the system): video, audio
+- **Downloads** on a self-provisioning download engine (fetched from its official releases,
+  checksum-verified, updated daily; the media converter comes from the system): video, audio
   only or exact streams, playlists and channels with entry picking, subtitles, embedded
   thumbnail, metadata and chapters, sponsor-segment removal, a queue with pause / resume /
   retry, notifications with *Show in folder*, and the app's own YouTube sign-in reused for
@@ -35,5 +35,5 @@ Qt 5 code base of Red 9. Nothing of the old code was kept.
   Red 9 settings are not migrated.
 
 ### Removed
-- Red 9's app lock, licensing, rate-app prompts, intro slides, history tab, forced theater
+- Red 9's app lock, rate-app prompts, intro slides, history tab, forced theater
   mode, custom scrollbars, "watch in mpv", and the remote filter lists.

@@ -12,6 +12,7 @@ inline constexpr QLatin1StringView kWindowState{"window/state"};
 inline constexpr QLatin1StringView kSettingsDialogGeometry{"window/settingsDialogGeometry"};
 inline constexpr QLatin1StringView kCloseAction{"window/closeAction"};
 inline constexpr QLatin1StringView kShowRail{"window/showRail"};
+inline constexpr QLatin1StringView kWhatsNewSeenVersion{"window/whatsNewSeenVersion"};
 inline constexpr QLatin1StringView kLastMode{"window/lastMode"};
 inline constexpr QLatin1StringView kLastUrl{"window/lastUrl"};
 inline constexpr QLatin1StringView kDownloadsPanelOpen{"window/downloadsPanelOpen"};

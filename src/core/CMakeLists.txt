@@ -47,6 +47,8 @@ qt_add_library(red_core STATIC
     theme/theme_service.h
     theme/youtube_pref.cpp
     theme/youtube_pref.h
+    changelog.cpp
+    changelog.h
     licensing/legacy_account.cpp
     licensing/legacy_account.h
     youtube_url.cpp

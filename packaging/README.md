@@ -50,6 +50,13 @@ pinned), `unsquashfs` it, and installs the binary, icons, desktop file and metai
 `squashfs-root/usr/`. `deno.yaml` stays as is; ffmpeg comes from the runtime. The metainfo
 declares `LicenseRef-proprietary`; screenshots must be served from a public URL.
 
+## Before tagging a release
+
+- `CHANGELOG.md`: replace `— unreleased` in the `## [x.y.z]` heading with the date; no
+  accounts/licensing text (CLAUDE.md; `tst_changelog` enforces it). The dialog shows this section.
+- `dist/linux/com.ktechpit.red.metainfo.xml`: matching `<release version date>` notes.
+- `CMakeLists.txt`: `project(VERSION)` bumped.
+
 ## Validation without building
 
 ```

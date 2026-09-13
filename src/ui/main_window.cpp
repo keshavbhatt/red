@@ -26,6 +26,7 @@
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "ui/whats_new_dialog.h"
 #include "web/bridge.h"
 #include "web/cookie_exporter.h"
 #include "web/full_screen_hint.h"
@@ -300,7 +301,13 @@ void MainWindow::start(bool tvMode)
     show();
     m_webView->setFocus(); // YouTube's own shortcuts (k, j, l, f, m…) need the page focused
     m_license->start();
-    QTimer::singleShot(600, this, &MainWindow::maybeShowGpuFallbackNotice);
+    // Startup notices run in sequence: the (modal) GPU notices first, then the
+    // release notes once those return — and late enough to be past the 3 s
+    // Wayland→xcb retry probe in main.cpp, which relaunches the process.
+    QTimer::singleShot(600, this, [this] {
+        maybeShowGpuFallbackNotice();
+        QTimer::singleShot(3000, this, [this] { maybeShowWhatsNew(); });
+    });
 }
 
 void MainWindow::restoreWindowState()
@@ -627,6 +634,8 @@ void MainWindow::debugOpen(const QString& what)
         showShortcuts();
     } else if (what == u"account"_s) {
         showAccount();
+    } else if (what == u"whatsnew"_s) {
+        maybeShowWhatsNew(true);
     } else if (what == u"link"_s) {
         m_actions->downloadUrl->trigger();
     } else if (what == u"tray"_s) {
@@ -724,6 +733,24 @@ void MainWindow::maybeShowGpuFallbackNotice()
                        tr("Red hit a graphics-driver problem and switched to software rendering so it stays "
                           "stable. Everything still works; you can turn hardware acceleration back on in "
                           "Settings → Advanced."));
+}
+
+void MainWindow::maybeShowWhatsNew(bool force)
+{
+    if (!force &&
+        (m_settings.whatsNewSeenVersion() == m_appVersion || QApplication::activeModalWidget() != nullptr)) {
+        return;
+    }
+    const QString notes = WhatsNewDialog::bundledNotes(m_appVersion);
+    if (notes.isEmpty()) {
+        qCWarning(lcUi) << "no changelog section for" << m_appVersion << "- What's new not shown";
+        return;
+    }
+    // Marked when shown, not when closed: a crash must not loop the dialog.
+    m_settings.setWhatsNewSeenVersion(m_appVersion);
+    auto* dialog = new WhatsNewDialog(m_appVersion, notes, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void MainWindow::handleRenderProcessGaveUp()

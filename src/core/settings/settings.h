@@ -277,6 +277,9 @@ public:
     /// with the experimental decoder on: that switch is backed out first).
     [[nodiscard]] bool videoDecodeFallbackNotice() const;
     void setVideoDecodeFallbackNotice(bool pending);
+    /// The app version whose release notes were shown ("What's new"); empty = never.
+    [[nodiscard]] QString whatsNewSeenVersion() const;
+    void setWhatsNewSeenVersion(const QString& version);
     [[nodiscard]] QString userAgentOverride() const;
     void setUserAgentOverride(const QString& userAgent);
     [[nodiscard]] SignInUserAgent signInUserAgent() const;

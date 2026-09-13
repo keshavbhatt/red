@@ -868,6 +868,16 @@ void Settings::setVideoDecodeFallbackNotice(bool pending)
     storeBool(keys::kVideoDecodeFallbackNotice, false, pending);
 }
 
+QString Settings::whatsNewSeenVersion() const
+{
+    return stringValue(keys::kWhatsNewSeenVersion).trimmed();
+}
+
+void Settings::setWhatsNewSeenVersion(const QString& version)
+{
+    storeString(keys::kWhatsNewSeenVersion, version.trimmed());
+}
+
 QString Settings::userAgentOverride() const
 {
     return stringValue(keys::kUserAgentOverride).trimmed();
