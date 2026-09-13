@@ -35,6 +35,7 @@ endfunction()
 # core
 red_add_test(tst_settings            tst_settings.cpp            red_core)
 red_add_test(tst_legacy_account      tst_legacy_account.cpp      red_core)
+red_add_test(tst_daily_allowance     tst_daily_allowance.cpp     red_core)
 red_add_test(tst_changelog           tst_changelog.cpp           red_core)
 target_compile_definitions(tst_changelog PRIVATE
     RED_CHANGELOG_PATH="${PROJECT_SOURCE_DIR}/CHANGELOG.md"

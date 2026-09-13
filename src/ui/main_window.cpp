@@ -123,8 +123,10 @@ void MainWindow::setupUi()
 
     m_notifier = platform::createPlatformNotifier(this).release();
     m_notifications = new core::NotificationService(m_settings, m_notifier, nullptr, this);
-    m_license = new services::LicenseService(this);
+    m_license = new services::LicenseService(m_settings, this);
     connect(m_license, &services::LicenseService::upgradeRequested, this, &MainWindow::promptUpgrade);
+    connect(m_license, &services::LicenseService::downloadLimitReached, this,
+            &MainWindow::promptDownloadLimit);
     m_downloads = new DownloadsHub(m_settings, m_theme, *m_notifications, m_webView->profile().cookies(),
                                    *m_license, this, this);
     m_tray = new TrayController(m_settings, *m_actions, this);
@@ -674,6 +676,35 @@ void MainWindow::promptUpgrade(const QString& feature)
                   .arg(m_license->evaluationDays())
             : tr("%1 is part of Red Pro. Get Red Pro to unlock it, and every other Pro feature.")
                   .arg(feature);
+    if (MessageSheet::confirm(this, MessageSheet::Tone::Question, title, body, tr("View plans"),
+                              tr("Not now"))) {
+        showAccount();
+        m_accountDialog->highlightPurchase();
+    }
+}
+
+/// The free tier's daily download allowance is used up (or a playlist wants
+/// more than is left): explain, offer the plans.
+void MainWindow::promptDownloadLimit(int requested, int remaining)
+{
+    const int limit = services::LicenseService::kFreeDownloadsPerDay;
+    QString title;
+    QString body;
+    if (remaining <= 0) {
+        title = tr("Today's free downloads are used up");
+        body = tr("Red downloads up to %1 videos a day for free, and today's are used. Get Red Pro for "
+                  "unlimited "
+                  "downloads, or come back tomorrow.")
+                   .arg(limit);
+    } else {
+        title = tr("Not enough free downloads left today");
+        body =
+            tr("This playlist has %1 videos, but only %2 of today's %3 free downloads are left. Pick fewer "
+               "entries, or get Red Pro for unlimited downloads.")
+                .arg(requested)
+                .arg(remaining)
+                .arg(limit);
+    }
     if (MessageSheet::confirm(this, MessageSheet::Tone::Question, title, body, tr("View plans"),
                               tr("Not now"))) {
         showAccount();

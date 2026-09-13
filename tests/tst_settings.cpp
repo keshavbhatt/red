@@ -37,6 +37,12 @@ private Q_SLOTS:
         QVERIFY(m_settings->whatsNewSeenVersion().isEmpty());
         m_settings->setWhatsNewSeenVersion(u" 10.0.0 "_s);
         QCOMPARE(m_settings->whatsNewSeenVersion(), u"10.0.0"_s);
+        QVERIFY(m_settings->freeDownloads().day.isEmpty());
+        m_settings->setFreeDownloads({u"2026-09-13"_s, 3});
+        QCOMPARE(m_settings->freeDownloads().used, 3);
+        m_settings->resetToDefaults(); // the counter is not a preference
+        QCOMPARE(m_settings->freeDownloads().day, u"2026-09-13"_s);
+        QCOMPARE(m_settings->freeDownloads().used, 3);
         QCOMPARE(m_settings->defaultContainer(), Container::Mp4);
         QVERIFY(m_settings->tvFullscreen());
         QVERIFY(m_settings->tvGamepad());

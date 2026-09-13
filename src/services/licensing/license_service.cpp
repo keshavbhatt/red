@@ -10,11 +10,13 @@
 #include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
+#include <QDate>
 
 namespace red::services {
 
-LicenseService::LicenseService(QObject* parent)
+LicenseService::LicenseService(core::Settings& settings, QObject* parent)
     : QObject(parent)
+    , m_settings(settings)
     , m_manager(redLicenseConfig())
 {
     connect(&m_manager, &AccountLicenseManager::licenseCheckInProgressChanged, this, [this](bool inProgress) {
@@ -101,6 +103,33 @@ bool LicenseService::checkAccess(const QString& feature)
     }
     Q_EMIT upgradeRequested(feature);
     return false;
+}
+
+int LicenseService::downloadsRemainingToday() const
+{
+    if (m_status.hasPaidAccess || m_status.evaluationActive) {
+        return -1;
+    }
+    return m_settings.freeDownloads().remaining(kFreeDownloadsPerDay, QDate::currentDate());
+}
+
+bool LicenseService::canDownload(int items)
+{
+    const int remaining = downloadsRemainingToday();
+    if (remaining < 0 || items <= remaining) {
+        return true;
+    }
+    qCInfo(lcServices) << "free download allowance: asked" << items << "left" << remaining;
+    Q_EMIT downloadLimitReached(items, remaining);
+    return false;
+}
+
+void LicenseService::spendDownloads(int items)
+{
+    if (downloadsRemainingToday() < 0) {
+        return; // unlimited: nothing to count
+    }
+    m_settings.setFreeDownloads(m_settings.freeDownloads().spent(items, QDate::currentDate()));
 }
 
 QString LicenseService::checkoutUrl() const

@@ -236,8 +236,15 @@ Semantics: `status.active` = paid (Pro); `hasPaidAccess` = access (paid *or* eva
 `~/snap/red-app/{current,common}`; adopted only when nothing is stored yet, and mirrored back
 to `~/Downloads/.red.id`. Verified against the server with the owner's Red 9 id.
 
-**Gated**: downloads, all of them (owner decision) — one choke point,
-`DownloadsHub::requestDownload`, plus resume/retry. Nothing else is gated.
+**Gated**: downloads, but not outright (owner decision, 2026-09-13): the free tier gets
+**5 downloads a day** (`LicenseService::kFreeDownloadsPerDay`), paid and evaluation are
+unlimited. A playlist counts its selected entries. `core::DailyAllowance` (day + count, in
+`licensing/freeDownloads*` of the settings file, kept across *Reset all settings*) does the
+arithmetic; `LicenseService::canDownload` / `spendDownloads` are the choke points, called from
+`DownloadsHub::requestDownload` and the download dialog's admission check (`setAdmission`, so
+an oversized playlist keeps the dialog open to pick fewer entries). Resume and retry are never
+counted again. `MainWindow::promptDownloadLimit` explains and offers the plans. Nothing else
+is gated.
 
 **Never in release builds**: the `RED_DEBUG_LICENSE` override exists under `QT_DEBUG` only
 (a Debug tree lives in `build-debug/`); an env override in a shipped binary would be a bypass.

@@ -6,6 +6,7 @@
 #include <QDialog>
 #include <QUrl>
 
+#include <functional>
 #include <optional>
 
 class QButtonGroup;
@@ -57,6 +58,13 @@ public:
     void selectWholePlaylist();
     /// Limits a playlist download to entries from..to (1-based); no-op otherwise.
     void selectPlaylistRange(int from, int to);
+    /// How many videos the Download button would queue (playlist entries, or 1).
+    [[nodiscard]] int selectedEntryCount() const;
+    /// Asked with selectedEntryCount() when Download is pressed; a false answer
+    /// keeps the dialog open (the caller has explained why).
+    void setAdmission(std::function<bool(int)> admission);
+    /// What the Download button does: asks the admission check, then accepts.
+    void submit();
 
 private:
     void setupUi();
@@ -114,6 +122,7 @@ private:
     Scope m_scope = Scope::Video;
     bool m_probing = false;
     bool m_isPlaylist = false;
+    std::function<bool(int)> m_admission;
     bool m_wantPlaylist = false;
     QString m_folder;
 

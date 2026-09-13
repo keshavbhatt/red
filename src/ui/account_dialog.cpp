@@ -149,9 +149,19 @@ void AccountDialog::refresh()
         case Tier::Free:
             plan = tr("Free");
             color = t.muted;
-            hint = m_license.evaluationEnded()
-                       ? tr("Your evaluation has ended. Get Red Pro to unlock the Pro features again.")
-                       : tr("Get Red Pro to unlock every Pro feature and support development.");
+            {
+                const int left = std::max(0, m_license.downloadsRemainingToday());
+                const QString allowance =
+                    left == 1 ? tr("Red downloads up to %1 videos a day for free; 1 left today.")
+                                    .arg(services::LicenseService::kFreeDownloadsPerDay)
+                              : tr("Red downloads up to %1 videos a day for free; %2 left today.")
+                                    .arg(services::LicenseService::kFreeDownloadsPerDay)
+                                    .arg(left);
+                hint = allowance + u' ' +
+                       (m_license.evaluationEnded()
+                            ? tr("Your evaluation has ended. Get Red Pro for unlimited downloads.")
+                            : tr("Get Red Pro for unlimited downloads and to support development."));
+            }
             break;
         }
         if (m_license.checking()) {

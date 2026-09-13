@@ -92,6 +92,7 @@ void AboutDialog::setupUi()
     links->addWidget(linkButton(tr("Online guide"), links::kGuide));
     links->addWidget(linkButton(tr("Report a bug"), links::kIssues));
     links->addWidget(linkButton(tr("Donate"), kDonateUrl));
+    links->addWidget(linkButton(tr("More apps"), links::kMoreApps));
     links->addStretch(1);
     root->addLayout(links);
 

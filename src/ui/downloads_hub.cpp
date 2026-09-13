@@ -185,9 +185,9 @@ void DownloadsHub::requestDownload(const QUrl& url, bool audioOnly)
         qCInfo(lcUi) << "not a downloadable YouTube URL:" << url;
         return;
     }
-    // Downloads are a Pro feature (free during the evaluation): the gate
-    // prompt takes over when there is no access.
-    if (!m_license.checkAccess(tr("Downloading videos"))) {
+    // The free tier gets a few downloads a day; the limit prompt takes over
+    // when they are used up (paid and evaluation: unlimited).
+    if (!m_license.canDownload(1)) {
         return;
     }
     if (m_engine->isReady()) {
@@ -221,7 +221,11 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     }
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     m_openDialogs.insert(url.toString(), dialog);
+    // A playlist may ask for more than the free tier has left today: the
+    // dialog stays open so fewer entries can be picked.
+    dialog->setAdmission([this](int items) { return m_license.canDownload(items); });
     connect(dialog, &QDialog::accepted, this, [this, dialog] {
+        m_license.spendDownloads(dialog->selectedEntryCount());
         const quint64 id = m_queue->add(dialog->job());
         qCInfo(lcUi) << "queued download" << id << dialog->job().url;
     });
@@ -252,7 +256,7 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
                                              kind.endsWith(u"-subtitles"_s) || kind.endsWith(u"-inspect"_s) ||
                                              (kind.endsWith(u"-playlist"_s) && range.isEmpty());
                     if (!inspectOnly) {
-                        QTimer::singleShot(1500, dialog, &QDialog::accept);
+                        QTimer::singleShot(1500, dialog, &DownloadDialog::submit);
                     } else if (kind.endsWith(u"-subtitles"_s)) {
                         if (auto* picker = dialog->findChild<QComboBox*>(u"subtitles"_s)) {
                             QTimer::singleShot(1500, picker, &QComboBox::showPopup);
@@ -327,9 +331,7 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
     switch (action) {
     case DownloadCardDelegate::Action::PauseResume:
         if (job->state == core::DownloadState::Paused) {
-            if (m_license.checkAccess(tr("Downloading videos"))) {
-                m_queue->resume(jobId);
-            }
+            m_queue->resume(jobId); // already counted when it was queued
         } else {
             m_queue->pause(jobId);
         }
@@ -338,9 +340,7 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
         m_queue->cancel(jobId);
         break;
     case DownloadCardDelegate::Action::Retry:
-        if (m_license.checkAccess(tr("Downloading videos"))) {
-            m_queue->retry(jobId);
-        }
+        m_queue->retry(jobId);
         break;
     case DownloadCardDelegate::Action::Open:
         if (!job->primaryFile().isEmpty()) {

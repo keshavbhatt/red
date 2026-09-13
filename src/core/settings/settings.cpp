@@ -878,6 +878,17 @@ void Settings::setWhatsNewSeenVersion(const QString& version)
     storeString(keys::kWhatsNewSeenVersion, version.trimmed());
 }
 
+DailyAllowance Settings::freeDownloads() const
+{
+    return {stringValue(keys::kFreeDownloadsDay), intValue(keys::kFreeDownloadsUsed, 0)};
+}
+
+void Settings::setFreeDownloads(const DailyAllowance& allowance)
+{
+    storeString(keys::kFreeDownloadsDay, allowance.day);
+    storeInt(keys::kFreeDownloadsUsed, 0, allowance.used);
+}
+
 QString Settings::userAgentOverride() const
 {
     return stringValue(keys::kUserAgentOverride).trimmed();
@@ -913,10 +924,12 @@ void Settings::sync()
 
 void Settings::resetToDefaults()
 {
+    const DailyAllowance downloads = freeDownloads(); // not a preference: survives the reset
     const QStringList allKeys = m_store->allKeys();
     for (const QString& key : allKeys) {
         m_store->remove(key);
     }
+    setFreeDownloads(downloads);
     m_store->sync();
     Q_EMIT closeActionChanged(closeAction());
     Q_EMIT showRailChanged(showRail());

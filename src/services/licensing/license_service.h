@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AccountLicenseManager.h"
+#include "core/settings/settings.h"
 
 #include <QObject>
 #include <QString>
@@ -9,7 +10,9 @@ namespace red::services {
 
 /// Account and licence state for the app (one instance, owned by the window):
 /// wraps AccountLicenseManager, migrates a Red 9 account ID on first run, and
-/// is the single gate every Pro feature asks (`checkAccess`).
+/// is the single gate every Pro feature asks (`checkAccess`). Downloads are
+/// not gated outright: the free tier gets kFreeDownloadsPerDay a day
+/// (`canDownload` / `spendDownloads`), paid and evaluation are unlimited.
 class LicenseService : public QObject
 {
     Q_OBJECT
@@ -24,7 +27,9 @@ public:
     };
     Q_ENUM(Tier)
 
-    explicit LicenseService(QObject* parent = nullptr);
+    static constexpr int kFreeDownloadsPerDay = 5;
+
+    LicenseService(core::Settings& settings, QObject* parent = nullptr);
     ~LicenseService() override;
 
     /// Loads or migrates the account ID and starts the first status check.
@@ -47,6 +52,14 @@ public:
     /// True when `feature` may run; otherwise emits upgradeRequested(feature).
     bool checkAccess(const QString& feature);
 
+    /// Downloads still allowed today; -1 = unlimited (paid or evaluation).
+    [[nodiscard]] int downloadsRemainingToday() const;
+    /// True when `items` more videos may be queued today; otherwise emits
+    /// downloadLimitReached(items, remaining). Does not count them.
+    bool canDownload(int items);
+    /// Counts `items` queued videos against today's free allowance.
+    void spendDownloads(int items);
+
     [[nodiscard]] QString checkoutUrl() const;
     [[nodiscard]] QString portalUrl() const;
     /// Re-verifies with the server now (the "Refresh" button).
@@ -56,8 +69,11 @@ Q_SIGNALS:
     void statusChanged();
     void checkingChanged(bool checking);
     void upgradeRequested(const QString& feature);
+    /// The free tier asked for more than today allows.
+    void downloadLimitReached(int requested, int remaining);
 
 private:
+    core::Settings& m_settings;
     AccountLicenseManager m_manager;
     AccountLicenseManager::LicenseStatus m_status;
     QString m_accountId;

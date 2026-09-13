@@ -32,6 +32,8 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
@@ -529,7 +531,7 @@ QWidget* DownloadDialog::buildFooter()
     m_download->setProperty("redPrimary", true);
     m_download->setEnabled(false);
     m_download->setDefault(true);
-    connect(m_download, &QPushButton::clicked, this, &QDialog::accept);
+    connect(m_download, &QPushButton::clicked, this, &DownloadDialog::submit);
     buttons->addWidget(m_download);
     layout->addLayout(buttons);
     return footer;
@@ -984,6 +986,34 @@ core::DownloadOptions::Kind DownloadDialog::kind() const
 }
 
 // ---- result ----------------------------------------------------------------
+
+int DownloadDialog::selectedEntryCount() const
+{
+    if (!m_isPlaylist) {
+        return 1;
+    }
+    int selected = 0;
+    for (int i = 0; i < m_entries->count(); ++i) {
+        selected += m_entries->item(i)->checkState() == Qt::Checked ? 1 : 0;
+    }
+    if (m_entries->count() == 0) { // entry list not shown: the whole thing
+        selected = std::max(m_info.entryCount, static_cast<int>(m_info.entries.size()));
+    }
+    return std::max(1, selected);
+}
+
+void DownloadDialog::setAdmission(std::function<bool(int)> admission)
+{
+    m_admission = std::move(admission);
+}
+
+void DownloadDialog::submit()
+{
+    if (m_admission && !m_admission(selectedEntryCount())) {
+        return;
+    }
+    accept();
+}
 
 QString DownloadDialog::playlistItemsSpec() const
 {

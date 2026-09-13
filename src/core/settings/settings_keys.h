@@ -13,6 +13,8 @@ inline constexpr QLatin1StringView kSettingsDialogGeometry{"window/settingsDialo
 inline constexpr QLatin1StringView kCloseAction{"window/closeAction"};
 inline constexpr QLatin1StringView kShowRail{"window/showRail"};
 inline constexpr QLatin1StringView kWhatsNewSeenVersion{"window/whatsNewSeenVersion"};
+inline constexpr QLatin1StringView kFreeDownloadsDay{"licensing/freeDownloadsDay"};
+inline constexpr QLatin1StringView kFreeDownloadsUsed{"licensing/freeDownloadsUsed"};
 inline constexpr QLatin1StringView kLastMode{"window/lastMode"};
 inline constexpr QLatin1StringView kLastUrl{"window/lastUrl"};
 inline constexpr QLatin1StringView kDownloadsPanelOpen{"window/downloadsPanelOpen"};

@@ -99,6 +99,9 @@ WhatsNewDialog::WhatsNewDialog(const QString& version, const QString& notesMarkd
 
     auto* buttons = new QHBoxLayout;
     buttons->addStretch(1);
+    auto* guide = new QPushButton(tr("Guide"), this);
+    connect(guide, &QPushButton::clicked, this, [] { platform::openUrl(links::kGuide); });
+    buttons->addWidget(guide);
     auto* full = new QPushButton(tr("Full changelog"), this);
     connect(full, &QPushButton::clicked, this, [] { platform::openUrl(links::kChangelog); });
     buttons->addWidget(full);

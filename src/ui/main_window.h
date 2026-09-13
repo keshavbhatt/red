@@ -90,6 +90,7 @@ private:
     void handlePermissionPrompt(const QWebEnginePermission& permission);
     void installScriptDialogs();
     void promptUpgrade(const QString& feature);
+    void promptDownloadLimit(int requested, int remaining);
     void handleTvSignal(const QString& signal, const QString& argument);
     void clearCache();
     void confirmClearSession();

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/licensing/daily_allowance.h"
+
 #include <QByteArray>
 #include <QDateTime>
 #include <QHash>
@@ -280,6 +282,9 @@ public:
     /// The app version whose release notes were shown ("What's new"); empty = never.
     [[nodiscard]] QString whatsNewSeenVersion() const;
     void setWhatsNewSeenVersion(const QString& version);
+    /// The free tier's download counter (day + count); see services::LicenseService.
+    [[nodiscard]] DailyAllowance freeDownloads() const;
+    void setFreeDownloads(const DailyAllowance& allowance);
     [[nodiscard]] QString userAgentOverride() const;
     void setUserAgentOverride(const QString& userAgent);
     [[nodiscard]] SignInUserAgent signInUserAgent() const;

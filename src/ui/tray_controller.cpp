@@ -7,12 +7,17 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QFontMetrics>
 #include <QMenu>
 #include <QSystemTrayIcon>
 
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
+
+namespace {
+constexpr int kNowPlayingWidth = 260; ///< px; about 40 characters of menu text
+}
 
 TrayController::TrayController(core::Settings& settings, Actions& actions, QObject* parent)
     : QObject(parent)
@@ -94,8 +99,12 @@ void TrayController::setMediaState(const core::MediaState& state)
 {
     m_media = state;
     const bool has = state.hasMedia();
-    m_nowPlaying->setText(has ? (state.title.isEmpty() ? tr("Now playing") : state.title)
+    // A long title would stretch the whole menu: elide it to a sensible width.
+    const QString title = state.title.isEmpty() ? tr("Now playing") : state.title;
+    const QFontMetrics metrics(m_menu->font());
+    m_nowPlaying->setText(has ? metrics.elidedText(title, Qt::ElideRight, kNowPlayingWidth)
                               : tr("Nothing playing"));
+    m_nowPlaying->setToolTip(has ? title : QString());
     m_actions.playPause->setText(state.isPlaying() ? tr("Pause") : tr("Play"));
     m_actions.playPause->setEnabled(has);
     m_actions.next->setEnabled(has && state.canGoNext);
