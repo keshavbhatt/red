@@ -6,7 +6,7 @@ base: core24
 compression: lzo
 
 title: Red
-summary: YouTube in a real desktop app, with a TV mode, ad blocking and downloads
+summary: YouTube, in a real desktop app
 website: https://github.com/keshavbhatt/red
 issues: https://github.com/keshavbhatt/red/issues
 license: Proprietary

@@ -128,8 +128,8 @@ void EngineSetupDialog::refresh(const services::EngineManager::Status& s)
     const bool engineReady = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty();
     glyph(m_ytdlpGlyph, engineReady, busy);
     glyph(m_ffmpegGlyph, !s.ffmpegPath.isEmpty(), busy);
-    m_ytdlpText->setText(s.ytdlpPath.isEmpty()   ? tr("will be downloaded (~45 MB)")
-                         : s.jsRuntime.isEmpty() ? tr("a component will be downloaded (~3 MB)")
+    m_ytdlpText->setText(s.ytdlpPath.isEmpty()   ? tr("will be downloaded")
+                         : s.jsRuntime.isEmpty() ? tr("a component will be downloaded")
                          : s.systemYtdlp         ? tr("from this system")
                                                  : tr("version %1").arg(s.ytdlpVersion));
     m_ffmpegText->setText(

@@ -101,7 +101,7 @@ def banner(dialog, size=(2160, 720)):
     img.alpha_composite(logo, (x0, 118))
     d.text((x0 + 180, 96), "Red", font=font(FONT_BOLD, 150), fill=(255, 255, 255))
     d.text((x0, 300), "YouTube, in a real desktop app.", font=font(FONT_REG, 54), fill=(255, 255, 255))
-    d.text((x0, 380), "Native and lightweight — built with Qt 6.",
+    d.text((x0, 380), "Native and lightweight.",
            font=font(FONT_REG, 30), fill=(255, 200, 200))
     # Translucent pills need their own layer: ImageDraw writes alpha, it does not blend.
     pf = font(FONT_MED, 27)
@@ -134,9 +134,8 @@ def main(raw):
         ("04-blocking", "blocking", "Ads gone, sponsors skipped", "Ads stripped before YouTube renders them, SponsorBlock per category, dislikes back, Shorts hidden."),
     ]
     for name, key, head, sub in plan:
-        shot = shots[key]
-        for folder, size in ((out, (1280, 800)), (store, (1600, 1000))):
-            compose(shot, head, sub, size=size).save(folder / f"{name}.png", optimize=True)
+        compose(shots[key], head, sub).save(out / f"{name}.png", optimize=True)
+        compose(shots[key], head, sub, size=(1600, 1000)).save(store / f"{name}.png", optimize=True)
     banner(shots["download-dialog"]).save(out / "banner.png", optimize=True)
     for f in sorted(out.glob("*.png")) + sorted(store.glob("*.png")):
         print(f.relative_to(ROOT), Image.open(f).size, f.stat().st_size // 1024, "KB")

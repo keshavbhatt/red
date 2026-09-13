@@ -15,7 +15,7 @@ git -C "$DEST" rm -rqf --ignore-unmatch images snap snap_launcher icon.png
 
 mkdir -p "$DEST/screenshots"
 cp "$DIR/packaging/public/README.md" "$DEST/README.md"
-cp "$DIR/LICENSE" "$DEST/LICENSE"
+cp "$DIR/packaging/public/LICENSE" "$DEST/LICENSE"
 cp "$DIR/CHANGELOG.md" "$DEST/CHANGELOG.md"
 cp -r "$DIR/screenshots"/. "$DEST/screenshots/"
 cp "$DIR/src/resources/icons/hicolor/512x512/apps/com.ktechpit.red.png" "$DEST/icon.png"

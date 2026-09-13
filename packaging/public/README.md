@@ -67,6 +67,11 @@ sudo snap install red-app
   </tr>
 </table>
 
+## About this repository
+
+This repository is Red's public home: the README, screenshots, changelog, releases and the
+issue tracker. Red is closed source; the application's code is not published here.
+
 ## Support
 
 Bugs and requests: [issues](https://github.com/keshavbhatt/red/issues). Please attach the

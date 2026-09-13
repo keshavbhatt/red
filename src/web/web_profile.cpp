@@ -68,6 +68,12 @@ WebProfile::WebProfile(core::Settings& settings, const QString& appVersion, QObj
     // persisted cookie, and before configureStorage() that store is empty
     // (the sign-in would never reach yt-dlp, ADR-006).
     m_cookies = std::make_unique<CookieExporter>(cookieStore(), persistentStoragePath() + u"/Cookies"_s);
+    // Reconcile YouTube's PREF with our theme now: the exporter has read the
+    // persisted cookies, so the other PREF flags are known and kept, and the
+    // cookieChanged hook below only fires when YouTube rewrites the cookie
+    // (a fresh profile, or a theme changed since the last run, would
+    // otherwise show the wrong page theme) (ADR-009).
+    applyThemeCookie();
     configureUserAgent();
     configureAttributes();
     configureBlocking();
