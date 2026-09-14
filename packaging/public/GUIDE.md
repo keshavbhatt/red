@@ -225,7 +225,8 @@ Press **Ctrl+,** or the rail's gear.
   window does, tray icon, side rail, download notifications.
 - **Appearance**: theme, page zoom, interface scale.
 - **Playback**: autoplay, preferred codec, hardware decoding, screen and background playback,
-  mini player size.
+  a playback progress bar behind Red's taskbar entry (off by default; Plasma and Unity-style
+  docks draw it), mini player size.
 - **Blocking**: see [Blocking](#blocking).
 - **Downloads**: see [Downloads](#downloads).
 - **TV mode**: see [TV mode](#tv-mode).
