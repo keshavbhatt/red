@@ -22,8 +22,9 @@ Red 10 is a redesigned Red on Qt 6.11 and Qt WebEngine, taking over from the Qt 
   retry, notifications with *Show in folder*, and the app's own YouTube sign-in reused for
   age-restricted or rate-limited videos. Playlists are detected from any watch link.
 - **Desktop integration**: media keys, MPRIS, a tray icon with playback controls, screen kept
-  awake while playing, a mini player, single instance (`red <link>`, `red --download <link>`),
-  desktop actions for TV mode, downloads and settings.
+  awake while playing, an optional playback progress bar behind the taskbar entry, a mini
+  player, single instance (`red <link>`, `red --download <link>`), desktop actions for TV mode,
+  Music mode, downloads and settings.
 - **Sign-in** through Google's page inside the app, with the identity Google accepts.
 - **New design**: a side rail, a downloads panel, and dialogs that follow YouTube's
   light and dark themes (system, light or dark, applied to the page too).
