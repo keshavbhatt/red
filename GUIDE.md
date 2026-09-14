@@ -9,6 +9,7 @@ open it from inside the app at any time: the **⋯** menu on the side rail → *
 - [The window](#the-window)
 - [Watching](#watching)
 - [TV mode](#tv-mode)
+- [Music mode](#music-mode)
 - [Blocking](#blocking)
 - [Downloads](#downloads)
 - [Settings](#settings)
@@ -41,7 +42,8 @@ or Esc to close it. The full history is in the [changelog](CHANGELOG.md).
 
 Red shows the YouTube site with a slim rail on the left. From top to bottom the rail has the
 Red logo (**Home**), **Back**, **Forward** and **Reload**, then **Download this** (the current video, playlist or
-channel), **Downloads** (opens the queue beside the page), **Mini player**, **TV mode**, and at
+channel), **Downloads** (opens the queue beside the page), **Mini player**, **TV mode**,
+**Music mode**, and at
 the bottom **Settings** and the **⋯** menu.
 
 <img src="screenshots/guide/menu.png" alt="The ⋯ menu" width="283">
@@ -105,6 +107,26 @@ back, **LT / RT** seek. Plug it in before or after starting Red; nothing needs p
 
 *Settings → TV mode* can start Red in TV mode, keep it windowed, hide Shorts, allow resolutions
 above the screen size and use the lighter low-memory interface.
+
+## Music mode
+
+![Music mode](screenshots/guide/music.png)
+
+**Ctrl+M** (or the rail button) switches the window to YouTube Music. Your sign-in carries
+over, and so does the video you were watching, as its track. Music keeps playing while you
+browse your library, playlists and search results, and the tray, media keys and the desktop's
+media controls follow along with the album name and cover. Ctrl+M switches back; Ctrl+T goes
+straight to TV mode.
+
+What changes in Music mode:
+
+- **Ctrl+D** downloads the track that is playing, from any page, with *Audio only* preselected.
+  Playlist pages download as a whole. Choosing *Video* here does not change the default the
+  other modes use.
+- The mini player is off (YouTube Music has its own player bar), and the screen is allowed to
+  sleep while music plays.
+- Links to YouTube Music from the desktop site open here instead of in a separate window, and
+  `red --music` starts Red in this mode. The mode is remembered across launches like TV mode.
 
 ## Blocking
 
@@ -207,6 +229,7 @@ Press **Ctrl+,** or the rail's gear.
 - **Blocking**: see [Blocking](#blocking).
 - **Downloads**: see [Downloads](#downloads).
 - **TV mode**: see [TV mode](#tv-mode).
+- **Music mode** has no settings page; see [Music mode](#music-mode).
 - **Advanced**: hardware acceleration, the identity used on Google's sign-in pages, a custom
   user agent, clear cache, sign out and clear the session, reset site permissions (microphone,
   camera, location), the log folder, diagnostics, and *Reset all settings* (keeps your sign-in
@@ -229,6 +252,7 @@ Press **Ctrl+,** or the rail's gear.
 | Ctrl+J | Downloads panel |
 | Ctrl+Shift+M | Mini player |
 | Ctrl+T | TV mode |
+| Ctrl+M | Music mode |
 | F11 | Full screen |
 | Ctrl++ / Ctrl+- / Ctrl+0 | Zoom in / out / reset |
 | Ctrl+W | Hide the window (to the tray) |
@@ -245,6 +269,7 @@ YouTube's own player keys keep working while the page has focus: **K** play / pa
 red <youtube-link>       open the link in the running window (or start Red with it)
 red --download <link>    queue a download
 red --tv                 start in TV mode
+red --music              start in Music mode (YouTube Music)
 red --settings           open the settings
 red --quit               quit the running instance
 red --profile <name>     a separate profile: own sign-in, settings and downloads

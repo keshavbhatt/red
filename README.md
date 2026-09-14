@@ -29,8 +29,10 @@ sudo snap install red-app
 
 ## Features
 
-**Two modes**
+**Three modes**
 - **Desktop**: the full YouTube site, signed in, themed light / dark / system.
+- **Music** (Ctrl+M): YouTube Music in the same window, playing on while you browse, with media
+  keys, tray and desktop media controls, and audio downloads one click away.
 - **TV** (Ctrl+T): YouTube's smart-TV interface with keyboard, mouse and gamepad control,
   full screen by default.
 
