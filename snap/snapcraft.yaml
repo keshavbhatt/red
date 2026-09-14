@@ -71,11 +71,7 @@ apps:
     extensions:
       - kde-neon-6
     environment:
-      # ffmpeg for the download engine comes from the ffmpeg-2404 content snap
-      # (ADR-004): nothing is staged, nothing is downloaded.
       PATH: $SNAP/ffmpeg-platform/usr/bin:$PATH
-      # CRAFT_ARCH_TRIPLET_BUILD_FOR is expanded at pack time (as in the
-      # ultimate-media-downloader snap).
       LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$LD_LIBRARY_PATH
     plugs:
       - ffmpeg-2404
@@ -94,8 +90,7 @@ apps:
       - audio-record
       - removable-media
       - screen-inhibit-control
-      # joystick: gamepads in TV mode (Chromium's Gamepad API reads /dev/input).
-      - joystick
+      - joystick # gamepads in TV mode
 
 plugs:
   ffmpeg-2404:
@@ -104,10 +99,7 @@ plugs:
     default-provider: ffmpeg-2404
 
 parts:
-  # JavaScript runtime for the download engine (yt-dlp needs one since 2025,
-  # ADR-004). Deno is yt-dlp's recommended runtime; with it in $SNAP/usr/bin
-  # the app never downloads QuickJS. Same release and checksums as the
-  # Flatpak manifest (packaging/flatpak/deno.yaml).
+  # JavaScript runtime for the download engine
   deno:
     plugin: nil
     build-packages:
@@ -141,23 +133,18 @@ parts:
       - libdrm-dev
     stage-packages:
       - libdrm2
-      # libqxcb links against it; without it the snap does not start.
-      - libxcb-shape0
-      # OpenType coverage for confined Qt (the snap ships no host fonts).
+      - libxcb-shape0 # libqxcb needs it
       - fonts-noto-core
-      # No ffmpeg package: the ffmpeg-2404 content snap provides the binary.
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DRED_BUILD_TESTS=OFF
     override-build: |
       craftctl default
-      # One source of truth for the version: the CMake project, not the
-      # metainfo release list (parse-info still supplies summary/description).
+      # version from the CMake project
       VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2)
       craftctl set version="${VER}"
-      # Store icon; the desktop file keeps its stock Icon name, which the
-      # kde-neon-6 extension resolves from the snap's hicolor tree.
+      # store icon
       mkdir -p "${CRAFT_PART_INSTALL}/meta/gui"
       cp "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/512x512/apps/com.ktechpit.red.png" \
          "${CRAFT_PART_INSTALL}/meta/gui/icon.png"
