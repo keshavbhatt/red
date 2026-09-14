@@ -15,6 +15,7 @@ struct CliOptions
 {
     QString profile;                 ///< --profile <name>; empty = default
     bool tvMode = false;             ///< --tv
+    bool musicMode = false;          ///< --music
     std::optional<QString> logFile;  ///< --log-file <path>; nullopt = default location
     bool noLogFile = false;          ///< --no-log-file
     std::optional<QString> download; ///< --download <url>
@@ -53,6 +54,7 @@ inline constexpr auto kRaise = "raise";
 inline constexpr auto kOpen = "open";
 inline constexpr auto kDownload = "download";
 inline constexpr auto kTv = "tv";
+inline constexpr auto kMusic = "music";
 inline constexpr auto kSettings = "settings";
 inline constexpr auto kQuit = "quit";
 } // namespace cmd

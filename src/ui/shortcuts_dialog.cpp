@@ -72,7 +72,8 @@ ShortcutsDialog::ShortcutsDialog(const Actions& a, const core::ThemeService& the
     // Left column: getting around and the window. Right: media and downloads.
     addGroup(left, tr("Navigate"), rows({a.home, a.back, a.forward, a.reload, a.copyLink}));
     addGroup(left, tr("View"),
-             rows({a.tvMode, a.miniPlayer, a.fullScreen, a.zoomIn, a.zoomOut, a.zoomReset, a.showHide}));
+             rows({a.tvMode, a.musicMode, a.miniPlayer, a.fullScreen, a.zoomIn, a.zoomOut, a.zoomReset,
+                   a.showHide}));
     addGroup(left, tr("App"), rows({a.settings, a.shortcuts, a.quit}));
     addGroup(right, tr("Downloads"), rows({a.download, a.downloadUrl, a.downloads}));
     addGroup(right, tr("Playback"), rows({a.playPause, a.next, a.previous}));

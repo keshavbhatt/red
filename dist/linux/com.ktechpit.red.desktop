@@ -1,22 +1,26 @@
 [Desktop Entry]
 Name=Red
 GenericName=YouTube Client
-Comment=YouTube client with TV mode, ad blocker, SponsorBlock and downloads
+Comment=YouTube and YouTube Music client with TV mode, ad blocker, SponsorBlock and downloads
 Icon=com.ktechpit.red
 Exec=red %U
 Terminal=false
 Type=Application
 Categories=AudioVideo;Video;Player;Qt;
-Keywords=YouTube;Video;TV;Downloader;Download;Adblock;SponsorBlock;Player;Leanback;Music;MP3;
+Keywords=YouTube;YouTube Music;Video;TV;Downloader;Download;Adblock;SponsorBlock;Player;Leanback;Music;MP3;
 StartupWMClass=red
 StartupNotify=true
 X-GNOME-UsesNotifications=true
 
-Actions=TvMode;Download;Settings;
+Actions=TvMode;Music;Download;Settings;
 
 [Desktop Action TvMode]
 Name=Open in TV mode
 Exec=red --tv
+
+[Desktop Action Music]
+Name=Open YouTube Music
+Exec=red --music
 
 [Desktop Action Download]
 Name=Download from a link…

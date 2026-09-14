@@ -35,6 +35,9 @@ private Q_SLOTS:
             effectiveUserAgent(u"engine QtWebEngine/6.11.1"_s, u"  custom  "_s, AppMode::Desktop, u"10"_s),
             u"custom"_s);
         QVERIFY(effectiveUserAgent(u"engine"_s, QString(), AppMode::Tv, u"10"_s).contains(u"Cobalt/19"_s));
+        // Music mode is the desktop site's sibling: same identity, never Cobalt.
+        QCOMPARE(effectiveUserAgent(u"engine QtWebEngine/6.11.1"_s, QString(), AppMode::Music, u"10"_s),
+                 effectiveUserAgent(u"engine QtWebEngine/6.11.1"_s, QString(), AppMode::Desktop, u"10"_s));
         // The Firefox identity is a per-host header, never the profile UA.
         QVERIFY(red::web::signInUserAgent(SignInUserAgent::Firefox, QString()).contains(u"Firefox/"_s));
         QVERIFY(red::web::signInUserAgent(SignInUserAgent::Chrome, QString()).isEmpty());

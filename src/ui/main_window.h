@@ -4,6 +4,9 @@
 
 #include <QMainWindow>
 #include <QPointer>
+#include <QUrl>
+
+#include <optional>
 
 class QShortcut;
 class QSplitter;
@@ -47,15 +50,16 @@ public:
                QWidget* parent = nullptr);
     ~MainWindow() override;
 
-    /// Shows the window (honouring the start mode and --tv).
-    void start(bool tvMode);
+    /// Shows the window in `requested` (--tv / --music), else the remembered mode.
+    void start(std::optional<core::AppMode> requested);
 
 public Q_SLOTS:
     void showAndRaise();
     void toggleVisibility();
     void openUrl(const QString& url);
     void downloadUrl(const QString& url);
-    void setTvMode(bool on);
+    /// Switches Desktop / TV / Music (ADR-001, ADR-013); `target` is loaded in the new mode.
+    void setMode(core::AppMode mode, std::optional<QUrl> target = std::nullopt);
     void showSettings();
     void showShortcuts();
     void showAbout();
@@ -86,6 +90,9 @@ private:
     void setMiniPlayer(bool on);
     void setDownloadsPanelVisible(bool visible);
     void applyChrome();
+    void syncModeActions();
+    void requestDownload(const QUrl& url);
+    void applyPageBackground();
     void handleRenderProcessGaveUp();
     void handlePermissionPrompt(const QWebEnginePermission& permission);
     void installScriptDialogs();

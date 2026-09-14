@@ -30,10 +30,12 @@ public:
 
 Q_SIGNALS:
     void popupOpened(QWidget* window);
+    /// A new window was asked for a YouTube Music page (the masthead app
+    /// picker): the main view switches to Music mode instead.
+    void musicUrlRequested(const QUrl& url);
 
 protected:
     bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
-    QWebEnginePage* createWindow(WebWindowType type) override;
     void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber,
                                   const QString& sourceId) override;
     void javaScriptAlert(const QUrl& securityOrigin, const QString& msg) override;

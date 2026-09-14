@@ -1,6 +1,7 @@
 #include "web/popup_window.h"
 
 #include "core/navigation_policy.h"
+#include "core/youtube_url.h"
 #include "platform/file_manager.h"
 #include "web/full_screen_hint.h"
 #include "web/logging.h"
@@ -30,6 +31,12 @@ public:
 protected:
     bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override
     {
+        if (isMainFrame && core::isYouTubeMusicHost(url.host())) {
+            qCInfo(lcWeb) << "popup -> Music mode:" << url;
+            Q_EMIT m_window->musicUrlRequested(url);
+            m_window->close();
+            return false;
+        }
         if (isMainFrame && core::shouldOpenExternally(url)) {
             qCInfo(lcWeb) << "popup → system browser:" << url;
             platform::openUrl(url.toString());

@@ -34,6 +34,7 @@ namespace {
 const QUrl kHomeUrl(u"https://www.youtube.com/"_s);
 const QUrl kSubscriptionsUrl(u"https://www.youtube.com/feed/subscriptions"_s);
 const QUrl kTvUrl(u"https://www.youtube.com/tv"_s);
+const QUrl kMusicUrl(u"https://music.youtube.com/"_s);
 } // namespace
 
 WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QString& appVersion,
@@ -58,6 +59,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
     m_permissions->attach(*m_page);
     connect(m_permissions, &PermissionController::promptRequested, this, &WebView::permissionPromptRequested);
     connect(m_page, &WebPage::popupOpened, this, &WebView::wirePopup);
+    connect(m_page, &WebPage::musicUrlRequested, this, &WebView::musicUrlRequested);
 
     connect(&m_settings, &core::Settings::zoomFactorChanged, this, [this](double) { applyZoom(); });
     connect(m_page, &QWebEnginePage::renderProcessTerminated, this, &WebView::handleRenderProcessTerminated);
@@ -70,8 +72,12 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
                 m_showingError = false;
             }
             m_crashPolicy.onLoadSucceeded();
-            if (m_profile->mode() == core::AppMode::Desktop && !m_showingError) {
+            if (m_showingError) {
+                // an error page is not a place to come back to
+            } else if (m_profile->mode() == core::AppMode::Desktop) {
                 m_settings.setLastUrl(url().toString());
+            } else if (m_profile->mode() == core::AppMode::Music && core::isYouTubeMusicHost(url().host())) {
+                m_settings.setLastMusicUrl(url().toString());
             }
         }
     });
@@ -122,12 +128,20 @@ QUrl WebView::startUrl() const
     if (m_profile->mode() == core::AppMode::Tv) {
         return kTvUrl;
     }
+    if (m_profile->mode() == core::AppMode::Music) {
+        const QUrl last(m_settings.lastMusicUrl());
+        if (m_settings.startPage() == core::StartPage::LastVisited && last.isValid() &&
+            core::isYouTubeMusicHost(last.host())) {
+            return last;
+        }
+        return kMusicUrl;
+    }
     switch (m_settings.startPage()) {
     case core::StartPage::Subscriptions:
         return kSubscriptionsUrl;
     case core::StartPage::LastVisited: {
         const QUrl last(m_settings.lastUrl());
-        if (last.isValid() && core::isYouTubeHost(last.host())) {
+        if (last.isValid() && core::isYouTubeHost(last.host()) && !core::isYouTubeMusicHost(last.host())) {
             return last;
         }
         return kHomeUrl;
@@ -148,21 +162,27 @@ core::AppMode WebView::mode() const
     return m_profile->mode();
 }
 
-void WebView::setMode(core::AppMode mode)
+void WebView::setMode(core::AppMode mode, std::optional<QUrl> target)
 {
     if (mode == m_profile->mode()) {
         // The profile already starts in the remembered mode; the first
         // "switch" into it at startup still has to load the page.
-        if (url().isEmpty()) {
+        if (target) {
+            openYouTubeUrl(*target);
+        } else if (url().isEmpty()) {
             loadStart();
         }
         return;
     }
-    // Carry the video across: a watch page becomes the Leanback route and back.
+    // Carry the video across: a watch page becomes the Leanback route, the
+    // YouTube Music track, or the desktop watch page.
     const std::optional<QUrl> current = core::canonicalVideoUrl(url());
     const QString videoId = current ? core::classifyYouTubeUrl(*current).videoId : m_media.videoId;
     m_profile->setMode(mode);
-    if (!videoId.isEmpty()) {
+    Q_EMIT modeChanged(mode);
+    if (target) {
+        openYouTubeUrl(*target);
+    } else if (!videoId.isEmpty()) {
         openYouTubeUrl(QUrl(u"https://www.youtube.com/watch?v="_s + videoId));
     } else {
         loadStart();
@@ -182,22 +202,49 @@ void WebView::openYouTubeUrl(const QUrl& url)
         load(kTvUrl);
         return;
     }
+    if (m_profile->mode() == core::AppMode::Music && !core::isYouTubeMusicHost(url.host())) {
+        if (info.kind == core::YouTubeUrlKind::Video) {
+            load(core::musicVideoUrl(info.videoId, info.playlistId));
+            return;
+        }
+        if (info.kind == core::YouTubeUrlKind::Playlist) {
+            load(QUrl(u"https://music.youtube.com/playlist?list="_s + info.playlistId));
+            return;
+        }
+        load(kMusicUrl);
+        return;
+    }
     load(url);
 }
 
 void WebView::goHome()
 {
-    load(m_profile->mode() == core::AppMode::Tv ? kTvUrl : kHomeUrl);
+    switch (m_profile->mode()) {
+    case core::AppMode::Tv:
+        load(kTvUrl);
+        return;
+    case core::AppMode::Music:
+        load(kMusicUrl);
+        return;
+    case core::AppMode::Desktop:
+        break;
+    }
+    load(kHomeUrl);
 }
 
 void WebView::handleUrlChanged(const QUrl& url)
 {
-    const bool downloadable = core::isDownloadable(url);
+    updateDownloadable();
+    recoverFromSignInRejection(url);
+}
+
+void WebView::updateDownloadable()
+{
+    const bool downloadable = !downloadableUrl().isEmpty();
     if (downloadable != m_downloadable) {
         m_downloadable = downloadable;
         Q_EMIT downloadableChanged(downloadable);
     }
-    recoverFromSignInRejection(url);
 }
 
 /// Google's "Couldn't sign you in" (embedded-browser check, ADR-008) sticks to
@@ -226,6 +273,16 @@ QUrl WebView::downloadableUrl() const
 {
     if (m_profile->mode() == core::AppMode::Tv) {
         const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(url());
+        const QString id = !info.videoId.isEmpty() ? info.videoId : m_media.videoId;
+        return id.isEmpty() ? QUrl() : QUrl(u"https://www.youtube.com/watch?v="_s + id);
+    }
+    if (m_profile->mode() == core::AppMode::Music) {
+        // YouTube Music keeps playing while you browse: the track counts on
+        // every page. Playlist and channel pages are offered as themselves.
+        const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(url());
+        if (info.kind == core::YouTubeUrlKind::Playlist || info.kind == core::YouTubeUrlKind::Channel) {
+            return url();
+        }
         const QString id = !info.videoId.isEmpty() ? info.videoId : m_media.videoId;
         return id.isEmpty() ? QUrl() : QUrl(u"https://www.youtube.com/watch?v="_s + id);
     }
@@ -258,6 +315,7 @@ void WebView::handleMediaState(const QJsonObject& state)
 {
     m_media = core::MediaState::fromJson(state, m_clock.elapsed());
     Q_EMIT mediaStateChanged(m_media);
+    updateDownloadable();
 }
 
 void WebView::mediaCommand(const QString& command, double argument)
@@ -297,6 +355,7 @@ void WebView::wirePopup(QWidget* window)
         return;
     }
     m_permissions->attach(*popup->page());
+    connect(popup, &PopupWindow::musicUrlRequested, this, &WebView::musicUrlRequested);
 }
 
 void WebView::handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status,
@@ -392,8 +451,7 @@ void WebView::contextMenuEvent(QContextMenuEvent* event)
     const bool editable = request->isContentEditable();
     const bool hasSelection = !request->selectedText().isEmpty();
     const QUrl link = request->linkUrl();
-    const QUrl downloadTarget =
-        core::isDownloadable(link) ? link : (core::isDownloadable(url()) ? url() : QUrl());
+    const QUrl downloadTarget = core::isDownloadable(link) ? link : downloadableUrl();
 
     auto* menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);

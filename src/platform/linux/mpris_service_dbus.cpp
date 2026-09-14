@@ -98,8 +98,15 @@ QVariantMap MprisDBusService::metadata() const
     if (!m_state.artist.isEmpty()) {
         m.insert(u"xesam:artist"_s, QStringList{m_state.artist});
     }
-    if (!m_state.videoId.isEmpty()) {
-        m.insert(u"xesam:url"_s, QString(u"https://www.youtube.com/watch?v="_s + m_state.videoId));
+    if (!m_state.album.isEmpty()) {
+        m.insert(u"xesam:album"_s, m_state.album);
+    }
+    const QString url = !m_state.url.isEmpty() ? m_state.url
+                        : m_state.videoId.isEmpty()
+                            ? QString()
+                            : QString(u"https://www.youtube.com/watch?v="_s + m_state.videoId);
+    if (!url.isEmpty()) {
+        m.insert(u"xesam:url"_s, url);
     }
     return m;
 }
@@ -116,7 +123,7 @@ qlonglong MprisDBusService::positionUs() const
 void MprisDBusService::setMediaState(const core::MediaState& state)
 {
     const bool trackChanged = state.videoId != m_state.videoId || state.title != m_state.title ||
-                              state.artwork != m_state.artwork ||
+                              state.album != m_state.album || state.artwork != m_state.artwork ||
                               !qFuzzyCompare(state.duration, m_state.duration);
     const bool statusChanged = state.playback != m_state.playback;
     const bool capsChanged =

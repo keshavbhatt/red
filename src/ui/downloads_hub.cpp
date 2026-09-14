@@ -132,13 +132,13 @@ void DownloadsHub::wireEngine()
     connect(m_engine, &services::EngineManager::ready, this, [this](const core::EnginePaths& paths) {
         m_queue->setEnginePaths(paths);
         m_probe->setEnginePaths(paths);
-        const QList<QUrl> pending = m_pendingUrls;
-        m_pendingUrls.clear();
+        const QList<PendingRequest> pending = m_pending;
+        m_pending.clear();
         if (!pending.isEmpty() && m_engineDialog) {
             m_engineDialog->accept();
         }
-        for (const QUrl& url : pending) {
-            openDialog(url);
+        for (const PendingRequest& request : pending) {
+            openDialog(request.url, request.audioOnly);
         }
     });
     connect(m_engine, &services::EngineManager::installFailed, this, [this](const QString& error) {
@@ -194,10 +194,7 @@ void DownloadsHub::requestDownload(const QUrl& url, bool audioOnly)
         openDialog(url, audioOnly);
         return;
     }
-    if (audioOnly) {
-        m_settings.setLastDownloadKind(core::DownloadKind::Audio); // honoured once the engine is ready
-    }
-    m_pendingUrls << url;
+    m_pending << PendingRequest{url, audioOnly};
     showEngineDialog();
     if (!m_engine->status().isBusy()) {
         m_engine->install();
@@ -209,7 +206,7 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     // Ctrl+D can arrive twice (window shortcut + page hotkey): reuse the dialog.
     if (DownloadDialog* existing = m_openDialogs.value(url.toString()); existing != nullptr) {
         if (audioOnly) {
-            existing->selectKind(core::DownloadOptions::Kind::Audio);
+            existing->preselectKind(core::DownloadOptions::Kind::Audio);
         }
         existing->raise();
         existing->activateWindow();
@@ -217,7 +214,7 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     }
     auto* dialog = new DownloadDialog(url, m_settings, m_theme, *m_probe, *m_thumbnails, m_dialogParent);
     if (audioOnly) {
-        dialog->selectKind(core::DownloadOptions::Kind::Audio);
+        dialog->preselectKind(core::DownloadOptions::Kind::Audio);
     }
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     m_openDialogs.insert(url.toString(), dialog);
@@ -302,7 +299,7 @@ void DownloadsHub::showEngineDialog()
     }
     m_engineDialog = new EngineSetupDialog(*m_engine, m_theme, m_dialogParent);
     m_engineDialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(m_engineDialog, &QDialog::rejected, this, [this] { m_pendingUrls.clear(); });
+    connect(m_engineDialog, &QDialog::rejected, this, [this] { m_pending.clear(); });
     m_engineDialog->show();
 }
 

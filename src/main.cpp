@@ -19,6 +19,8 @@
 #include <QStandardPaths>
 #include <QTimer>
 
+#include <optional>
+
 using namespace Qt::StringLiterals;
 
 #ifdef Q_OS_UNIX
@@ -152,13 +154,17 @@ int main(int argc, char* argv[])
     QObject::connect(&app, &red::app::Application::downloadRequested, &window,
                      &red::ui::MainWindow::downloadUrl);
     QObject::connect(&app, &red::app::Application::tvModeRequested, &window,
-                     [&window] { window.setTvMode(true); });
+                     [&window] { window.setMode(red::core::AppMode::Tv); });
+    QObject::connect(&app, &red::app::Application::musicModeRequested, &window,
+                     [&window] { window.setMode(red::core::AppMode::Music); });
     QObject::connect(&app, &red::app::Application::settingsRequested, &window,
                      &red::ui::MainWindow::showSettings);
     QObject::connect(&app, &red::app::Application::quitRequested, &window, &red::ui::MainWindow::quit);
 
     const red::app::CliOptions& cli = app.cliOptions();
-    window.start(cli.tvMode);
+    window.start(cli.tvMode      ? std::optional{red::core::AppMode::Tv}
+                 : cli.musicMode ? std::optional{red::core::AppMode::Music}
+                                 : std::nullopt);
 
     // Developer aid: RED_DEBUG_WINDOW_SIZE=WxH sizes the window for a grab.
     if (const QString size = qEnvironmentVariable("RED_DEBUG_WINDOW_SIZE"); size.contains(u'x')) {
@@ -238,7 +244,8 @@ int main(int argc, char* argv[])
         for (const QJsonObject& command : red::app::commandsFor(cli)) {
             const QString name = command.value(QLatin1StringView(red::app::cmd::kKey)).toString();
             if (name != QLatin1StringView(red::app::cmd::kRaise) &&
-                name != QLatin1StringView(red::app::cmd::kTv)) {
+                name != QLatin1StringView(red::app::cmd::kTv) &&
+                name != QLatin1StringView(red::app::cmd::kMusic)) {
                 app.dispatchCommand(command);
             }
         }

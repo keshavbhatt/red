@@ -8,8 +8,10 @@ versions follow [Semantic Versioning](https://semver.org/).
 Red 10 is a redesigned Red on Qt 6.11 and Qt WebEngine, taking over from the Qt 5 based Red 9.
 
 ### Added
-- **Two modes in one window**: the desktop site and YouTube's living-room TV interface
-  (Ctrl+T), remembered across launches, with the current video carried across the switch.
+- **Three modes in one window**: the desktop site, YouTube Music (Ctrl+M) and YouTube's
+  living-room TV interface (Ctrl+T), remembered across launches, with the current video carried
+  across the switch. Music mode plays on while you browse, with media keys, tray and desktop
+  media controls, and *Audio only* preselected for downloads.
 - **Blocking** that never touches playback hosts: ads stripped from player and feed responses
   before YouTube renders them plus a small network-level list; SponsorBlock with per-category
   skip / mark / off; Return YouTube Dislike; Hide Shorts (desktop and TV).

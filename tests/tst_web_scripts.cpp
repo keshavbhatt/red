@@ -10,6 +10,7 @@
 #include <QWebEngineScriptCollection>
 
 using namespace Qt::StringLiterals;
+using red::core::AppMode;
 using red::web::ScriptBundle;
 
 class TestWebScripts : public QObject
@@ -19,8 +20,8 @@ class TestWebScripts : public QObject
 private Q_SLOTS:
     void everyResourceExistsAndParses()
     {
-        QStringList all = ScriptBundle::bootstrapResources(false);
-        for (const QString& r : ScriptBundle::bootstrapResources(true)) {
+        QStringList all = ScriptBundle::bootstrapResources(AppMode::Desktop);
+        for (const QString& r : ScriptBundle::bootstrapResources(AppMode::Tv)) {
             if (!all.contains(r)) {
                 all << r;
             }
@@ -38,7 +39,7 @@ private Q_SLOTS:
 
     void headerBlocksArePresent()
     {
-        for (const QString& resource : ScriptBundle::bootstrapResources(true)) {
+        for (const QString& resource : ScriptBundle::bootstrapResources(AppMode::Tv)) {
             if (resource.contains(u"qwebchannel"_s)) {
                 continue;
             }
@@ -50,8 +51,8 @@ private Q_SLOTS:
 
     void modeSelectsTvScripts()
     {
-        const QStringList desktop = ScriptBundle::bootstrapResources(false);
-        const QStringList tv = ScriptBundle::bootstrapResources(true);
+        const QStringList desktop = ScriptBundle::bootstrapResources(AppMode::Desktop);
+        const QStringList tv = ScriptBundle::bootstrapResources(AppMode::Tv);
         QVERIFY(desktop.contains(u":/scripts/theme-control.js"_s));
         QVERIFY(!desktop.contains(u":/scripts/tv/gamepad.js"_s));
         QVERIFY(tv.contains(u":/scripts/tv/gamepad.js"_s));
@@ -62,17 +63,33 @@ private Q_SLOTS:
         QCOMPARE(desktop.at(2), u":/scripts/hooks.js"_s);
     }
 
+    void modeSelectsMusicScripts()
+    {
+        const QStringList music = ScriptBundle::bootstrapResources(AppMode::Music);
+        QVERIFY(music.contains(u":/scripts/media-session.js"_s));
+        QVERIFY(music.contains(u":/scripts/adblock.js"_s));
+        QVERIFY(music.contains(u":/scripts/sponsorblock.js"_s));
+        QVERIFY(music.contains(u":/scripts/background-play.js"_s));
+        QVERIFY(!music.contains(u":/scripts/hide-shorts.js"_s));
+        QVERIFY(!music.contains(u":/scripts/theme-control.js"_s));
+        QVERIFY(!music.contains(u":/scripts/mini-player.js"_s));
+        QVERIFY(!music.contains(u":/scripts/dislikes.js"_s));
+        QVERIFY(!music.contains(u":/scripts/tv/gamepad.js"_s));
+        QVERIFY(ScriptBundle::bootstrapResources(AppMode::Tv).contains(u":/scripts/hide-shorts.js"_s));
+        QVERIFY(ScriptBundle::bootstrapResources(AppMode::Desktop).contains(u":/scripts/hide-shorts.js"_s));
+    }
+
     void installsOnProfile()
     {
         QWebEngineProfile profile; // off-the-record
         ScriptBundle bundle(profile);
-        bundle.installBootstrap({{u"mode"_s, u"desktop"_s}}, false);
+        bundle.installBootstrap({{u"mode"_s, u"desktop"_s}}, AppMode::Desktop);
         QVERIFY(bundle.isInstalled(u"bootstrap"_s));
         QCOMPARE(profile.scripts()->count(), 1);
         const QString source = profile.scripts()->find(u"red:bootstrap"_s).first().sourceCode();
         QVERIFY(source.startsWith(u"window.__redConfig = {\"mode\":\"desktop\"}"_s));
         QVERIFY(source.contains(u"tv/h5vcc"_s) == false);
-        bundle.installBootstrap({{u"mode"_s, u"tv"_s}}, true);
+        bundle.installBootstrap({{u"mode"_s, u"tv"_s}}, AppMode::Tv);
         QCOMPARE(profile.scripts()->count(), 1); // replaced, not duplicated
         QVERIFY(profile.scripts()
                     ->find(u"red:bootstrap"_s)

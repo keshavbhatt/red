@@ -11,7 +11,7 @@ tools opening submission PRs or writing their commit messages:
 
 - Please describe the application briefly:
   Red is a YouTube client for the Linux desktop. It shows the YouTube site in a native Qt 6
-  window with a smart TV (Leanback) mode driven by keyboard or gamepad, ad and tracker
+  window with a smart TV (Leanback) mode driven by keyboard or gamepad, a YouTube Music mode, ad and tracker
   blocking, SponsorBlock, media keys and MPRIS controls, a mini player, and a built-in
   downloader for videos, playlists and audio.
 - Video: attach the screen recording of the Flatpak build (`scripts/demo-tour.sh` drives it).

@@ -96,6 +96,9 @@ DownloadDialog::DownloadDialog(const QUrl& url, core::Settings& settings, core::
                    : core::DownloadOptions::Kind::Video);
     connect(this, &QDialog::accepted, this, [this] {
         const core::DownloadOptions::Kind k = kind();
+        if (m_preselectedKind && k == *m_preselectedKind) {
+            return;
+        }
         m_settings.setLastDownloadKind(k == core::DownloadOptions::Kind::Audio ? core::DownloadKind::Audio
                                        : k == core::DownloadOptions::Kind::Custom
                                            ? core::DownloadKind::Custom
@@ -956,6 +959,12 @@ void DownloadDialog::selectKind(core::DownloadOptions::Kind kind)
     if (QAbstractButton* button = m_kinds->button(id); button && button->isEnabled()) {
         button->setChecked(true);
     }
+}
+
+void DownloadDialog::preselectKind(core::DownloadOptions::Kind kind)
+{
+    m_preselectedKind = kind;
+    selectKind(kind);
 }
 
 void DownloadDialog::selectWholePlaylist()

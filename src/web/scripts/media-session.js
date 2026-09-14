@@ -3,8 +3,9 @@
 //           SponsorBlock — ADR-007) and execute media commands from C++.
 // depends:  the main <video> element; navigator.mediaSession.metadata (set by
 //           YouTube); the public player API on #movie_player /
-//           .html5-video-player (getVideoData, nextVideo, previousVideo, seekTo)
-// verified: 2026-09-06
+//           .html5-video-player (getVideoData, nextVideo, previousVideo, seekTo);
+//           on YouTube Music the transport buttons in ytmusic-player-bar
+// verified: 2026-09-14
 // on-fail:  no-op (no media state → tray/MPRIS show nothing)
 (function () {
     'use strict';
@@ -14,10 +15,28 @@
     }
     var video = null;
     var lastSent = '';
+    var lastHref = location.href;
     var tick = null;
 
     function player() {
         return document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+    }
+    function music() {
+        return !!(red.isMusic && red.isMusic());
+    }
+    // YouTube Music drives its queue from the player bar, not the player.
+    function musicBar() {
+        return music() ? document.querySelector('ytmusic-player-bar') : null;
+    }
+    function transport(which) {
+        var bar = musicBar();
+        if (bar) {
+            return bar.querySelector(which === 'next' ? '.next-button' : '.previous-button');
+        }
+        return document.querySelector(which === 'next' ? '.ytp-next-button, .ytp-next-button-modern' : '.ytp-prev-button');
+    }
+    function enabled(el) {
+        return !!el && !el.disabled && el.getAttribute('aria-disabled') !== 'true';
     }
     function findVideo() {
         var p = player();
@@ -42,27 +61,28 @@
     }
     function metadata() {
         var md = navigator.mediaSession && navigator.mediaSession.metadata;
-        var out = { title: '', artist: '', artwork: '' };
+        var out = { title: '', artist: '', album: '', artwork: '' };
         if (md) {
             out.title = md.title || '';
             out.artist = md.artist || '';
+            out.album = md.album || '';
             if (md.artwork && md.artwork.length) {
                 out.artwork = md.artwork[md.artwork.length - 1].src || '';
             }
         }
         var p = player();
-        if ((!out.title || !out.artist) && p && typeof p.getVideoData === 'function') {
+        if (p && typeof p.getVideoData === 'function') {
             try {
+                // The id comes from the player: off a watch page (YouTube
+                // Music's library while a track plays) the URL has none.
                 var data = p.getVideoData();
                 out.title = out.title || data.title || '';
                 out.artist = out.artist || data.author || '';
-                if (!out.videoId) {
-                    out.videoId = data.video_id || '';
-                }
+                out.videoId = data.video_id || '';
             } catch (e) { /* ignore */ }
         }
         if (!out.title) {
-            out.title = document.title.replace(/ - YouTube( TV)?$/, '');
+            out.title = document.title.replace(/ - YouTube( TV| Music)?$/, '');
         }
         return out;
     }
@@ -72,27 +92,30 @@
         var pageId = videoIdFromLocation();
         var id = pageId || md.videoId || '';
         var playing = v && !v.paused && !v.ended;
-        // Off a watch page the player is parked (still holds the last video):
-        // report nothing unless YouTube's own miniplayer is active.
-        var parked = !pageId && !document.querySelector('ytd-miniplayer[active]') && !red.isTv();
+        // Off a watch page the desktop player is parked (still holds the last
+        // video): report nothing unless YouTube's own miniplayer is active.
+        // YouTube Music keeps playing while you browse, so it never parks.
+        var parked = !music() && !pageId && !document.querySelector('ytd-miniplayer[active]') && !red.isTv();
         var s = {
             state: !v || parked || (!id && v.readyState === 0) ? 'none' : (playing ? 'playing' : 'paused'),
             videoId: id,
             title: md.title,
             artist: md.artist,
+            album: md.album,
             artwork: md.artwork || (id ? 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg' : ''),
+            url: id ? (music() ? 'https://music.youtube.com/watch?v=' : 'https://www.youtube.com/watch?v=') + id : '',
             duration: v && isFinite(v.duration) ? v.duration : 0,
             position: v ? v.currentTime : 0,
             live: !!(v && v.duration === Infinity),
-            canGoNext: !!document.querySelector('.ytp-next-button, .ytp-next-button-modern'),
-            canGoPrevious: !!document.querySelector('.ytp-prev-button')
+            canGoNext: enabled(transport('next')),
+            canGoPrevious: enabled(transport('previous'))
         };
         return s;
     }
     function send(force) {
         try {
             var s = state();
-            var key = JSON.stringify([s.state, s.videoId, s.title, s.artist, s.artwork, Math.round(s.duration)]);
+            var key = JSON.stringify([s.state, s.videoId, s.title, s.artist, s.album, s.artwork, Math.round(s.duration)]);
             // Position is sent with every report; the key only decides whether
             // paused/idle reports are worth repeating.
             if (!force && key === lastSent && s.state !== 'playing') {
@@ -109,7 +132,10 @@
             return;
         }
         tick = setInterval(function () {
-            if (video && !video.paused) {
+            if (music() && location.href !== lastHref) {
+                lastHref = location.href;
+                send(true);
+            } else if (video && !video.paused) {
                 send(false);
             }
         }, 1000);
@@ -154,18 +180,22 @@
             case 'stop':
                 if (p && p.stopVideo) { p.stopVideo(); } else if (v) { v.pause(); }
                 break;
-            case 'next':
-                if (p && p.nextVideo) { p.nextVideo(); } else {
-                    var n = document.querySelector('.ytp-next-button');
+            case 'next': {
+                var n = musicBar() ? transport('next') : null;
+                if (n) { n.click(); } else if (p && p.nextVideo) { p.nextVideo(); } else {
+                    n = document.querySelector('.ytp-next-button');
                     if (n) { n.click(); }
                 }
                 break;
-            case 'previous':
-                if (p && p.previousVideo) { p.previousVideo(); } else {
-                    var b = document.querySelector('.ytp-prev-button');
+            }
+            case 'previous': {
+                var b = musicBar() ? transport('previous') : null;
+                if (b) { b.click(); } else if (p && p.previousVideo) { p.previousVideo(); } else {
+                    b = document.querySelector('.ytp-prev-button');
                     if (b) { b.click(); }
                 }
                 break;
+            }
             case 'seek':
                 if (p && p.seekTo) { p.seekTo(arg, true); } else if (v) { v.currentTime = arg; }
                 break;

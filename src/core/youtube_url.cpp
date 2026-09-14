@@ -48,6 +48,11 @@ bool isGoogleServiceHost(const QString& host)
            hostMatches(h, QLatin1StringView("youtube.com"));
 }
 
+bool isYouTubeMusicHost(const QString& host)
+{
+    return host.compare(QLatin1StringView("music.youtube.com"), Qt::CaseInsensitive) == 0;
+}
+
 QString downloadablePlaylistId(const QString& list)
 {
     // YouTube mixes ("RD…" radios, incl. RDMM/RDCLAK) are generated per viewer
@@ -143,6 +148,18 @@ std::optional<QUrl> canonicalVideoUrl(const QUrl& url)
         return std::nullopt;
     }
     return QUrl(u"https://www.youtube.com/watch?v="_s + info.videoId);
+}
+
+QUrl musicVideoUrl(const QString& videoId, const QString& playlistId)
+{
+    QUrl url(QStringLiteral("https://music.youtube.com/watch"));
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("v"), videoId);
+    if (!playlistId.isEmpty()) {
+        query.addQueryItem(QStringLiteral("list"), playlistId);
+    }
+    url.setQuery(query);
+    return url;
 }
 
 bool isDownloadable(const QUrl& url)

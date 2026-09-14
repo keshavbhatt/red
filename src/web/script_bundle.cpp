@@ -35,25 +35,34 @@ QString ScriptBundle::readResource(const QString& resourcePath)
     return QString::fromUtf8(file.readAll());
 }
 
-QStringList ScriptBundle::bootstrapResources(bool tvMode)
+QStringList ScriptBundle::bootstrapResources(core::AppMode mode)
 {
     // Order matters: hooks.js provides the JSON/fetch/XHR modifier registry
     // every other script registers into (LESSONS V3).
     static const QStringList kShared{
-        u":/scripts/hooks.js"_s,           u":/scripts/adblock.js"_s,     u":/scripts/sponsorblock.js"_s,
-        u":/scripts/media-session.js"_s,   u":/scripts/hide-shorts.js"_s, u":/scripts/codec-preference.js"_s,
+        u":/scripts/hooks.js"_s,
+        u":/scripts/adblock.js"_s,
+        u":/scripts/sponsorblock.js"_s,
+        u":/scripts/media-session.js"_s,
+        u":/scripts/codec-preference.js"_s,
         u":/scripts/background-play.js"_s,
     };
     static const QStringList kDesktop{
+        u":/scripts/hide-shorts.js"_s,
         u":/scripts/theme-control.js"_s,
         u":/scripts/mini-player.js"_s,
         u":/scripts/dislikes.js"_s,
     };
     static const QStringList kTv{
-        u":/scripts/tv/h5vcc.js"_s, u":/scripts/tv/identification.js"_s, u":/scripts/tv/leanback-fixes.js"_s,
-        u":/scripts/tv/input.js"_s, u":/scripts/tv/gamepad.js"_s,
+        u":/scripts/hide-shorts.js"_s,       u":/scripts/tv/h5vcc.js"_s, u":/scripts/tv/identification.js"_s,
+        u":/scripts/tv/leanback-fixes.js"_s, u":/scripts/tv/input.js"_s, u":/scripts/tv/gamepad.js"_s,
     };
-    const QStringList features = kShared + (tvMode ? kTv : kDesktop);
+    // YouTube Music has no Shorts, no dislike button and its own player bar:
+    // the shared set is all it gets.
+    static const QStringList kMusic{};
+    const QStringList features = kShared + (mode == core::AppMode::Tv      ? kTv
+                                            : mode == core::AppMode::Music ? kMusic
+                                                                           : kDesktop);
     QStringList resources{u":/qtwebchannel/qwebchannel.js"_s, u":/scripts/bootstrap.js"_s};
 
     // Diagnostic escape hatch: RED_DISABLE_WEB_SCRIPTS turns page tweaks off to
@@ -73,12 +82,12 @@ QStringList ScriptBundle::bootstrapResources(bool tvMode)
     return resources;
 }
 
-void ScriptBundle::installBootstrap(const QJsonObject& config, bool tvMode)
+void ScriptBundle::installBootstrap(const QJsonObject& config, core::AppMode mode)
 {
     // Config travels as JSON — never string-concatenated user text.
     QString source = u"window.__redConfig = "_s +
                      QString::fromUtf8(QJsonDocument(config).toJson(QJsonDocument::Compact)) + u";\n"_s;
-    for (const QString& resource : bootstrapResources(tvMode)) {
+    for (const QString& resource : bootstrapResources(mode)) {
         source += readResource(resource);
         source += u"\n"_s;
     }

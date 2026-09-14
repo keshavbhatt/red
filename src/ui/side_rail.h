@@ -50,6 +50,7 @@ private:
     QToolButton* m_downloads = nullptr;
     QToolButton* m_miniPlayer = nullptr;
     QToolButton* m_tv = nullptr;
+    QToolButton* m_music = nullptr;
     QToolButton* m_settings = nullptr;
     QToolButton* m_menu = nullptr;
     QLabel* m_badge = nullptr;

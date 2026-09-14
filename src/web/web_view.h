@@ -9,6 +9,8 @@
 #include <QWebEnginePermission>
 #include <QWebEngineView>
 
+#include <optional>
+
 class QWebEngineLoadingInfo;
 
 namespace red::core {
@@ -36,8 +38,9 @@ public:
 
     /// Loads the mode's start page (desktop: per StartPage setting; TV: Leanback).
     void loadStart();
-    /// Switches the mode (ADR-001) and reloads.
-    void setMode(core::AppMode mode);
+    /// Switches the mode (ADR-001, ADR-013) and reloads: `target` when given,
+    /// else the current video carried across, else the mode's start page.
+    void setMode(core::AppMode mode, std::optional<QUrl> target = std::nullopt);
     [[nodiscard]] core::AppMode mode() const;
     /// Loads a YouTube URL in the current mode (TV mode maps videos to the Leanback route).
     void openYouTubeUrl(const QUrl& url);
@@ -77,6 +80,9 @@ Q_SIGNALS:
     /// Leanback signals: "exit", "reload", "openUrl"…
     void tvSignal(const QString& signal, const QString& argument);
     void downloadableChanged(bool downloadable);
+    void modeChanged(core::AppMode mode);
+    /// A new window was asked for a YouTube Music page: it belongs in Music mode.
+    void musicUrlRequested(const QUrl& url);
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
@@ -90,6 +96,7 @@ private:
     void handleMediaState(const QJsonObject& state);
     void showLoadError(const QWebEngineLoadingInfo& info);
     void handleUrlChanged(const QUrl& url);
+    void updateDownloadable();
     void recoverFromSignInRejection(const QUrl& url);
     [[nodiscard]] QUrl startUrl() const;
 

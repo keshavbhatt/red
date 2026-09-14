@@ -1,10 +1,13 @@
 #include "web/web_page.h"
 
 #include "core/navigation_policy.h"
+#include "core/youtube_url.h"
 #include "platform/file_manager.h"
 #include "web/logging.h"
 #include "web/popup_window.h"
 #include "web/web_profile.h"
+
+#include <QWebEngineNewWindowRequest>
 
 using namespace Qt::StringLiterals;
 
@@ -13,7 +16,25 @@ namespace red::web {
 WebPage::WebPage(WebProfile& profile, QObject* parent)
     : QWebEnginePage(&profile, parent)
     , m_profile(profile)
-{}
+{
+    // Without a createWindow override every window.open / target=_blank
+    // arrives here with its URL: YouTube Music goes to the main view (Music
+    // mode), anything else gets a pop-up that decides on its first
+    // navigation whether it stays (Google sign-in) or hands off to the browser.
+    connect(this, &QWebEnginePage::newWindowRequested, this, [this](QWebEngineNewWindowRequest& request) {
+        const QUrl target = request.requestedUrl();
+        if (core::isYouTubeMusicHost(target.host())) {
+            qCInfo(lcWeb) << "new window for YouTube Music -> main view:" << target;
+            Q_EMIT musicUrlRequested(target);
+            return;
+        }
+        auto* window = new PopupWindow(m_profile, m_host);
+        window->setScriptDialogs(m_dialogs);
+        window->show();
+        Q_EMIT popupOpened(window);
+        request.openIn(window->page());
+    });
+}
 
 bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame)
 {
@@ -26,18 +47,6 @@ bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool
         }
     }
     return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
-}
-
-QWebEnginePage* WebPage::createWindow(WebWindowType type)
-{
-    Q_UNUSED(type)
-    // The window decides on its first navigation whether it stays (Google
-    // sign-in) or hands the URL to the browser and closes.
-    auto* window = new PopupWindow(m_profile, m_host);
-    window->setScriptDialogs(m_dialogs);
-    window->show();
-    Q_EMIT popupOpened(window);
-    return window->page();
 }
 
 void WebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message,

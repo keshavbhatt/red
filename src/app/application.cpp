@@ -229,6 +229,8 @@ void Application::dispatchCommand(const QJsonObject& command)
         Q_EMIT downloadRequested(command.value(QLatin1StringView(cmd::kUrlKey)).toString());
     } else if (name == QLatin1StringView(cmd::kTv)) {
         Q_EMIT tvModeRequested();
+    } else if (name == QLatin1StringView(cmd::kMusic)) {
+        Q_EMIT musicModeRequested();
     } else if (name == QLatin1StringView(cmd::kSettings)) {
         Q_EMIT settingsRequested();
     } else if (name == QLatin1StringView(cmd::kQuit)) {

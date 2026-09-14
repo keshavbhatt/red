@@ -15,6 +15,7 @@ private Q_SLOTS:
         QVERIFY(!shouldOpenExternally(QUrl(u"https://www.youtube.com/watch?v=x"_s)));
         QVERIFY(!shouldOpenExternally(QUrl(u"https://accounts.google.com/signin"_s)));
         QVERIFY(!shouldOpenExternally(QUrl(u"https://consent.youtube.com/m"_s)));
+        QVERIFY(!shouldOpenExternally(QUrl(u"https://music.youtube.com/watch?v=x"_s)));
         QVERIFY(shouldOpenExternally(QUrl(u"https://example.com/"_s)));
         QVERIFY(shouldOpenExternally(QUrl(u"mailto:someone@example.com"_s)));
         QVERIFY(!shouldOpenExternally(QUrl(u"about:blank"_s)));

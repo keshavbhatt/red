@@ -50,6 +50,7 @@
 #include <QResizeEvent>
 #include <QSessionManager>
 #include <QShortcut>
+#include <QSignalBlocker>
 #include <QSplitter>
 #include <QStandardPaths>
 #include <QTimer>
@@ -178,12 +179,18 @@ void MainWindow::setupUi()
         setFullScreenMode(false);
     });
 
-    m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F)
-                                                           : QColor(0xFF, 0xFF, 0xFF));
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
-        m_webView->page()->setBackgroundColor(m_theme.isDark() ? QColor(0x0F, 0x0F, 0x0F)
-                                                               : QColor(0xFF, 0xFF, 0xFF));
-    });
+    applyPageBackground();
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
+            [this](Qt::ColorScheme) { applyPageBackground(); });
+    connect(m_webView, &web::WebView::modeChanged, this, [this](core::AppMode) { applyPageBackground(); });
+}
+
+/// The colour behind the page while it loads: YouTube Music is dark-only, so
+/// a light theme must not flash white there.
+void MainWindow::applyPageBackground()
+{
+    const bool dark = m_theme.isDark() || m_webView->mode() == core::AppMode::Music;
+    m_webView->page()->setBackgroundColor(dark ? QColor(0x0F, 0x0F, 0x0F) : QColor(0xFF, 0xFF, 0xFF));
 }
 
 void MainWindow::connectActions()
@@ -204,7 +211,7 @@ void MainWindow::connectActions()
         if (url.isEmpty()) {
             m_downloads->promptForUrl();
         } else {
-            m_downloads->requestDownload(url);
+            requestDownload(url);
         }
     });
     connect(a.downloadUrl, &QAction::triggered, m_downloads, &DownloadsHub::promptForUrl);
@@ -218,7 +225,12 @@ void MainWindow::connectActions()
     });
     connect(a.downloads, &QAction::toggled, this, &MainWindow::setDownloadsPanelVisible);
     connect(a.miniPlayer, &QAction::toggled, this, &MainWindow::setMiniPlayer);
-    connect(a.tvMode, &QAction::toggled, this, &MainWindow::setTvMode);
+    // triggered, not toggled: setMode syncs the checked states itself, and a
+    // shortcut on the active mode's action unchecks it, which means Desktop.
+    connect(a.tvMode, &QAction::triggered, this,
+            [this](bool on) { setMode(on ? core::AppMode::Tv : core::AppMode::Desktop); });
+    connect(a.musicMode, &QAction::triggered, this,
+            [this](bool on) { setMode(on ? core::AppMode::Music : core::AppMode::Desktop); });
     connect(a.playPause, &QAction::triggered, m_media, &MediaController::playPause);
     connect(a.next, &QAction::triggered, m_media, &MediaController::next);
     connect(a.previous, &QAction::triggered, m_media, &MediaController::previous);
@@ -243,8 +255,7 @@ void MainWindow::connectActions()
     connect(m_media, &MediaController::raiseRequested, this, &MainWindow::showAndRaise);
     connect(m_downloads, &DownloadsHub::activeCountChanged, m_rail, &SideRail::setActiveDownloads);
     connect(m_downloads, &DownloadsHub::showPanelRequested, this, [this] {
-        if (!m_panelVisible && !isFullScreen() && !m_miniPlayer &&
-            m_webView->mode() == core::AppMode::Desktop) {
+        if (!m_panelVisible && !isFullScreen() && !m_miniPlayer && m_webView->mode() != core::AppMode::Tv) {
             m_actions->downloads->setChecked(true);
         }
     });
@@ -262,17 +273,25 @@ void MainWindow::connectWebView()
             [this](bool on) { m_actions->fullScreen->setChecked(on); });
     connect(m_webView, &web::WebView::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_webView, &web::WebView::permissionPromptRequested, this, &MainWindow::handlePermissionPrompt);
-    connect(m_webView, &web::WebView::downloadRequested, m_downloads,
-            [this](const QUrl& url) { m_downloads->requestDownload(url); });
+    connect(m_webView, &web::WebView::downloadRequested, this, &MainWindow::requestDownload);
     connect(m_webView, &web::WebView::audioDownloadRequested, m_downloads,
             [this](const QUrl& url) { m_downloads->requestDownload(url, true); });
     connect(m_webView, &web::WebView::downloadableChanged, m_rail, &SideRail::setDownloadable);
+    connect(m_webView, &web::WebView::musicUrlRequested, this, [this](const QUrl& url) {
+        setMode(core::AppMode::Music, url);
+        showAndRaise();
+    });
     connect(m_webView, &web::WebView::tvSignal, this, &MainWindow::handleTvSignal);
     connect(m_webView->page(), &QWebEnginePage::loadingChanged, this,
             [this](const QWebEngineLoadingInfo&) { m_rail->setLoading(m_webView->page()->isLoading()); });
     connect(m_webView->page(), &QWebEnginePage::titleChanged, this, [this](const QString& title) {
-        const QString clean = QString(title).remove(u" - YouTube"_s).remove(u" - YouTube TV"_s).trimmed();
-        setWindowTitle(clean.isEmpty() || clean == u"YouTube"_s ? u"Red"_s : clean + u" — Red"_s);
+        const QString clean = QString(title)
+                                  .remove(u" - YouTube Music"_s)
+                                  .remove(u" - YouTube TV"_s)
+                                  .remove(u" - YouTube"_s)
+                                  .trimmed();
+        const bool bare = clean.isEmpty() || clean == u"YouTube"_s || clean == u"YouTube Music"_s;
+        setWindowTitle(bare ? u"Red"_s : clean + u" — Red"_s);
     });
     connect(m_webView->page(), &QWebEnginePage::urlChanged, this, [this](const QUrl&) {
         m_actions->back->setEnabled(m_webView->history()->canGoBack());
@@ -292,16 +311,17 @@ void MainWindow::connectWebView()
 
 // ---- lifecycle -------------------------------------------------------------
 
-void MainWindow::start(bool tvMode)
+void MainWindow::start(std::optional<core::AppMode> requested)
 {
-    m_startedInTv = tvMode;
-    const bool tv = tvMode || m_settings.tvStartInTvMode() || m_settings.lastMode() == core::AppMode::Tv;
-    if (tv) {
-        m_actions->tvMode->setChecked(true); // switches the profile, loads Leanback
-    } else {
+    m_startedInTv = requested == core::AppMode::Tv;
+    const core::AppMode mode =
+        requested.value_or(m_settings.tvStartInTvMode() ? core::AppMode::Tv : m_settings.lastMode());
+    if (mode == core::AppMode::Desktop) {
         m_webView->loadStart();
+    } else {
+        setMode(mode); // switches the profile and loads the mode's start page
     }
-    if (m_settings.downloadsPanelOpen() && !tv) {
+    if (m_settings.downloadsPanelOpen() && mode != core::AppMode::Tv) {
         m_actions->downloads->setChecked(true);
     }
     show();
@@ -426,27 +446,31 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     // comes back with the width (the user's choice is kept in m_panelVisible).
     const bool fits = width() >= kPanelFoldWidth;
     if (m_downloads->panel()->isVisible() != (fits && m_panelVisible && !isFullScreen() && !m_miniPlayer &&
-                                              m_webView->mode() == core::AppMode::Desktop)) {
+                                              m_webView->mode() != core::AppMode::Tv)) {
         applyChrome();
     }
 }
 
 void MainWindow::applyChrome()
 {
-    const bool tv = m_webView->mode() == core::AppMode::Tv;
+    const core::AppMode mode = m_webView->mode();
+    const bool tv = mode == core::AppMode::Tv;
+    const bool music = mode == core::AppMode::Music;
     const bool bare = isFullScreen() || m_miniPlayer || tv;
     m_rail->setVisible(!bare && m_settings.showRail());
     m_downloads->panel()->setVisible(!bare && m_panelVisible && width() >= kPanelFoldWidth);
     m_actions->downloads->setEnabled(!tv && !m_miniPlayer);
     // The mini player only makes sense with a video on screen (FEATURES D6);
-    // while it is on it stays enabled so it can always be turned off.
+    // while it is on it stays enabled so it can always be turned off. YouTube
+    // Music has its own player bar, so it is off there.
     const bool hasVideo = m_media->state().hasMedia() && !m_media->state().videoId.isEmpty();
-    m_actions->miniPlayer->setEnabled(!tv && (m_miniPlayer || hasVideo));
+    m_actions->miniPlayer->setEnabled(!tv && !music && (m_miniPlayer || hasVideo));
     m_actions->miniPlayer->setToolTip(
         m_actions->miniPlayer->isEnabled()
             ? tr("Mini player  (%1)")
                   .arg(m_actions->miniPlayer->shortcut().toString(QKeySequence::NativeText))
-            : tr("Play a video to use the mini player"));
+        : music ? tr("The mini player is not available in Music mode")
+                : tr("Play a video to use the mini player"));
 }
 
 void MainWindow::setDownloadsPanelVisible(bool visible)
@@ -488,30 +512,52 @@ void MainWindow::setFullScreenMode(bool on)
     applyChrome();
 }
 
-void MainWindow::setTvMode(bool on)
+void MainWindow::setMode(core::AppMode mode, std::optional<QUrl> target)
 {
-    const core::AppMode mode = on ? core::AppMode::Tv : core::AppMode::Desktop;
-    if (m_webView->mode() == mode && m_webView->url().isValid() && !m_webView->url().isEmpty()) {
+    const core::AppMode before = m_webView->mode();
+    if (before == mode && !target && m_webView->url().isValid() && !m_webView->url().isEmpty()) {
+        syncModeActions();
         return;
     }
-    if (on && m_miniPlayer) {
+    if (mode != core::AppMode::Desktop && m_miniPlayer) {
         m_actions->miniPlayer->setChecked(false);
     }
-    m_webView->setMode(mode);
+    m_webView->setMode(mode, std::move(target));
+    syncModeActions();
     applyChrome();
-    if (on) {
+    if (mode == core::AppMode::Tv) {
         if (m_settings.tvFullscreen() && !isFullScreen()) {
             m_actions->fullScreen->setChecked(true);
         }
         m_hint->showHint(tr("TV mode  ·  Esc: back  ·  Ctrl+T: desktop  ·  Ctrl+D: download"));
-        qCInfo(lcUi) << "entered TV mode";
     } else {
-        m_hint->hideHint();
-        if (isFullScreen() && m_settings.tvFullscreen()) {
+        if (before == core::AppMode::Tv && isFullScreen() && m_settings.tvFullscreen()) {
             m_actions->fullScreen->setChecked(false);
         }
-        qCInfo(lcUi) << "left TV mode";
+        if (mode == core::AppMode::Music) {
+            m_hint->showHint(tr("Music mode  ·  Ctrl+M: desktop  ·  Ctrl+D: download the track"));
+        } else {
+            m_hint->hideHint();
+        }
     }
+    qCInfo(lcUi) << "mode:" << core::appModeName(mode);
+}
+
+/// The two mode actions reflect the current mode without firing.
+void MainWindow::syncModeActions()
+{
+    const core::AppMode mode = m_webView->mode();
+    const QSignalBlocker tv(m_actions->tvMode);
+    const QSignalBlocker music(m_actions->musicMode);
+    m_actions->tvMode->setChecked(mode == core::AppMode::Tv);
+    m_actions->musicMode->setChecked(mode == core::AppMode::Music);
+}
+
+/// Music (the mode, or a YouTube Music link) preselects Audio only.
+void MainWindow::requestDownload(const QUrl& url)
+{
+    const bool audio = m_webView->mode() == core::AppMode::Music || core::isYouTubeMusicHost(url.host());
+    m_downloads->requestDownload(url, audio);
 }
 
 void MainWindow::setMiniPlayer(bool on)
@@ -562,6 +608,10 @@ void MainWindow::openUrl(const QString& url)
         return;
     }
     showAndRaise();
+    if (core::isYouTubeMusicHost(target.host()) && m_webView->mode() != core::AppMode::Music) {
+        setMode(core::AppMode::Music, target);
+        return;
+    }
     m_webView->openYouTubeUrl(target);
 }
 
@@ -572,7 +622,7 @@ void MainWindow::downloadUrl(const QString& url)
         m_downloads->promptForUrl(); // the desktop action "Download from a link…"
         return;
     }
-    m_downloads->requestDownload(QUrl::fromUserInput(url.trimmed()));
+    requestDownload(QUrl::fromUserInput(url.trimmed()));
 }
 
 void MainWindow::handleTvSignal(const QString& signal, const QString&)
@@ -581,7 +631,7 @@ void MainWindow::handleTvSignal(const QString& signal, const QString&)
         if (m_startedInTv) {
             quit();
         } else {
-            m_actions->tvMode->setChecked(false);
+            setMode(core::AppMode::Desktop);
         }
     } else if (signal == u"reload"_s) {
         m_webView->reload();

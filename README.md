@@ -35,8 +35,10 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
 
 ## Features
 
-**Two modes**
+**Three modes**
 - **Desktop**: the full YouTube site, signed in, themed light / dark / system.
+- **Music** (Ctrl+M): YouTube Music in the same window, playing on while you browse, with media
+  keys, tray and desktop media controls, and audio downloads one click away.
 - **TV** (Ctrl+T): YouTube's smart-TV interface with keyboard, mouse and gamepad control,
   full screen by default.
 
@@ -84,7 +86,7 @@ runtime), CMake ≥ 3.21, and a C++20 compiler.
 # Development build against the KDE Qt 6.11 snap SDK (works on any distro)
 sudo snap install kde-qt6-core24-sdk kf6-core24
 scripts/dev-build.sh --tests    # configure + build + run the test suite
-scripts/dev-run.sh              # launch (scripts/dev-run.sh -- --tv for TV mode)
+scripts/dev-run.sh              # launch (-- --tv for TV mode, -- --music for YouTube Music)
 
 # …or with a system Qt >= 6.11
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo

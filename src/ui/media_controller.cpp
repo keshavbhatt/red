@@ -23,6 +23,7 @@ MediaController::MediaController(core::Settings& settings, web::WebView& view, c
             [this](const QString& command, double argument) { m_view.mediaCommand(command, argument); });
     connect(m_mpris.get(), &platform::MprisService::raiseRequested, this, &MediaController::raiseRequested);
     connect(&m_settings, &core::Settings::keepScreenAwakeChanged, this, [this](bool) { updateInhibit(); });
+    connect(&m_view, &web::WebView::modeChanged, this, [this](core::AppMode) { updateInhibit(); });
 }
 
 MediaController::~MediaController() = default;
@@ -41,7 +42,10 @@ void MediaController::handleState(const core::MediaState& state)
 
 void MediaController::updateInhibit()
 {
-    m_inhibitor->setInhibited(m_settings.keepScreenAwake() && m_state.isPlaying(), tr("Playing a video"));
+    // Music plays in the background by nature: the screen may sleep.
+    const bool wanted =
+        m_settings.keepScreenAwake() && m_state.isPlaying() && m_view.mode() != core::AppMode::Music;
+    m_inhibitor->setInhibited(wanted, tr("Playing a video"));
 }
 
 void MediaController::playPause()

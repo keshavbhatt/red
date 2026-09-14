@@ -17,6 +17,7 @@ inline constexpr QLatin1StringView kFreeDownloadsDay{"licensing/freeDownloadsDay
 inline constexpr QLatin1StringView kFreeDownloadsUsed{"licensing/freeDownloadsUsed"};
 inline constexpr QLatin1StringView kLastMode{"window/lastMode"};
 inline constexpr QLatin1StringView kLastUrl{"window/lastUrl"};
+inline constexpr QLatin1StringView kLastMusicUrl{"window/lastMusicUrl"};
 inline constexpr QLatin1StringView kDownloadsPanelOpen{"window/downloadsPanelOpen"};
 
 // general/

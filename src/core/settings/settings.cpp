@@ -208,7 +208,7 @@ void Settings::setShowRail(bool show)
 
 AppMode Settings::lastMode() const
 {
-    return enumFromInt(intValue(keys::kLastMode, static_cast<int>(kDefaultMode)), kDefaultMode, 2);
+    return enumFromInt(intValue(keys::kLastMode, static_cast<int>(kDefaultMode)), kDefaultMode, 3);
 }
 
 void Settings::setLastMode(AppMode mode)
@@ -224,6 +224,16 @@ QString Settings::lastUrl() const
 void Settings::setLastUrl(const QString& url)
 {
     storeString(keys::kLastUrl, url);
+}
+
+QString Settings::lastMusicUrl() const
+{
+    return stringValue(keys::kLastMusicUrl);
+}
+
+void Settings::setLastMusicUrl(const QString& url)
+{
+    storeString(keys::kLastMusicUrl, url);
 }
 
 bool Settings::downloadsPanelOpen() const

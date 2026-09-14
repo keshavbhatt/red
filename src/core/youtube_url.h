@@ -33,6 +33,8 @@ struct YouTubeUrlInfo
 /// sign-in / consent / CDN hosts it needs).
 [[nodiscard]] bool isYouTubeHost(const QString& host);
 [[nodiscard]] bool isGoogleServiceHost(const QString& host);
+/// Exactly music.youtube.com (YouTube Music).
+[[nodiscard]] bool isYouTubeMusicHost(const QString& host);
 
 /// The `list=` value if yt-dlp can read it as a playlist, else empty.
 [[nodiscard]] QString downloadablePlaylistId(const QString& list);
@@ -40,6 +42,8 @@ struct YouTubeUrlInfo
 
 /// A canonical https://www.youtube.com/watch?v=<id> URL, or nullopt.
 [[nodiscard]] std::optional<QUrl> canonicalVideoUrl(const QUrl& url);
+/// https://music.youtube.com/watch?v=<id>, with the playlist when given.
+[[nodiscard]] QUrl musicVideoUrl(const QString& videoId, const QString& playlistId = {});
 [[nodiscard]] bool isDownloadable(const QUrl& url);
 [[nodiscard]] QUrl thumbnailUrl(const QString& videoId, const QString& size = QStringLiteral("mqdefault"));
 

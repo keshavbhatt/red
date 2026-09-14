@@ -25,7 +25,7 @@ private Q_SLOTS:
         red::core::ThemeService theme(settings);
 
         red::ui::MainWindow window(settings, theme, u"10.0.0-test"_s);
-        window.start(false);
+        window.start(std::nullopt);
         QVERIFY(QTest::qWaitForWindowExposed(&window));
         QTest::qWait(300);
 
@@ -37,9 +37,9 @@ private Q_SLOTS:
         settings.setShowRail(false);
         settings.setShowRail(true);
         window.showAndRaise();
-        window.setTvMode(true);
+        window.setMode(red::core::AppMode::Tv);
         QTest::qWait(100);
-        window.setTvMode(false);
+        window.setMode(red::core::AppMode::Desktop);
         QTest::qWait(100);
         window.close();
     }

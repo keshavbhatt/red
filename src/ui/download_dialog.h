@@ -52,6 +52,9 @@ public:
     [[nodiscard]] core::DownloadJob job() const;
     /// Switches the Video / Audio only / Advanced choice.
     void selectKind(core::DownloadOptions::Kind kind);
+    /// Selects `kind` for this dialog only: the remembered default changes
+    /// only when the user picks something else.
+    void preselectKind(core::DownloadOptions::Kind kind);
     [[nodiscard]] core::DownloadOptions::Kind kind() const;
     /// Picks "Whole playlist" for a video-in-playlist link (as soon as the
     /// playlist has been read); no-op for plain videos.
@@ -122,6 +125,7 @@ private:
     Scope m_scope = Scope::Video;
     bool m_probing = false;
     bool m_isPlaylist = false;
+    std::optional<core::DownloadOptions::Kind> m_preselectedKind;
     std::function<bool(int)> m_admission;
     bool m_wantPlaylist = false;
     QString m_folder;

@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QHash>
+#include <QLatin1StringView>
 #include <QObject>
 #include <QSettings>
 #include <QString>
@@ -38,7 +39,22 @@ enum class AppMode
 {
     Desktop,
     Tv,
+    Music, ///< music.youtube.com in the same window
 };
+
+/// The mode's name as used in logs, diagnostics and the page script config.
+[[nodiscard]] constexpr QLatin1StringView appModeName(AppMode mode) noexcept
+{
+    switch (mode) {
+    case AppMode::Tv:
+        return QLatin1StringView("tv");
+    case AppMode::Music:
+        return QLatin1StringView("music");
+    case AppMode::Desktop:
+        break;
+    }
+    return QLatin1StringView("desktop");
+}
 
 enum class CodecPreference
 {
@@ -153,6 +169,9 @@ public:
     void setLastMode(AppMode mode);
     [[nodiscard]] QString lastUrl() const;
     void setLastUrl(const QString& url);
+    /// Music mode keeps its own "where I left off" page.
+    [[nodiscard]] QString lastMusicUrl() const;
+    void setLastMusicUrl(const QString& url);
     [[nodiscard]] bool downloadsPanelOpen() const;
     void setDownloadsPanelOpen(bool open);
 

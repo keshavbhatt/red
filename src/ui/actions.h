@@ -30,6 +30,7 @@ public:
     QAction* copyLink = nullptr;
     QAction* miniPlayer = nullptr;
     QAction* tvMode = nullptr;
+    QAction* musicMode = nullptr;
     QAction* playPause = nullptr;
     QAction* next = nullptr;
     QAction* previous = nullptr;

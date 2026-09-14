@@ -58,8 +58,12 @@ QStringList BlockList::youtubeAdPaths()
 QStringList BlockList::youtubeTrackerPaths()
 {
     return {
-        u"/youtubei/v1/log_event"_s, u"/api/stats/atr"_s, u"/api/stats/delayplay"_s, u"/csi_204"_s,
-        u"/generate_204"_s,
+        // Not /generate_204: it is the connectivity probe, and YouTube Music
+        // shows "No internet connection" when it fails.
+        u"/youtubei/v1/log_event"_s,
+        u"/api/stats/atr"_s,
+        u"/api/stats/delayplay"_s,
+        u"/csi_204"_s,
     };
 }
 

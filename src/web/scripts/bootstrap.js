@@ -50,8 +50,14 @@
         onConfig: function (fn) {
             configWaiters.push(fn);
         },
+        mode: function () {
+            return api.config.mode || 'desktop';
+        },
         isTv: function () {
             return api.config.mode === 'tv';
+        },
+        isMusic: function () {
+            return api.config.mode === 'music';
         },
         // Inserts (or replaces) a <style id> with the page's CSP nonce copied
         // onto it; the nonce only exists once the document has parsed, so the

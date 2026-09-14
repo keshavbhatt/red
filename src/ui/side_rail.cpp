@@ -100,8 +100,10 @@ void SideRail::setupUi()
 
     m_miniPlayer = makeButton(m_actions.miniPlayer, u"miniplayer"_s);
     m_tv = makeButton(m_actions.tvMode, u"tv"_s);
+    m_music = makeButton(m_actions.musicMode, u"music"_s);
     layout->addWidget(m_miniPlayer, 0, Qt::AlignHCenter);
     layout->addWidget(m_tv, 0, Qt::AlignHCenter);
+    layout->addWidget(m_music, 0, Qt::AlignHCenter);
 
     layout->addStretch(1);
 
@@ -131,8 +133,8 @@ void SideRail::showMenu()
 void SideRail::applyIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QList<QToolButton*> buttons{m_back,       m_forward, m_reload,   m_downloads,
-                                      m_miniPlayer, m_tv,      m_settings, m_menu};
+    const QList<QToolButton*> buttons{m_back, m_forward, m_reload,   m_downloads, m_miniPlayer,
+                                      m_tv,   m_music,   m_settings, m_menu};
     // A QToolButton re-syncs icon and text from its default action on every
     // action change (checked, enabled…) — so the icon has to live on the action,
     // or a toggle turns the button into its text label.

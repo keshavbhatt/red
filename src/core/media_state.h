@@ -19,7 +19,9 @@ struct MediaState
     QString videoId;
     QString title;
     QString artist;          ///< channel name
+    QString album;           ///< YouTube Music album, else empty
     QString artwork;         ///< thumbnail URL
+    QString url;             ///< the watch page for this item (site-specific host)
     double duration = 0;     ///< seconds
     double position = 0;     ///< seconds at the time of the report
     qint64 reportedAtMs = 0; ///< monotonic ms when `position` was sampled
@@ -42,6 +44,8 @@ inline MediaState MediaState::fromJson(const QJsonObject& o, qint64 nowMs)
     s.videoId = o.value(QStringLiteral("videoId")).toString();
     s.title = o.value(QStringLiteral("title")).toString();
     s.artist = o.value(QStringLiteral("artist")).toString();
+    s.album = o.value(QStringLiteral("album")).toString();
+    s.url = o.value(QStringLiteral("url")).toString();
     s.artwork = o.value(QStringLiteral("artwork")).toString();
     s.duration = o.value(QStringLiteral("duration")).toDouble();
     s.position = o.value(QStringLiteral("position")).toDouble();

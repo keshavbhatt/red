@@ -265,3 +265,32 @@ in the heading with the date before tagging.
 
 **Rule (owner, CLAUDE.md):** accounts and licensing never appear in user-facing release notes;
 `tst_changelog` fails if the changelog mentions them, and checks the project version has notes.
+
+## ADR-013: a third mode, YouTube Music (2026-09-14)
+
+**Context.** YouTube Music links open through `target=_blank`, so they landed in a bare
+`PopupWindow` where nothing of Red worked: no rail, no downloads, and `media-session.js`
+reported nothing on any YouTube Music page that is not `/watch` because of its desktop-only
+"parked" rule. YouTube Music is the same InnerTube backend, the same cookies and the same html5
+player, so it fits the existing plumbing; only the chrome and a few page-side selectors differ.
+Owner decision: a full mode, not a pop-up fix.
+
+**Decision.** `core::AppMode::Music` next to Desktop and TV (ADR-001 extended, not replaced):
+same profile and user agent as Desktop, script set = the shared scripts only (no hide-shorts,
+theme-control, mini-player, dislikes), `mode: "music"` in the script config with
+`red.isMusic()`. `WebView` maps videos and playlists to `music.youtube.com` URLs in Music mode
+and keeps a separate `lastMusicUrl`. A new-window request for the music host
+(`QWebEnginePage::newWindowRequested`, which carries the URL) switches the main view to Music
+instead of opening a pop-up; a pop-up that navigates there hands the URL back and closes.
+`media-session.js` never parks in Music, drives next/previous through `ytmusic-player-bar`, and
+reports `album` and a site-specific `url` (MPRIS `xesam:album`, `xesam:url`). Downloads
+preselect *Audio only* through `DownloadDialog::preselectKind`, which leaves the remembered
+default alone unless the user picks something else; the rail's Download button follows the
+playing track on every page (media-state fallback, as in TV). Mini player disabled, screen
+inhibit off, page background dark. `--tv --music` is a parse error. One `MainWindow::setMode`
+slot; the two checkable actions connect on `triggered` and are re-synced under a signal blocker.
+
+**Consequences.** YouTube Music is dark-only, so the light theme stops at the chrome. Album
+pages are not downloadable yet (M7). SponsorBlock segments are still fetched only on `/watch`
+and markers are not drawn on YouTube Music's bar (M8). `yt-navigate-finish` does not fire on
+YouTube Music, so the media reporter watches the URL from its tick.

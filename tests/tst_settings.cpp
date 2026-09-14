@@ -104,6 +104,18 @@ private Q_SLOTS:
         QCOMPARE(again.subtitleLanguages(), (QStringList{u"en"_s, u"de"_s}));
     }
 
+    void musicModeRoundTrip()
+    {
+        m_settings->setLastMode(AppMode::Music);
+        m_settings->setLastMusicUrl(u"https://music.youtube.com/library"_s);
+        m_settings->sync();
+        Settings again(m_dir->filePath(u"red.ini"_s));
+        QCOMPARE(again.lastMode(), AppMode::Music);
+        QCOMPARE(again.lastMusicUrl(), u"https://music.youtube.com/library"_s);
+        QCOMPARE(QString(appModeName(AppMode::Music)), u"music"_s);
+        QCOMPARE(QString(appModeName(AppMode::Desktop)), u"desktop"_s);
+    }
+
     void resetToDefaults()
     {
         m_settings->setTheme(Theme::Light);

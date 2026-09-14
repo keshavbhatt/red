@@ -43,6 +43,7 @@ Actions::Actions(QWidget* owner)
     copyLink = make(owner, tr("Copy video link"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C)});
     miniPlayer = make(owner, tr("Mini player"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M)});
     tvMode = make(owner, tr("TV mode"), {QKeySequence(Qt::CTRL | Qt::Key_T)});
+    musicMode = make(owner, tr("Music mode"), {QKeySequence(Qt::CTRL | Qt::Key_M)});
     playPause = make(owner, tr("Play / Pause"),
                      {QKeySequence(Qt::Key_MediaTogglePlayPause), QKeySequence(Qt::Key_MediaPlay)});
     next = make(owner, tr("Next video"), {QKeySequence(Qt::Key_MediaNext)});
@@ -65,6 +66,7 @@ Actions::Actions(QWidget* owner)
 
     miniPlayer->setCheckable(true);
     tvMode->setCheckable(true);
+    musicMode->setCheckable(true);
     downloads->setCheckable(true);
     fullScreen->setCheckable(true);
     quit->setMenuRole(QAction::QuitRole);
@@ -74,9 +76,10 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,       back,     forward,   reload,    download,    downloadUrl, downloads, copyLink,
-            miniPlayer, tvMode,   playPause, next,      previous,    zoomIn,      zoomOut,   zoomReset,
-            fullScreen, showHide, settings,  shortcuts, onlineGuide, account,     about,     quit};
+    return {home,        back,       forward,   reload,     download,  downloadUrl, downloads,
+            copyLink,    miniPlayer, tvMode,    musicMode,  playPause, next,        previous,
+            zoomIn,      zoomOut,    zoomReset, fullScreen, showHide,  settings,    shortcuts,
+            onlineGuide, account,    about,     quit};
 }
 
 } // namespace red::ui

@@ -7,7 +7,7 @@ Sources: `reference/analysis-red-v9.md` (Red v9), TV-mode research (LESSONS sect
 new-whatsie `DOCS/FEATURES.md` (desktop-shell features that proved themselves).
 
 The owner's brief (2026-09-06): "smart, performant", two modes (desktop YouTube + TV mode on
-Leanback), fast ad blocking, out-of-the-box yt-dlp downloads for anything on YouTube, UI/UX from
+Leanback; a third, YouTube Music, was added on 2026-09-14, section G), fast ad blocking, out-of-the-box yt-dlp downloads for anything on YouTube, UI/UX from
 scratch with a brand theme matching YouTube, whatsie coding practices, packaging last.
 
 ## A. Shell (window, tray, identity)
@@ -63,7 +63,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | T10 | SponsorBlock in TV mode (segments from C++, native Leanback toast) | yes | KEEP | done — `sponsorblock.js` |
 | T11 | Hide Shorts, guide tabs filter, low-memory mode, super-resolution removal | yes | KEEP (hide shorts, low-memory) / LATER (others) | hide shorts done; open notes: `/tv` is iframed in rare cases, so a preload may need to run in subframes (Red keeps `runsOnSubFrames` off until that is observed); a "Red" entry inside Leanback's own Settings page is LATER |
 | T12 | DIAL / device discoverability (cast from phone) | yes | LATER | needs SSDP server |
-| T13 | Touch overlay, userstyles, music mode | yes | DROP | |
+| T13 | Touch overlay, userstyles, music mode | yes | DROP | the "music mode" seen elsewhere is an audio-only flag inside Leanback; Red's Music mode is the YouTube Music site itself, section G |
 | T14 | Download the video being watched in TV mode (Ctrl+D) | n/a | KEEP | done — `tv/current-video.js` |
 | T15 | Voice search (`env_enableMediaStreams`), mic permission | yes | KEEP | done — `tv/leanback-fixes.js`, permissions |
 
@@ -97,6 +97,19 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | E12 | Watch/Listen in mpv | yes | DROP | the app is the player |
 | E13 | Notification on completion with Open / Show in folder | none | KEEP | done — `ui::DownloadsHub` |
 | E14 | Live streams (record from now), premieres | none | LATER | |
+
+## G. Music mode (music.youtube.com)
+
+| # | Feature | Status |
+|---|---|---|
+| M1 | Third `AppMode`: rail button, Ctrl+M, `red --music`, desktop action, remembered across launches (`window/lastMode`), own "where I left off" (`window/lastMusicUrl`) | done, ADR-013 |
+| M2 | YouTube Music links (masthead app picker, `target=_blank`) open in the main view instead of a pop-up | done, `WebPage` `newWindowRequested`, pop-up first-navigation safety net |
+| M3 | Media keys, tray now-playing, MPRIS with album and the music.youtube.com URL; reporting continues on every page | done, `media-session.js` (no "parked" rule in Music, `ytmusic-player-bar` transport) |
+| M4 | Background play, ad and tracker blocking, SponsorBlock share the desktop scripts | done, common script set only |
+| M5 | Downloads preselect *Audio only* without changing the desktop default; Ctrl+D downloads the playing track from any page | done, `DownloadDialog::preselectKind`, `WebView::downloadableUrl` media fallback |
+| M6 | Mini player off, screen not kept awake, page background dark (YouTube Music is dark-only) | done |
+| M7 | Album pages (`/browse/MPREb_`) downloadable | LATER |
+| M8 | SponsorBlock markers on YouTube Music's own progress bar; segments off the watch page | LATER |
 
 ## F. Settings surface
 

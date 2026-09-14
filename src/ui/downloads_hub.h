@@ -98,7 +98,12 @@ private:
     DownloadsPanel* m_panel = nullptr;
     QPointer<EngineSetupDialog> m_engineDialog;
     QTimer* m_persistTimer = nullptr;
-    QList<QUrl> m_pendingUrls; ///< waiting for the engine
+    struct PendingRequest
+    {
+        QUrl url;
+        bool audioOnly = false;
+    };
+    QList<PendingRequest> m_pending; ///< waiting for the engine
     QHash<quint64, quint64> m_notificationJobs;
     QHash<QString, QList<quint64>>
         m_awaitingThumbnail; ///< url → jobs waiting for keep()             ///< notification id → job id

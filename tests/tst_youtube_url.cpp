@@ -25,6 +25,15 @@ private Q_SLOTS:
             << u"https://www.youtube.com/watch?v=aqz-KE-bpKQ&list=RDaqz-KE-bpKQ&start_radio=1"_s
             << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s
             << QString(); // mixes are unviewable for yt-dlp
+        QTest::newRow("music watch")
+            << u"https://music.youtube.com/watch?v=aqz-KE-bpKQ&list=RDAMVMaqz-KE-bpKQ"_s
+            << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s
+            << QString(); // YouTube Music mixes are dropped like any RD list
+        QTest::newRow("music playlist")
+            << u"https://music.youtube.com/playlist?list=OLAK5uy_abc"_s
+            << static_cast<int>(YouTubeUrlKind::Playlist) << QString() << u"OLAK5uy_abc"_s;
+        QTest::newRow("music album") << u"https://music.youtube.com/browse/MPREb_abc"_s
+                                     << static_cast<int>(YouTubeUrlKind::Other) << QString() << QString();
         QTest::newRow("youtu.be") << u"https://youtu.be/aqz-KE-bpKQ?t=10"_s
                                   << static_cast<int>(YouTubeUrlKind::Video) << u"aqz-KE-bpKQ"_s << QString();
         QTest::newRow("shorts") << u"https://www.youtube.com/shorts/aqz-KE-bpKQ"_s
@@ -77,6 +86,12 @@ private Q_SLOTS:
         QCOMPARE(thumbnailUrl(u"abc"_s).toString(), u"https://i.ytimg.com/vi/abc/mqdefault.jpg"_s);
         QCOMPARE(videoIdFromTvHash(u"/watch?v=aqz-KE-bpKQ"_s), u"aqz-KE-bpKQ"_s);
         QCOMPARE(videoIdFromTvHash(u"/browse"_s), QString());
+        QCOMPARE(canonicalVideoUrl(QUrl(u"https://music.youtube.com/watch?v=aqz-KE-bpKQ"_s)).value(),
+                 QUrl(u"https://www.youtube.com/watch?v=aqz-KE-bpKQ"_s));
+        QCOMPARE(musicVideoUrl(u"aqz-KE-bpKQ"_s).toString(),
+                 u"https://music.youtube.com/watch?v=aqz-KE-bpKQ"_s);
+        QCOMPARE(musicVideoUrl(u"aqz-KE-bpKQ"_s, u"PL1"_s).toString(),
+                 u"https://music.youtube.com/watch?v=aqz-KE-bpKQ&list=PL1"_s);
     }
 
     void hosts()
@@ -88,6 +103,11 @@ private Q_SLOTS:
         QVERIFY(isGoogleServiceHost(u"accounts.google.com"_s));
         QVERIFY(isGoogleServiceHost(u"lh3.googleusercontent.com"_s));
         QVERIFY(!isGoogleServiceHost(u"example.com"_s));
+        QVERIFY(isYouTubeHost(u"music.youtube.com"_s));
+        QVERIFY(isYouTubeMusicHost(u"music.youtube.com"_s));
+        QVERIFY(isYouTubeMusicHost(u"MUSIC.youtube.com"_s));
+        QVERIFY(!isYouTubeMusicHost(u"www.youtube.com"_s));
+        QVERIFY(!isYouTubeMusicHost(u"xmusic.youtube.com"_s));
     }
 };
 

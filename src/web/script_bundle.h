@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/settings/settings.h"
+
 #include <QJsonObject>
 #include <QString>
 #include <QWebEngineScript>
@@ -19,7 +21,7 @@ public:
 
     /// (Re)installs the DocumentCreation bundle with the given config
     /// (exposed to scripts as `window.__red.config`).
-    void installBootstrap(const QJsonObject& config, bool tvMode);
+    void installBootstrap(const QJsonObject& config, core::AppMode mode);
 
     void installResource(const QString& name, const QString& resourcePath,
                          QWebEngineScript::InjectionPoint point = QWebEngineScript::DocumentReady);
@@ -30,7 +32,7 @@ public:
     [[nodiscard]] static QString scriptName(const QString& name);
 
     /// Names of the resources bundled into the bootstrap, in order.
-    [[nodiscard]] static QStringList bootstrapResources(bool tvMode);
+    [[nodiscard]] static QStringList bootstrapResources(core::AppMode mode);
 
 private:
     void installSource(const QString& name, const QString& source, QWebEngineScript::InjectionPoint point);

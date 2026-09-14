@@ -46,6 +46,7 @@ Q_SIGNALS:
     void openRequested(const QString& url);
     void downloadRequested(const QString& url);
     void tvModeRequested();
+    void musicModeRequested();
     void settingsRequested();
     void quitRequested();
 

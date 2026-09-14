@@ -85,6 +85,7 @@ QString buildDiagnostics(const core::Settings& settings, const QString& userAgen
     out << u"- Host: "_s << platform::describeHost() << u'\n';
     out << u"- CPU: "_s << QSysInfo::currentCpuArchitecture() << u'\n';
     out << u"- User agent: "_s << userAgent << u'\n';
+    out << u"- Mode: "_s << core::appModeName(settings.lastMode()) << u'\n';
     out << u"- Engine: "_s << engineSummary << u'\n';
     out << u"- Settings: "_s << settings.fileName() << u'\n';
     out << u"- Data: "_s << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) << u'\n';

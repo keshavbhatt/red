@@ -19,14 +19,16 @@
   <description>
     <p>
       Red is a YouTube client for the Linux desktop: a native app to watch YouTube without ads,
-      with a smart TV mode, SponsorBlock, media keys, a mini player and a built-in YouTube
-      downloader. Sign in with your Google account and your subscriptions, history and
-      recommendations work as on the website, in a lightweight window instead of a browser tab.
+      with a smart TV mode, a YouTube Music mode, SponsorBlock, media keys, a mini player and a
+      built-in YouTube downloader. Sign in with your Google account and your subscriptions,
+      history and recommendations work as on the website, in a lightweight window instead of a
+      browser tab.
     </p>
-    <p>Two ways to watch, one window:</p>
+    <p>Three ways to watch, one window:</p>
     <ul>
       <li>Desktop mode: the full YouTube website, signed in, in light, dark or system theme, with picture-in-picture style mini player</li>
       <li>TV mode: the YouTube Leanback interface from smart TVs and consoles, full screen, driven by keyboard, mouse or gamepad controller, ideal for a media center, living room PC or handheld</li>
+      <li>Music mode: YouTube Music in the same window, a music player with media keys, tray and MPRIS controls, background play, and audio downloads one click away</li>
     </ul>
     <p>Watch without interruptions:</p>
     <ul>
@@ -82,6 +84,8 @@
     <keyword>downloader</keyword>
     <keyword>adblock</keyword>
     <keyword>youtube client</keyword>
+    <keyword>youtube music</keyword>
+    <keyword>music player</keyword>
     <keyword>youtube tv</keyword>
     <keyword>youtube downloader</keyword>
     <keyword>youtube to mp3</keyword>

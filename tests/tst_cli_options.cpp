@@ -18,6 +18,7 @@ private Q_SLOTS:
         QVERIFY(!r.versionRequested);
         QVERIFY(r.options.profile.isEmpty());
         QVERIFY(!r.options.tvMode);
+        QVERIFY(!r.options.musicMode);
         QVERIFY(!r.options.logFile.has_value());
         QVERIFY(!r.options.hasCommands());
     }
@@ -55,6 +56,26 @@ private Q_SLOTS:
         const CliParseResult r = parseCliOptions({u"red"_s, u"--bogus"_s});
         QVERIFY(!r.ok());
         QVERIFY(r.errorText.contains(u"bogus"_s));
+    }
+
+    void parsesMusic()
+    {
+        const CliParseResult r = parseCliOptions({u"red"_s, u"-m"_s});
+        QVERIFY(r.ok());
+        QVERIFY(r.options.musicMode);
+        QVERIFY(!r.options.tvMode);
+        QVERIFY(r.options.hasCommands());
+        const QList<QJsonObject> cmds = commandsFor(r.options);
+        QCOMPARE(cmds.size(), 2);
+        QCOMPARE(cmds[0].value(u"cmd"_s).toString(), u"music"_s);
+        QCOMPARE(cmds[1].value(u"cmd"_s).toString(), u"raise"_s);
+    }
+
+    void tvAndMusicCannotCombine()
+    {
+        const CliParseResult r = parseCliOptions({u"red"_s, u"--tv"_s, u"--music"_s});
+        QVERIFY(!r.ok());
+        QVERIFY(r.errorText.contains(u"--music"_s));
     }
 
     void commandsForwardInOrderAndEndWithRaise()

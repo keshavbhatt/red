@@ -26,6 +26,12 @@ public:
     ~PopupWindow() override = default;
 
     [[nodiscard]] QWebEnginePage* page() const;
+
+Q_SIGNALS:
+    /// The pop-up navigated to YouTube Music: it belongs in the main view.
+    void musicUrlRequested(const QUrl& url);
+
+public:
     /// The same sheets the main page uses, parented to this window.
     void setScriptDialogs(ScriptDialogs dialogs) { m_dialogs = std::move(dialogs); }
 

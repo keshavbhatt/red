@@ -171,7 +171,7 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, true);
     s->setAttribute(QWebEngineSettings::ErrorPageEnabled, false); // we render our own (web/error_page)
     s->setAttribute(QWebEngineSettings::PdfViewerEnabled, false);
-    s->setAttribute(QWebEngineSettings::ShowScrollBars, m_mode == core::AppMode::Desktop);
+    s->setAttribute(QWebEngineSettings::ShowScrollBars, m_mode != core::AppMode::Tv);
     s->setAttribute(QWebEngineSettings::NavigateOnDropEnabled, false);
 }
 
@@ -197,11 +197,13 @@ QJsonObject WebProfile::scriptConfig() const
         {u"hideShorts"_s, m_settings.tvHideShorts()},
     };
     return QJsonObject{
-        {u"mode"_s, m_mode == core::AppMode::Tv ? u"tv"_s : u"desktop"_s},
+        {u"mode"_s, QString(core::appModeName(m_mode))},
         {u"appVersion"_s, m_appVersion},
         {u"colorScheme"_s, themeName(m_settings.theme())},
         {u"adblock"_s, m_settings.blockAds()},
-        {u"hideShorts"_s, m_mode == core::AppMode::Tv ? m_settings.tvHideShorts() : m_settings.hideShorts()},
+        {u"hideShorts"_s, m_mode == core::AppMode::Tv        ? m_settings.tvHideShorts()
+                          : m_mode == core::AppMode::Desktop ? m_settings.hideShorts()
+                                                             : false},
         {u"dislikes"_s, m_settings.showDislikes()},
         {u"sponsorBlock"_s, sponsor},
         {u"codec"_s, codecName(m_settings.codecPreference())},
@@ -213,7 +215,7 @@ QJsonObject WebProfile::scriptConfig() const
 
 void WebProfile::installBootstrap()
 {
-    m_scripts->installBootstrap(scriptConfig(), m_mode == core::AppMode::Tv);
+    m_scripts->installBootstrap(scriptConfig(), m_mode);
 }
 
 void WebProfile::pushConfig()
@@ -249,9 +251,9 @@ void WebProfile::setMode(core::AppMode mode)
     m_mode = mode;
     m_settings.setLastMode(mode);
     configureUserAgent();
-    settings()->setAttribute(QWebEngineSettings::ShowScrollBars, m_mode == core::AppMode::Desktop);
+    settings()->setAttribute(QWebEngineSettings::ShowScrollBars, m_mode != core::AppMode::Tv);
     installBootstrap();
-    qCInfo(lcWeb) << "mode:" << (mode == core::AppMode::Tv ? "tv" : "desktop");
+    qCInfo(lcWeb) << "mode:" << core::appModeName(mode);
 }
 
 void WebProfile::setMiniPlayer(bool on)
