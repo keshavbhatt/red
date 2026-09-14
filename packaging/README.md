@@ -25,6 +25,15 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
   with the repo variable `PUBLISH_TO_STORE=true` and the `SNAPCRAFT_STORE_CREDENTIALS`
   secret it releases to **edge**. Nothing is stored as a workflow artifact.
 
+### Store listing text
+
+`title`, `summary` and `description` in `snap/snapcraft.yaml` are the store listing text (they
+take precedence over what `parse-info` reads from the metainfo). The store does not pick them up
+from an upload: after changing them, either paste them into
+https://snapcraft.io/red-app/listing or run `snapcraft upload-metadata <built .snap>` with a
+logged-in snapcraft. Limits: title 40 characters, summary 79, description 4096; the description
+syntax is `**bold**`, `_italics_`, `* list`, backtick code and bare URLs.
+
 ## Flatpak
 
 `packaging/flatpak/com.ktechpit.red.yaml` follows the other ktechpit apps on Flathub:

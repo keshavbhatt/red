@@ -5,8 +5,51 @@ confinement: strict
 base: core24
 compression: lzo
 
-title: Red
-summary: YouTube, in a real desktop app
+title: Red - YouTube client for Linux
+summary: Watch YouTube without ads, TV mode, SponsorBlock, downloads, mini player
+description: |
+  Red is a YouTube client for the Linux desktop: the real YouTube site in a native, lightweight
+  window, with the things a browser tab cannot give you. Sign in with your Google account and your
+  subscriptions, history and recommendations work as on the website.
+
+  **Two ways to watch**
+
+  * _Desktop mode_: the full YouTube website in light, dark or system theme, with a floating
+    mini player that stays above other windows while you work.
+  * _TV mode_: YouTube's smart TV interface (Leanback) full screen, driven by keyboard, mouse or
+    a game controller. Perfect for a media center, a living room PC or a handheld. Switch with
+    `Ctrl+T` at any time; the video you were watching carries over.
+
+  **Watch without interruptions**
+
+  * Built-in ad blocker: video ads, banners and sponsored feed items are removed before the page
+    renders. Playback traffic is never touched, so it cannot break a video.
+  * Tracker blocking, SponsorBlock to skip sponsor segments, intros and reminders, Return
+    YouTube Dislike counts, and a switch to hide Shorts.
+
+  **YouTube downloader built in**
+
+  * Download any video, playlist or channel as MP4, MKV or WebM, up to 4K.
+  * YouTube to MP3: save the audio only as MP3, M4A, Opus, FLAC or WAV.
+  * Subtitles, thumbnail, metadata and chapters embedded; sponsor segments cut out on request.
+  * Playlists are detected from any link, entries can be picked one by one, and the queue
+    pauses, resumes and retries. Your sign-in is reused, so age-restricted videos download too.
+  * The download engine sets itself up on first use and keeps itself updated.
+
+  **Made for the desktop**
+
+  * Media keys and desktop media controls (MPRIS), a tray icon with play, pause and skip.
+  * The screen stays awake while a video plays; playback continues when the window is hidden.
+  * Hardware video decoding, native Wayland and X11, notifications when a download finishes.
+  * Single instance: `red-app <youtube-link>` opens the link, `red-app --download <link>` queues
+    a download, `red-app --tv` starts in TV mode.
+
+  Guide and help: https://github.com/keshavbhatt/red/blob/master/GUIDE.md
+  Bugs and requests: https://github.com/keshavbhatt/red/issues
+
+  A lightweight alternative to the browser tab, to Electron YouTube apps and to a separate
+  downloader. YouTube is a trademark of Google LLC; Red is an independent client and is not
+  affiliated with YouTube or Google.
 website: https://github.com/keshavbhatt/red
 issues: https://github.com/keshavbhatt/red/issues
 license: Proprietary
