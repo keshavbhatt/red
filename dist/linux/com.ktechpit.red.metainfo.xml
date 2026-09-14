@@ -135,6 +135,19 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.1.0" date="2026-09-14" type="stable">
+      <description>
+        <p>Music mode, an online guide and a bug report sheet, and fixes for the packaged builds.</p>
+        <ul>
+          <li>Music mode: YouTube Music in the same window (Ctrl+M), remembered across launches, playing on while you browse, with media keys, tray and desktop media controls and audio downloads one click away</li>
+          <li>What's new sheet on the first start of a new version</li>
+          <li>Online guide and a Report a bug sheet that opens a pre-filled issue or an email with the diagnostics attached</li>
+          <li>Optional playback progress bar behind the taskbar entry</li>
+          <li>Upsell pop-ups removed with the ads</li>
+          <li>Fixed: F11 in the snap and Flatpak builds, pop-up window dialogs, the YouTube Music "No internet connection" banner, long drop-down lists, long titles in the tray menu</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.0.0" date="2026-09-07" type="stable">
       <description>
         <p>Red 10 is a redesigned Red on Qt 6 and Qt WebEngine.</p>
