@@ -189,6 +189,28 @@
                     red.hooks.prune(v, predicate, depth - 1);
                 }
             }
+        },
+        // Deletes every property named in `names` (an object used as a set)
+        // anywhere below `node`; for renderers that arrive as a property
+        // (a pop-up), not as a feed entry.
+        dropKeys: function (node, names, depth) {
+            if (depth <= 0 || !node || typeof node !== 'object') {
+                return;
+            }
+            if (Array.isArray(node)) {
+                for (var i = 0; i < node.length; i++) {
+                    red.hooks.dropKeys(node[i], names, depth - 1);
+                }
+                return;
+            }
+            var keys = Object.keys(node);
+            for (var k = 0; k < keys.length; k++) {
+                if (names[keys[k]]) {
+                    delete node[keys[k]];
+                } else if (node[keys[k]] && typeof node[keys[k]] === 'object') {
+                    red.hooks.dropKeys(node[keys[k]], names, depth - 1);
+                }
+            }
         }
     };
     hookInitial('ytInitialPlayerResponse');

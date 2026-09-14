@@ -5,8 +5,9 @@
 //           dialog, and fast-forward any ad that still starts in the player.
 // depends:  __red.hooks; InnerTube field names (adPlacements, adSlots,
 //           playerAds, *AdRenderer / adSlotRenderer); YouTube's #movie_player
-//           element and its ad-showing class; ytd-enforcement-message-view-model
-// verified: 2026-09-06 against www.youtube.com and youtube.com/tv
+//           element and its ad-showing class; ytd-enforcement-message-view-model;
+//           mealbarPromoRenderer pop-ups (desktop and YouTube Music)
+// verified: 2026-09-14 against www.youtube.com, youtube.com/tv and music.youtube.com
 // on-fail:  no-op; the page keeps its own behaviour
 (function () {
     'use strict';
@@ -27,6 +28,9 @@
         primetimePromoRenderer: 1, brandVideoShelfRenderer: 1, brandVideoSingletonRenderer: 1,
         merchandiseShelfRenderer: 1, searchPyvRenderer: 1, tvMastheadRenderer: 1, adsEngagementPanelRenderer: 1
     };
+    // Upsell pop-ups ("Try YouTube Music family plan", Premium trials) come as a
+    // property of the response, not a feed entry: dropped wherever they sit.
+    var PROMO_KEYS = { mealbarPromoRenderer: 1, musicMealbarPromoRenderer: 1, promotionRenderer: 1 };
     function isAdItem(el) {
         for (var key in el) {
             if (AD_RENDERERS[key]) {
@@ -85,6 +89,7 @@
             obj.continuationContents || obj.entries || obj.items) {
             red.hooks.prune(obj, isAdItem, 24);
         }
+        red.hooks.dropKeys(obj, PROMO_KEYS, 24);
     });
 
     // --- cosmetic layer -------------------------------------------------------
@@ -98,7 +103,9 @@
         '.ytp-ad-overlay-container, .ytp-ad-image-overlay, .ytp-ad-text-overlay, .ytp-ad-action-interstitial,',
         'ytd-enforcement-message-view-model, tp-yt-paper-dialog:has(> ytd-enforcement-message-view-model),',
         'ytd-popup-container > tp-yt-paper-dialog:has(ytd-enforcement-message-view-model),',
-        'ytlr-ad-slot-renderer, ytlr-promo-shelf-renderer',
+        'ytlr-ad-slot-renderer, ytlr-promo-shelf-renderer,',
+        'ytmusic-mealbar-promo-renderer, ytmusic-popup-container tp-yt-paper-dialog:has(> ytmusic-mealbar-promo-renderer),',
+        'ytmusic-popup-container tp-yt-paper-dialog:has(ytmusic-mealbar-promo-renderer)',
         '{ display: none !important; }'
     ].join('\n');
     function applyCss() {
