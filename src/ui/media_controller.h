@@ -12,6 +12,7 @@ class Settings;
 namespace red::platform {
 class MprisService;
 class ScreenInhibitor;
+class TaskbarProgress;
 } // namespace red::platform
 namespace red::web {
 class WebView;
@@ -43,11 +44,13 @@ Q_SIGNALS:
 private:
     void handleState(const core::MediaState& state);
     void updateInhibit();
+    void updateTaskbarProgress();
 
     core::Settings& m_settings;
     web::WebView& m_view;
     std::unique_ptr<platform::MprisService> m_mpris;
     std::unique_ptr<platform::ScreenInhibitor> m_inhibitor;
+    std::unique_ptr<platform::TaskbarProgress> m_taskbar;
     core::MediaState m_state;
 };
 

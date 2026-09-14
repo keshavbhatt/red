@@ -35,6 +35,7 @@ inline constexpr QLatin1StringView kAutoplay{"playback/autoplay"};
 inline constexpr QLatin1StringView kCodecPreference{"playback/codecPreference"};
 inline constexpr QLatin1StringView kHardwareVideoDecode{"playback/hardwareVideoDecode"};
 inline constexpr QLatin1StringView kKeepScreenAwake{"playback/keepScreenAwake"};
+inline constexpr QLatin1StringView kTaskbarProgress{"playback/taskbarProgress"};
 inline constexpr QLatin1StringView kMiniPlayerSize{"playback/miniPlayerSize"};
 inline constexpr QLatin1StringView kPlayInBackground{"playback/playInBackground"};
 

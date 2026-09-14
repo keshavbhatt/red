@@ -201,6 +201,9 @@ public:
     [[nodiscard]] bool hardwareVideoDecode() const;
     void setHardwareVideoDecode(bool enabled);
     [[nodiscard]] bool keepScreenAwake() const;
+    /// Playback position as a progress bar behind the taskbar entry (off by default).
+    [[nodiscard]] bool taskbarProgress() const;
+    void setTaskbarProgress(bool enabled);
     void setKeepScreenAwake(bool enabled);
     [[nodiscard]] MiniPlayerSize miniPlayerSize() const;
     void setMiniPlayerSize(MiniPlayerSize size);
@@ -326,6 +329,7 @@ Q_SIGNALS:
     void codecPreferenceChanged(red::core::CodecPreference codec);
     void hardwareVideoDecodeChanged(bool enabled);
     void keepScreenAwakeChanged(bool enabled);
+    void taskbarProgressChanged(bool enabled);
     void miniPlayerSizeChanged(red::core::MiniPlayerSize size);
     void playInBackgroundChanged(bool enabled);
     void blockingChanged(); ///< ads / trackers toggled

@@ -14,6 +14,7 @@ qt_add_library(red_platform STATIC
     platform_info.cpp
     platform_info.h
     screen_inhibitor.h
+    taskbar_progress.h
 )
 red_set_warnings(red_platform)
 
@@ -39,6 +40,7 @@ if(LINUX)
         linux/mpris_adaptors.cpp
         linux/mpris_adaptors.h
         linux/screen_inhibitor_dbus.cpp
+        linux/taskbar_progress_dbus.cpp
     )
     target_link_libraries(red_platform PUBLIC Qt6::DBus)
 else()
@@ -48,5 +50,6 @@ else()
         gpu_stderr_watch_generic.cpp
         mpris_service_generic.cpp
         screen_inhibitor_generic.cpp
+        taskbar_progress_generic.cpp
     )
 endif()

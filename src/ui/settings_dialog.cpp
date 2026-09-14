@@ -325,6 +325,11 @@ QWidget* SettingsDialog::buildPlayback()
     m_background = new QCheckBox(tr("Keep playing when the window is hidden or minimized"), behaviour);
     connect(m_background, &QCheckBox::toggled, this, [this](bool on) { m_settings.setPlayInBackground(on); });
     g->addRow(tr("Background"), m_background);
+    m_taskbarProgress =
+        new QCheckBox(tr("Show the playback position as a progress bar on the taskbar"), behaviour);
+    connect(m_taskbarProgress, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setTaskbarProgress(on); });
+    g->addRow(tr("Taskbar"), m_taskbarProgress);
     m_miniSize = new QComboBox(behaviour);
     m_miniSize->addItem(tr("Small (400 × 225)"), static_cast<int>(core::MiniPlayerSize::Small));
     m_miniSize->addItem(tr("Medium (480 × 270)"), static_cast<int>(core::MiniPlayerSize::Medium));
@@ -694,6 +699,7 @@ void SettingsDialog::loadValues()
     m_hwDecode->setChecked(m_settings.hardwareVideoDecode());
     m_keepAwake->setChecked(m_settings.keepScreenAwake());
     m_background->setChecked(m_settings.playInBackground());
+    m_taskbarProgress->setChecked(m_settings.taskbarProgress());
     m_miniSize->setCurrentIndex(m_miniSize->findData(static_cast<int>(m_settings.miniPlayerSize())));
     m_blockAds->setChecked(m_settings.blockAds());
     m_blockTrackers->setChecked(m_settings.blockTrackers());

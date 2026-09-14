@@ -3,6 +3,7 @@
 #include "core/settings/settings.h"
 #include "platform/mpris_service.h"
 #include "platform/screen_inhibitor.h"
+#include "platform/taskbar_progress.h"
 #include "ui/logging.h"
 #include "web/web_view.h"
 
@@ -17,6 +18,7 @@ MediaController::MediaController(core::Settings& settings, web::WebView& view, c
     , m_view(view)
     , m_mpris(platform::MprisService::create(u"Red"_s, desktopEntry))
     , m_inhibitor(platform::ScreenInhibitor::create())
+    , m_taskbar(platform::TaskbarProgress::create(desktopEntry))
 {
     connect(&m_view, &web::WebView::mediaStateChanged, this, &MediaController::handleState);
     connect(m_mpris.get(), &platform::MprisService::commandRequested, this,
@@ -24,6 +26,8 @@ MediaController::MediaController(core::Settings& settings, web::WebView& view, c
     connect(m_mpris.get(), &platform::MprisService::raiseRequested, this, &MediaController::raiseRequested);
     connect(&m_settings, &core::Settings::keepScreenAwakeChanged, this, [this](bool) { updateInhibit(); });
     connect(&m_view, &web::WebView::modeChanged, this, [this](core::AppMode) { updateInhibit(); });
+    connect(&m_settings, &core::Settings::taskbarProgressChanged, this,
+            [this](bool) { updateTaskbarProgress(); });
 }
 
 MediaController::~MediaController() = default;
@@ -37,6 +41,7 @@ void MediaController::handleState(const core::MediaState& state)
         qCDebug(lcUi) << "media" << (state.isPlaying() ? "playing" : "paused") << state.title;
     }
     updateInhibit();
+    updateTaskbarProgress();
     Q_EMIT stateChanged(state);
 }
 
@@ -46,6 +51,18 @@ void MediaController::updateInhibit()
     const bool wanted =
         m_settings.keepScreenAwake() && m_state.isPlaying() && m_view.mode() != core::AppMode::Music;
     m_inhibitor->setInhibited(wanted, tr("Playing a video"));
+}
+
+/// Elisa-style: the position drawn behind the taskbar entry while something plays.
+void MediaController::updateTaskbarProgress()
+{
+    const bool wanted =
+        m_settings.taskbarProgress() && m_state.isPlaying() && m_state.duration > 0 && !m_state.live;
+    if (!wanted) {
+        m_taskbar->clear();
+        return;
+    }
+    m_taskbar->setProgress(m_state.position / m_state.duration);
 }
 
 void MediaController::playPause()

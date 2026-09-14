@@ -101,6 +101,7 @@ private:
     QComboBox* m_codec = nullptr;
     QCheckBox* m_hwDecode = nullptr;
     QCheckBox* m_keepAwake = nullptr;
+    QCheckBox* m_taskbarProgress = nullptr;
     QCheckBox* m_background = nullptr;
     QComboBox* m_miniSize = nullptr;
     // blocking

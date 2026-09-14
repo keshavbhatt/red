@@ -37,6 +37,9 @@ private Q_SLOTS:
         QVERIFY(m_settings->whatsNewSeenVersion().isEmpty());
         m_settings->setWhatsNewSeenVersion(u" 10.0.0 "_s);
         QCOMPARE(m_settings->whatsNewSeenVersion(), u"10.0.0"_s);
+        QVERIFY(!m_settings->taskbarProgress());
+        m_settings->setTaskbarProgress(true);
+        QVERIFY(m_settings->taskbarProgress());
         QVERIFY(m_settings->freeDownloads().day.isEmpty());
         m_settings->setFreeDownloads({u"2026-09-13"_s, 3});
         QCOMPARE(m_settings->freeDownloads().used, 3);

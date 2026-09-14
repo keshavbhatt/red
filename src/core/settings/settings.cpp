@@ -30,6 +30,7 @@ constexpr bool kDefaultAutoplay = true;
 constexpr CodecPreference kDefaultCodec = CodecPreference::Auto;
 constexpr bool kDefaultHardwareVideoDecode = false;
 constexpr bool kDefaultKeepScreenAwake = true;
+constexpr bool kDefaultTaskbarProgress = false;
 constexpr MiniPlayerSize kDefaultMiniPlayerSize = MiniPlayerSize::Medium;
 constexpr bool kDefaultPlayInBackground = true;
 constexpr bool kDefaultBlockAds = true;
@@ -376,6 +377,18 @@ void Settings::setKeepScreenAwake(bool enabled)
 {
     if (storeBool(keys::kKeepScreenAwake, kDefaultKeepScreenAwake, enabled)) {
         Q_EMIT keepScreenAwakeChanged(enabled);
+    }
+}
+
+bool Settings::taskbarProgress() const
+{
+    return boolValue(keys::kTaskbarProgress, kDefaultTaskbarProgress);
+}
+
+void Settings::setTaskbarProgress(bool enabled)
+{
+    if (storeBool(keys::kTaskbarProgress, kDefaultTaskbarProgress, enabled)) {
+        Q_EMIT taskbarProgressChanged(enabled);
     }
 }
 
@@ -951,6 +964,7 @@ void Settings::resetToDefaults()
     Q_EMIT autoplayChanged(autoplay());
     Q_EMIT codecPreferenceChanged(codecPreference());
     Q_EMIT keepScreenAwakeChanged(keepScreenAwake());
+    Q_EMIT taskbarProgressChanged(taskbarProgress());
     Q_EMIT miniPlayerSizeChanged(miniPlayerSize());
     Q_EMIT playInBackgroundChanged(playInBackground());
     Q_EMIT blockingChanged();
