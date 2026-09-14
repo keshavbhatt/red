@@ -6,19 +6,22 @@ base: core24
 compression: lzo
 
 title: Red - YouTube client for Linux
-summary: Watch YouTube without ads, TV mode, SponsorBlock, downloads, mini player
+summary: YouTube and YouTube Music without ads, TV mode, SponsorBlock, downloads
 description: |
   Red is a YouTube client for the Linux desktop: the real YouTube site in a native, lightweight
   window, with the things a browser tab cannot give you. Sign in with your Google account and your
   subscriptions, history and recommendations work as on the website.
 
-  **Two ways to watch**
+  **Three ways to watch**
 
   * _Desktop mode_: the full YouTube website in light, dark or system theme, with a floating
     mini player that stays above other windows while you work.
   * _TV mode_: YouTube's smart TV interface (Leanback) full screen, driven by keyboard, mouse or
     a game controller. Perfect for a media center, a living room PC or a handheld. Switch with
     `Ctrl+T` at any time; the video you were watching carries over.
+  * _Music mode_: YouTube Music in the same window (`Ctrl+M`), playing on while you browse, with
+    media keys, tray and desktop media controls showing album and cover, and audio downloads one
+    click away.
 
   **Watch without interruptions**
 
@@ -38,11 +41,12 @@ description: |
 
   **Made for the desktop**
 
-  * Media keys and desktop media controls (MPRIS), a tray icon with play, pause and skip.
+  * Media keys and desktop media controls (MPRIS), a tray icon with play, pause and skip, and an
+    optional playback progress bar behind the taskbar entry.
   * The screen stays awake while a video plays; playback continues when the window is hidden.
   * Hardware video decoding, native Wayland and X11, notifications when a download finishes.
   * Single instance: `red-app <youtube-link>` opens the link, `red-app --download <link>` queues
-    a download, `red-app --tv` starts in TV mode.
+    a download, `red-app --tv` starts in TV mode, `red-app --music` in Music mode.
 
   Guide and help: https://github.com/keshavbhatt/red/blob/master/GUIDE.md
   Bugs and requests: https://github.com/keshavbhatt/red/issues
