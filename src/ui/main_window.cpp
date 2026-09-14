@@ -338,6 +338,9 @@ void MainWindow::start(std::optional<core::AppMode> requested)
 
 void MainWindow::restoreWindowState()
 {
+    if (qEnvironmentVariableIsSet("RED_DEBUG_WINDOW_SIZE")) {
+        return; // a grab wants the size it asked for, not the remembered one
+    }
     const QByteArray geometry = m_settings.windowGeometry();
     if (!geometry.isEmpty() && !restoreGeometry(geometry)) {
         qCWarning(lcUi) << "stored window geometry rejected, using defaults";

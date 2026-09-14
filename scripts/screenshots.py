@@ -108,7 +108,7 @@ def banner(dialog, size=(2160, 720)):
     layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
     x = x0
-    for pill in ("TV mode", "Ad & sponsor blocking", "Downloads", "Media keys & mini player"):
+    for pill in ("TV mode", "Music mode", "Ad & sponsor blocking", "Downloads", "Media keys"):
         tw = ld.textlength(pill, font=pf)
         ld.rounded_rectangle((x, 470, x + tw + 56, 528), radius=29, fill=(255, 255, 255, 40))
         ld.text((x + 28, 483), pill, font=pf, fill=(255, 255, 255, 255))
@@ -127,9 +127,9 @@ def main(raw):
     shots = {k: Image.open(raw / f"{k}.png") for k in
              ("desktop", "tv", "downloads", "download-dialog", "blocking")}
     plan = [
-        ("00-hero", "desktop", "YouTube, in a real desktop app", "Fast, native, ad-free — with media keys, a mini player and downloads built in."),
+        ("00-hero", "desktop", "YouTube, in a real desktop app", "Fast, native, ad-free: YouTube Music, media keys, a mini player and downloads built in."),
         ("01-tv", "tv", "Lean back", "YouTube's living-room interface, driven by keyboard, mouse or gamepad. Ctrl+T switches any time."),
-        ("02-downloads", "downloads", "Download anything", "Videos, audio, playlists and channels — queued beside the page, with your sign-in for restricted videos."),
+        ("02-downloads", "downloads", "Download anything", "Videos, audio, playlists and channels, queued beside the page, with your sign-in for restricted videos."),
         ("03-download-dialog", "download-dialog", "Video, audio, or the exact streams", "Quality presets, subtitles, chapters and cover art embedded. Playlists are detected from any link."),
         ("04-blocking", "blocking", "Ads gone, sponsors skipped", "Ads stripped before YouTube renders them, SponsorBlock per category, dislikes back, Shorts hidden."),
     ]
