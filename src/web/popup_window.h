@@ -1,5 +1,7 @@
 #pragma once
 
+#include "web/script_dialogs.h"
+
 #include <QWidget>
 
 class QShortcut;
@@ -24,6 +26,8 @@ public:
     ~PopupWindow() override = default;
 
     [[nodiscard]] QWebEnginePage* page() const;
+    /// The same sheets the main page uses, parented to this window.
+    void setScriptDialogs(ScriptDialogs dialogs) { m_dialogs = std::move(dialogs); }
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
@@ -35,6 +39,7 @@ private:
     QShortcut* m_exitFullScreen = nullptr;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     FullScreenHint* m_fullScreenHint = nullptr;
+    ScriptDialogs m_dialogs;
 };
 
 } // namespace red::web

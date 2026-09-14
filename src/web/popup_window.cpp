@@ -39,6 +39,32 @@ protected:
         return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
     }
 
+    void javaScriptAlert(const QUrl& securityOrigin, const QString& msg) override
+    {
+        if (m_window->m_dialogs.alert) {
+            m_window->m_dialogs.alert(m_window, securityOrigin, msg);
+            return;
+        }
+        QWebEnginePage::javaScriptAlert(securityOrigin, msg);
+    }
+
+    bool javaScriptConfirm(const QUrl& securityOrigin, const QString& msg) override
+    {
+        if (m_window->m_dialogs.confirm) {
+            return m_window->m_dialogs.confirm(m_window, securityOrigin, msg);
+        }
+        return QWebEnginePage::javaScriptConfirm(securityOrigin, msg);
+    }
+
+    bool javaScriptPrompt(const QUrl& securityOrigin, const QString& msg, const QString& defaultValue,
+                          QString* result) override
+    {
+        if (m_window->m_dialogs.prompt) {
+            return m_window->m_dialogs.prompt(m_window, securityOrigin, msg, defaultValue, result);
+        }
+        return QWebEnginePage::javaScriptPrompt(securityOrigin, msg, defaultValue, result);
+    }
+
 private:
     PopupWindow* m_window;
 };

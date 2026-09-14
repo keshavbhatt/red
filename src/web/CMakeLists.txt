@@ -17,6 +17,7 @@ qt_add_library(red_web STATIC
     permission_controller.h
     popup_window.cpp
     popup_window.h
+    script_dialogs.h
     request_interceptor.cpp
     request_interceptor.h
     script_bundle.cpp

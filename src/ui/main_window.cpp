@@ -820,26 +820,28 @@ void MainWindow::handleRenderProcessGaveUp()
 /// raw URL in the title bar.
 void MainWindow::installScriptDialogs()
 {
-    web::WebPage::ScriptDialogs dialogs;
+    web::ScriptDialogs dialogs;
     auto siteName = [](const QUrl& origin) {
         const QString host = origin.host();
         return host.isEmpty() ? tr("This page") : host;
     };
-    dialogs.alert = [this, siteName](const QUrl& origin, const QString& message) {
-        MessageSheet::info(this, tr("%1 says").arg(siteName(origin)), message);
+    // `window` is the main window or a pop-up (YouTube Music, sign-in): the
+    // sheet belongs to whichever raised it.
+    dialogs.alert = [siteName](QWidget* window, const QUrl& origin, const QString& message) {
+        MessageSheet::info(window, tr("%1 says").arg(siteName(origin)), message);
     };
-    dialogs.confirm = [this, siteName](const QUrl& origin, const QString& message) {
+    dialogs.confirm = [siteName](QWidget* window, const QUrl& origin, const QString& message) {
         if (message.contains(u"leave this page"_s, Qt::CaseInsensitive)) {
-            return MessageSheet::confirm(this, MessageSheet::Tone::Question, tr("Leave this page?"),
+            return MessageSheet::confirm(window, MessageSheet::Tone::Question, tr("Leave this page?"),
                                          tr("Changes you made may not be saved."), tr("Leave"), tr("Stay"));
         }
-        return MessageSheet::confirm(this, MessageSheet::Tone::Question, tr("%1 asks").arg(siteName(origin)),
-                                     message, tr("OK"));
+        return MessageSheet::confirm(window, MessageSheet::Tone::Question,
+                                     tr("%1 asks").arg(siteName(origin)), message, tr("OK"));
     };
-    dialogs.prompt = [this, siteName](const QUrl& origin, const QString& message, const QString& defaultValue,
-                                      QString* result) {
+    dialogs.prompt = [siteName](QWidget* window, const QUrl& origin, const QString& message,
+                                const QString& defaultValue, QString* result) {
         bool ok = false;
-        const QString text = MessageSheet::askText(this, tr("%1 asks").arg(siteName(origin)), message,
+        const QString text = MessageSheet::askText(window, tr("%1 asks").arg(siteName(origin)), message,
                                                    QString(), defaultValue, tr("OK"), &ok);
         if (ok && result != nullptr) {
             *result = text;

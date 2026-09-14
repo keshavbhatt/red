@@ -21,7 +21,9 @@ if (exprs.length === 0 && calls.length === 0) { console.error('usage: cdp-eval.m
 
 const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
 // The main view: a YouTube page, or Google's sign-in when it is showing there.
-const page = targets.find(t => t.type === 'page' && /(^|\.)(youtube|google)\.com$/.test(new URL(t.url).hostname));
+// CDP_TARGET=<substring> picks one page when several are open (a pop-up window).
+const wanted = process.env.CDP_TARGET || '';
+const page = targets.find(t => t.type === 'page' && /(^|\.)(youtube|google)\.com$/.test(new URL(t.url).hostname) && t.url.includes(wanted));
 if (!page) { console.error('no page target; targets: ' + targets.map(t => t.url).join(', ')); process.exit(1); }
 
 const ws = new WebSocket(page.webSocketDebuggerUrl);

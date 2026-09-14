@@ -34,6 +34,7 @@ QWebEnginePage* WebPage::createWindow(WebWindowType type)
     // The window decides on its first navigation whether it stays (Google
     // sign-in) or hands the URL to the browser and closes.
     auto* window = new PopupWindow(m_profile, m_host);
+    window->setScriptDialogs(m_dialogs);
     window->show();
     Q_EMIT popupOpened(window);
     return window->page();
@@ -63,7 +64,7 @@ void WebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, cons
 void WebPage::javaScriptAlert(const QUrl& securityOrigin, const QString& msg)
 {
     if (m_dialogs.alert) {
-        m_dialogs.alert(securityOrigin, msg);
+        m_dialogs.alert(hostWindow(), securityOrigin, msg);
         return;
     }
     QWebEnginePage::javaScriptAlert(securityOrigin, msg);
@@ -72,7 +73,7 @@ void WebPage::javaScriptAlert(const QUrl& securityOrigin, const QString& msg)
 bool WebPage::javaScriptConfirm(const QUrl& securityOrigin, const QString& msg)
 {
     if (m_dialogs.confirm) {
-        return m_dialogs.confirm(securityOrigin, msg);
+        return m_dialogs.confirm(hostWindow(), securityOrigin, msg);
     }
     return QWebEnginePage::javaScriptConfirm(securityOrigin, msg);
 }
@@ -81,7 +82,7 @@ bool WebPage::javaScriptPrompt(const QUrl& securityOrigin, const QString& msg, c
                                QString* result)
 {
     if (m_dialogs.prompt) {
-        return m_dialogs.prompt(securityOrigin, msg, defaultValue, result);
+        return m_dialogs.prompt(hostWindow(), securityOrigin, msg, defaultValue, result);
     }
     return QWebEnginePage::javaScriptPrompt(securityOrigin, msg, defaultValue, result);
 }

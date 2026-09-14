@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QWebEnginePage>
+#include "web/script_dialogs.h"
 
-#include <functional>
+#include <QWebEnginePage>
+#include <QWidget>
 
 namespace red::web {
 
@@ -24,17 +25,7 @@ public:
     /// Parent for pop-up windows and dialogs (the main window's view).
     void setHostWidget(QWidget* host) { m_host = host; }
 
-    /// The UI's replacements for the engine's stock alert / confirm / prompt
-    /// boxes (the "leave this page?" guard included). Each runs modally;
-    /// `prompt` returns false when cancelled. Unset ones fall back to Qt's.
-    struct ScriptDialogs
-    {
-        std::function<void(const QUrl& origin, const QString& message)> alert;
-        std::function<bool(const QUrl& origin, const QString& message)> confirm;
-        std::function<bool(const QUrl& origin, const QString& message, const QString& defaultValue,
-                           QString* result)>
-            prompt;
-    };
+    /// Replacements for the stock script dialogs; pop-up windows inherit them.
     void setScriptDialogs(ScriptDialogs dialogs) { m_dialogs = std::move(dialogs); }
 
 Q_SIGNALS:
@@ -51,6 +42,8 @@ protected:
                           QString* result) override;
 
 private:
+    [[nodiscard]] QWidget* hostWindow() const { return m_host != nullptr ? m_host->window() : nullptr; }
+
     WebProfile& m_profile;
     QWidget* m_host = nullptr;
     ScriptDialogs m_dialogs;
