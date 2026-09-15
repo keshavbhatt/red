@@ -21,9 +21,11 @@
 sudo snap install red-app --edge
 ```
 
-**Flatpak**: bundles for x86_64 and aarch64 are attached to each
-[GitHub release](https://github.com/keshavbhatt/red/releases); install with
-`flatpak install red-x86_64.flatpak`. A Flathub listing follows the first release.
+**Flatpak** (x86_64 and aarch64), from [Flathub](https://flathub.org/apps/com.ktechpit.red):
+
+```sh
+flatpak install flathub com.ktechpit.red
+```
 
 ## Why Red
 
