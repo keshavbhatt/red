@@ -135,6 +135,16 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.2.0" date="2026-09-15" type="stable">
+      <description>
+        <p>Organised downloads and YouTube Music's Download entry.</p>
+        <ul>
+          <li>Downloads sorted into Videos, Music, Playlists and Channels folders, with a switch to keep one flat folder</li>
+          <li>The Download entry in YouTube Music's menus downloads through Red</li>
+          <li>Fixed: the icon of the context menu's audio download entry</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.1.0" date="2026-09-14" type="stable">
       <description>
         <p>Music mode, an online guide and a bug report sheet, and fixes for the packaged builds.</p>
@@ -143,8 +153,7 @@
           <li>What's new sheet on the first start of a new version</li>
           <li>Online guide and a Report a bug sheet that opens a pre-filled issue or an email with the diagnostics attached</li>
           <li>Optional playback progress bar behind the taskbar entry</li>
-          <li>Downloads sorted into Videos, Music, Playlists and Channels folders (switchable)</li>
-          <li>Upsell pop-ups removed with the ads; YouTube Music's own Download entry downloads through Red</li>
+          <li>Upsell pop-ups removed with the ads</li>
           <li>Fixed: F11 in the snap and Flatpak builds, pop-up window dialogs, the YouTube Music "No internet connection" banner, long drop-down lists, long titles in the tray menu</li>
         </ul>
       </description>
