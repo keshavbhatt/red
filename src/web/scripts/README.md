@@ -1,6 +1,6 @@
 # Injected scripts
 
-JavaScript injected into YouTube (desktop) and YouTube Leanback (TV mode). Rules:
+JavaScript injected into YouTube (desktop), YouTube Leanback (TV mode) and YouTube Music (Music mode). Rules:
 
 * One file per concern, registered in `../CMakeLists.txt` via `qt_add_resources`, installed by
   `web::ScriptBundle` on the **profile-level** script collection at `DocumentCreation`.
@@ -30,6 +30,7 @@ JavaScript injected into YouTube (desktop) and YouTube Leanback (TV mode). Rules
 | `tv/leanback-fixes.js` | tv | T8, T15 |
 | `tv/input.js` | tv | T4, T14 |
 | `tv/gamepad.js` | tv | T5 |
+| `music/download-menu.js` | music | M9 |
 
 Bridge API (`web::Bridge`): JS→C++ `scriptFailed`, `log`, `mediaState`, `requestSponsorSegments`,
 `sponsorSkipped`, `tvSignal`, `retry`, `downloadRequested`; C++→JS `sponsorSegments`,

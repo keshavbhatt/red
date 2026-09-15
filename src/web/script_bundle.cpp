@@ -57,9 +57,8 @@ QStringList ScriptBundle::bootstrapResources(core::AppMode mode)
         u":/scripts/hide-shorts.js"_s,       u":/scripts/tv/h5vcc.js"_s, u":/scripts/tv/identification.js"_s,
         u":/scripts/tv/leanback-fixes.js"_s, u":/scripts/tv/input.js"_s, u":/scripts/tv/gamepad.js"_s,
     };
-    // YouTube Music has no Shorts, no dislike button and its own player bar:
-    // the shared set is all it gets.
-    static const QStringList kMusic{};
+    // YouTube Music has no Shorts, no dislike button and its own player bar.
+    static const QStringList kMusic{u":/scripts/music/download-menu.js"_s};
     const QStringList features = kShared + (mode == core::AppMode::Tv      ? kTv
                                             : mode == core::AppMode::Music ? kMusic
                                                                            : kDesktop);

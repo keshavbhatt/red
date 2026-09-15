@@ -109,6 +109,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | M4 | Background play, ad and tracker blocking, SponsorBlock share the desktop scripts | done, common script set only |
 | M5 | Downloads preselect *Audio only* without changing the desktop default; Ctrl+D downloads the playing track from any page | done, `DownloadDialog::preselectKind`, `WebView::downloadableUrl` media fallback |
 | M6 | Mini player off, screen not kept awake, page background dark (YouTube Music is dark-only) | done |
+| M9 | The Premium-only *Download* entry in YouTube Music's menus (song rows, queue, player bar) downloads through Red: the video or playlist id comes from the neighbouring queue entries | done, `music/download-menu.js` |
 | M7 | Album pages (`/browse/MPREb_`) downloadable | LATER |
 | M8 | SponsorBlock markers on YouTube Music's own progress bar; segments off the watch page | LATER |
 

@@ -53,6 +53,7 @@ qt_add_resources(red_web "scripts"
         scripts/tv/leanback-fixes.js
         scripts/tv/input.js
         scripts/tv/gamepad.js
+        scripts/music/download-menu.js
 )
 
 target_link_libraries(red_web
