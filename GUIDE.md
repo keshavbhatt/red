@@ -120,6 +120,8 @@ straight to TV mode.
 What changes in Music mode:
 
 - **Ctrl+D** downloads the track that is playing, from any page, with *Audio only* preselected.
+  The *Download* entry in YouTube Music's own menus (a song's three dots, the queue, the player
+  bar) opens the same dialog instead of a Premium offer.
   Playlist pages download as a whole. Choosing *Video* here does not change the default the
   other modes use.
 - The mini player is off (YouTube Music has its own player bar), and the screen is allowed to

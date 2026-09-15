@@ -14,7 +14,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **Online guide** in the menu and in About, and a **Report a bug** sheet that opens a pre-filled
   issue or an email with the diagnostics on the clipboard.
 - Optional playback progress bar behind Red's taskbar entry (Settings, Playback).
-- Upsell pop-ups such as "Try YouTube Music family plan" are removed with the ads.
+- Upsell pop-ups such as "Try YouTube Music family plan" are removed with the ads, and the
+  *Download* entry in YouTube Music's menus downloads through Red instead of asking for Premium.
 
 ### Fixed
 - F11 toggles full screen in the snap and Flatpak builds too.
