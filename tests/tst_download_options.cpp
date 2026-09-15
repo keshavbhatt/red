@@ -114,6 +114,52 @@ private Q_SLOTS:
         QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, u"Ch"_s), u"Ch - T.mp4"_s);
     }
 
+    void organisedFolders()
+    {
+        QCOMPARE(downloadFolder(DownloadOptions::Kind::Video, false, false), u"Videos"_s);
+        QCOMPARE(downloadFolder(DownloadOptions::Kind::Custom, false, false), u"Videos"_s);
+        QCOMPARE(downloadFolder(DownloadOptions::Kind::Audio, false, false), u"Music"_s);
+        QCOMPARE(downloadFolder(DownloadOptions::Kind::Audio, true, false), u"Playlists"_s);
+        QCOMPARE(downloadFolder(DownloadOptions::Kind::Video, true, true), u"Channels"_s);
+
+        DownloadOptions o;
+        o.outputDirectory = u"/tmp/out"_s;
+        o.folder = u"Videos"_s;
+        QCOMPARE(outputTemplate(o), u"Videos/%(title)s.%(ext)s"_s);
+        QCOMPARE(downloadArguments(o, {}, u"u"_s).at(downloadArguments(o, {}, u"u"_s).indexOf(u"-o"_s) + 1),
+                 u"/tmp/out/Videos/%(title)s.%(ext)s"_s);
+        QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, QString()), u"Videos/T.mp4"_s);
+
+        o.kind = DownloadOptions::Kind::Audio;
+        o.folder = u"Music"_s;
+        QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, QString()), u"Music/T.opus"_s);
+
+        o.kind = DownloadOptions::Kind::Video;
+        o.isPlaylist = true;
+        o.folder = u"Playlists"_s;
+        QCOMPARE(
+            outputTemplate(o),
+            u"Playlists/%(playlist_title,playlist_id|Playlist)s/%(playlist_index|0)03d - %(title)s.%(ext)s"_s);
+        o.isChannel = true;
+        o.folder = u"Channels"_s;
+        QCOMPARE(
+            outputTemplate(o),
+            u"Channels/%(channel,uploader,playlist_uploader|Channel)s/%(playlist_index|0)03d - %(title)s.%(ext)s"_s);
+
+        // Organising off: the layout from before, playlists still in their own folder.
+        o.folder.clear();
+        o.isChannel = false;
+        QCOMPARE(outputTemplate(o),
+                 u"%(playlist_title,playlist_id|Playlist)s/%(playlist_index|0)03d - %(title)s.%(ext)s"_s);
+        const DownloadOptions back = DownloadOptions::fromJson([&] {
+            o.folder = u"Channels"_s;
+            o.isChannel = true;
+            return o.toJson();
+        }());
+        QCOMPARE(back.folder, u"Channels"_s);
+        QVERIFY(back.isChannel);
+    }
+
     void probeArgumentsAndJson()
     {
         const QStringList flat = probeArguments({}, u"https://www.youtube.com/playlist?list=x"_s, true);

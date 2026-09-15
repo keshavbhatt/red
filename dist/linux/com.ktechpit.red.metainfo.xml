@@ -143,6 +143,7 @@
           <li>What's new sheet on the first start of a new version</li>
           <li>Online guide and a Report a bug sheet that opens a pre-filled issue or an email with the diagnostics attached</li>
           <li>Optional playback progress bar behind the taskbar entry</li>
+          <li>Downloads sorted into Videos, Music, Playlists and Channels folders (switchable)</li>
           <li>Upsell pop-ups removed with the ads; YouTube Music's own Download entry downloads through Red</li>
           <li>Fixed: F11 in the snap and Flatpak builds, pop-up window dialogs, the YouTube Music "No internet connection" banner, long drop-down lists, long titles in the tray menu</li>
         </ul>

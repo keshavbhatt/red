@@ -116,6 +116,7 @@ private:
     // downloads
     QLineEdit* m_folder = nullptr;
     QComboBox* m_pattern = nullptr;
+    QCheckBox* m_organise = nullptr;
     QComboBox* m_quality = nullptr;
     QComboBox* m_container = nullptr;
     QComboBox* m_audioFormat = nullptr;

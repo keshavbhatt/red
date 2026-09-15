@@ -37,9 +37,11 @@ struct DownloadOptions
     QStringList sponsorCategories; ///< for --sponsorblock-remove
 
     QString outputDirectory;
+    QString folder; ///< subfolder of outputDirectory ("Videos", "Music", …); empty = none
     FilenamePattern filenamePattern = FilenamePattern::Title;
     QString playlistItems; ///< yt-dlp item spec ("1,3-5"); empty = all
     bool isPlaylist = false;
+    bool isChannel = false; ///< the playlist is a channel: its folder takes the channel's name
     int speedLimitKbps = 0;
 
     [[nodiscard]] QJsonObject toJson() const;
@@ -59,8 +61,11 @@ struct EnginePaths
 [[nodiscard]] QString formatSelector(const DownloadOptions& options);
 /// yt-dlp's -S sort spec for the options ("res:1080,ext:mp4:m4a" …), may be empty.
 [[nodiscard]] QString formatSort(const DownloadOptions& options);
-/// The -o template (relative to outputDirectory), e.g. "%(title)s [%(id)s].%(ext)s".
-[[nodiscard]] QString outputTemplate(FilenamePattern pattern, bool playlist);
+/// The -o template (relative to outputDirectory), e.g. "Videos/%(title)s [%(id)s].%(ext)s".
+[[nodiscard]] QString outputTemplate(const DownloadOptions& options);
+/// The subfolder a download sorts into when organising is on: "Videos",
+/// "Music" (audio only), "Playlists" or "Channels".
+[[nodiscard]] QString downloadFolder(DownloadOptions::Kind kind, bool playlist, bool channel);
 /// The container extension the options will produce ("mp4", "mp3", …), for the preview.
 [[nodiscard]] QString expectedExtension(const DownloadOptions& options);
 /// A filename preview for the dialog ("Title [id].mp4").

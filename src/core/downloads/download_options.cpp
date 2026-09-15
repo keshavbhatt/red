@@ -132,9 +132,11 @@ QJsonObject DownloadOptions::toJson() const
         {u"removeSponsors"_s, removeSponsors},
         {u"sponsorCategories"_s, toArray(sponsorCategories)},
         {u"outputDirectory"_s, outputDirectory},
+        {u"folder"_s, folder},
         {u"filenamePattern"_s, static_cast<int>(filenamePattern)},
         {u"playlistItems"_s, playlistItems},
         {u"isPlaylist"_s, isPlaylist},
+        {u"isChannel"_s, isChannel},
         {u"speedLimitKbps"_s, speedLimitKbps},
     };
 }
@@ -157,9 +159,11 @@ DownloadOptions DownloadOptions::fromJson(const QJsonObject& o)
     d.removeSponsors = o.value(u"removeSponsors"_s).toBool();
     d.sponsorCategories = fromArray(o.value(u"sponsorCategories"_s).toArray());
     d.outputDirectory = o.value(u"outputDirectory"_s).toString();
+    d.folder = o.value(u"folder"_s).toString();
     d.filenamePattern = static_cast<FilenamePattern>(std::clamp(o.value(u"filenamePattern"_s).toInt(), 0, 2));
     d.playlistItems = o.value(u"playlistItems"_s).toString();
     d.isPlaylist = o.value(u"isPlaylist"_s).toBool();
+    d.isChannel = o.value(u"isChannel"_s).toBool();
     d.speedLimitKbps = o.value(u"speedLimitKbps"_s).toInt();
     return d;
 }
@@ -208,10 +212,18 @@ QString formatSort(const DownloadOptions& options)
     return parts.join(u',');
 }
 
-QString outputTemplate(FilenamePattern pattern, bool playlist)
+QString downloadFolder(DownloadOptions::Kind kind, bool playlist, bool channel)
+{
+    if (playlist) {
+        return channel ? u"Channels"_s : u"Playlists"_s;
+    }
+    return kind == DownloadOptions::Kind::Audio ? u"Music"_s : u"Videos"_s;
+}
+
+QString outputTemplate(const DownloadOptions& options)
 {
     QString name;
-    switch (pattern) {
+    switch (options.filenamePattern) {
     case FilenamePattern::Title:
         name = u"%(title)s.%(ext)s"_s;
         break;
@@ -222,10 +234,13 @@ QString outputTemplate(FilenamePattern pattern, bool playlist)
         name = u"%(uploader,channel|Unknown)s - %(title)s.%(ext)s"_s;
         break;
     }
-    if (playlist) {
-        return u"%(playlist_title,playlist_id|Playlist)s/%(playlist_index|0)03d - "_s + name;
+    if (options.isPlaylist) {
+        // A channel's playlist title is "<Channel> - Videos": use the channel's name instead.
+        name = (options.isChannel ? u"%(channel,uploader,playlist_uploader|Channel)s/"_s
+                                  : u"%(playlist_title,playlist_id|Playlist)s/"_s) +
+               u"%(playlist_index|0)03d - "_s + name;
     }
-    return name;
+    return options.folder.isEmpty() ? name : options.folder + u'/' + name;
 }
 
 QString expectedExtension(const DownloadOptions& options)
@@ -248,16 +263,17 @@ QString previewFileName(const DownloadOptions& options, const QString& title, co
 {
     const QString ext = expectedExtension(options);
     const QString safeTitle = sanitizeForTemplate(title.isEmpty() ? u"Video"_s : title);
+    const QString prefix = options.folder.isEmpty() ? QString() : options.folder + u'/';
     switch (options.filenamePattern) {
     case FilenamePattern::Title:
-        return safeTitle + u'.' + ext;
+        return prefix + safeTitle + u'.' + ext;
     case FilenamePattern::TitleId:
-        return safeTitle + u" ["_s + id + u"]."_s + ext;
+        return prefix + safeTitle + u" ["_s + id + u"]."_s + ext;
     case FilenamePattern::ChannelTitle:
-        return sanitizeForTemplate(uploader.isEmpty() ? u"Unknown"_s : uploader) + u" - "_s + safeTitle +
-               u'.' + ext;
+        return prefix + sanitizeForTemplate(uploader.isEmpty() ? u"Unknown"_s : uploader) + u" - "_s +
+               safeTitle + u'.' + ext;
     }
-    return safeTitle + u'.' + ext;
+    return prefix + safeTitle + u'.' + ext;
 }
 
 QStringList baseArguments(const EnginePaths& paths)
@@ -376,7 +392,7 @@ QStringList downloadArguments(const DownloadOptions& options, const EnginePaths&
         args << u"--limit-rate"_s << u"%1K"_s.arg(options.speedLimitKbps);
     }
     const QString dir = options.outputDirectory.isEmpty() ? QDir::homePath() : options.outputDirectory;
-    args << u"-o"_s << QDir(dir).filePath(outputTemplate(options.filenamePattern, options.isPlaylist));
+    args << u"-o"_s << QDir(dir).filePath(outputTemplate(options));
     args << u"--"_s << url;
     return args;
 }

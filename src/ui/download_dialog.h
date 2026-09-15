@@ -125,6 +125,7 @@ private:
     Scope m_scope = Scope::Video;
     bool m_probing = false;
     bool m_isPlaylist = false;
+    bool m_isChannel = false;
     std::optional<core::DownloadOptions::Kind> m_preselectedKind;
     std::function<bool(int)> m_admission;
     bool m_wantPlaylist = false;

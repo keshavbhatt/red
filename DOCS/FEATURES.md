@@ -92,7 +92,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | E6 | Queue with concurrency, pause (kill + `--continue`), resume, cancel, retry, remove, open, show in folder, clear finished; persisted across restarts | flat files, kill = pause | KEEP | done — `core::DownloadJob`, `core::DownloadQueue`, `web::…` n/a |
 | E7 | Progress via `--newline --progress-template "download:%(progress)j"` and `postprocess:` stage; final path via `--print after_move:filepath` | regex on human output | KEEP | done — `core::ytdlp_output` |
 | E8 | Cookies from the app's own YouTube session (Netscape file, 0600, deleted after) — setting | none | KEEP | done — `web::CookieExporter`, `core::netscape_cookies` |
-| E9 | Speed limit, output template presets, thumbnail/metadata embed defaults | none | KEEP | settings |
+| E9 | Speed limit, output template presets, thumbnail/metadata embed defaults; downloads sorted into Videos / Music / Playlists / Channels (switch, default on) | none | KEEP | settings, `core::downloadFolder`, `DownloadOptions::folder` |
 | E10 | Downloads panel: slide-in right panel with cards (thumb, title, status, progress, hover actions), engine chip, "New download" | side panel list | KEEP | done — `ui::DownloadsPanel`, `ui::DownloadCardDelegate` |
 | E11 | Download from context menu on video links / thumbnails, from the rail button (current page), from Ctrl+D, from `--download` | context menu | KEEP | done — `web::WebPage`, `ui::MainWindow` |
 | E12 | Watch/Listen in mpv | yes | DROP | the app is the player |

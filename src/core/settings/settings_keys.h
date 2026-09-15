@@ -52,6 +52,7 @@ inline constexpr QLatin1StringView kShowDislikes{"blocking/showDislikes"};
 // downloads/
 inline constexpr QLatin1StringView kDownloadDirectory{"downloads/directory"};
 inline constexpr QLatin1StringView kFilenamePattern{"downloads/filenamePattern"};
+inline constexpr QLatin1StringView kOrganiseDownloads{"downloads/organise"};
 inline constexpr QLatin1StringView kDefaultQuality{"downloads/defaultQuality"};
 inline constexpr QLatin1StringView kDefaultContainer{"downloads/defaultContainer"};
 inline constexpr QLatin1StringView kDefaultAudioFormat{"downloads/defaultAudioFormat"};

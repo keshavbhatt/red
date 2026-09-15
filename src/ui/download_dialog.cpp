@@ -70,6 +70,7 @@ DownloadDialog::DownloadDialog(const QUrl& url, core::Settings& settings, core::
     const core::YouTubeUrlInfo info = core::classifyYouTubeUrl(url);
     const bool listOnly =
         info.kind == core::YouTubeUrlKind::Playlist || info.kind == core::YouTubeUrlKind::Channel;
+    m_isChannel = info.kind == core::YouTubeUrlKind::Channel;
     if (!listOnly && !info.videoId.isEmpty()) {
         m_video.url = QUrl(u"https://www.youtube.com/watch?v="_s + info.videoId);
     }
@@ -907,7 +908,9 @@ void DownloadDialog::updatePreview()
     QString preview =
         core::previewFileName(opts, m_info.title.isEmpty() ? tr("Video") : m_info.title, id, m_info.uploader);
     if (m_isPlaylist) {
-        preview = tr("%1/…").arg(m_info.title.isEmpty() ? tr("Playlist") : m_info.title);
+        const QString list =
+            m_info.title.isEmpty() ? (opts.isChannel ? tr("Channel") : tr("Playlist")) : m_info.title;
+        preview = (opts.folder.isEmpty() ? QString() : opts.folder + u'/') + tr("%1/…").arg(list);
     }
     m_preview->setText(m_preview->fontMetrics().elidedText(preview, Qt::ElideMiddle, 300));
     m_preview->setToolTip(preview);
@@ -1081,6 +1084,9 @@ core::DownloadOptions DownloadDialog::options() const
     o.outputDirectory = m_folder;
     o.filenamePattern = m_settings.filenamePattern();
     o.isPlaylist = m_isPlaylist;
+    o.isChannel = m_isPlaylist && m_isChannel;
+    o.folder =
+        m_settings.organiseDownloads() ? core::downloadFolder(o.kind, o.isPlaylist, o.isChannel) : QString();
     o.playlistItems = m_isPlaylist ? playlistItemsSpec() : QString();
     o.speedLimitKbps = m_settings.speedLimitKbps();
     return o;

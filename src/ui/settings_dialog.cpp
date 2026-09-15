@@ -439,6 +439,9 @@ QWidget* SettingsDialog::buildDownloads()
         m_settings.setFilenamePattern(static_cast<core::FilenamePattern>(m_pattern->currentData().toInt()));
     });
     f->addRow(tr("File names"), m_pattern);
+    m_organise = new QCheckBox(tr("Sort downloads into folders (Videos, Music, Playlists, Channels)"), where);
+    connect(m_organise, &QCheckBox::toggled, this, [this](bool on) { m_settings.setOrganiseDownloads(on); });
+    f->addRow(tr("Folders"), m_organise);
 
     auto* defaults = new QWidget(this);
     auto* d = form(defaults);
@@ -714,6 +717,7 @@ void SettingsDialog::loadValues()
     }
     m_folder->setText(m_settings.downloadDirectory());
     m_pattern->setCurrentIndex(m_pattern->findData(static_cast<int>(m_settings.filenamePattern())));
+    m_organise->setChecked(m_settings.organiseDownloads());
     m_quality->setCurrentIndex(m_quality->findData(static_cast<int>(m_settings.defaultQuality())));
     m_container->setCurrentIndex(m_container->findData(static_cast<int>(m_settings.defaultContainer())));
     m_audioFormat->setCurrentIndex(

@@ -40,6 +40,7 @@ constexpr bool kDefaultShowDislikes = true;
 constexpr bool kDefaultSponsorBlock = true;
 constexpr bool kDefaultSponsorMarkers = true;
 constexpr FilenamePattern kDefaultFilenamePattern = FilenamePattern::Title;
+constexpr bool kDefaultOrganiseDownloads = true;
 constexpr VideoQuality kDefaultQuality = VideoQuality::Best;
 constexpr Container kDefaultContainer = Container::Mp4;
 constexpr AudioFormat kDefaultAudioFormat = AudioFormat::Best;
@@ -564,6 +565,18 @@ void Settings::setFilenamePattern(FilenamePattern pattern)
 {
     if (storeInt(keys::kFilenamePattern, static_cast<int>(kDefaultFilenamePattern),
                  static_cast<int>(pattern))) {
+        Q_EMIT downloadDefaultsChanged();
+    }
+}
+
+bool Settings::organiseDownloads() const
+{
+    return boolValue(keys::kOrganiseDownloads, kDefaultOrganiseDownloads);
+}
+
+void Settings::setOrganiseDownloads(bool enabled)
+{
+    if (storeBool(keys::kOrganiseDownloads, kDefaultOrganiseDownloads, enabled)) {
         Q_EMIT downloadDefaultsChanged();
     }
 }

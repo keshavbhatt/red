@@ -348,7 +348,10 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
         if (!job->primaryFile().isEmpty()) {
             platform::revealInFileManager(job->primaryFile());
         } else {
-            platform::openDirectory(job->options.outputDirectory);
+            const QString folder = job->options.folder.isEmpty()
+                                       ? job->options.outputDirectory
+                                       : QDir(job->options.outputDirectory).filePath(job->options.folder);
+            platform::openDirectory(QDir(folder).exists() ? folder : job->options.outputDirectory);
         }
         break;
     case DownloadCardDelegate::Action::Remove:

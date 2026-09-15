@@ -238,6 +238,9 @@ public:
     void setDownloadDirectory(const QString& directory);
     [[nodiscard]] FilenamePattern filenamePattern() const;
     void setFilenamePattern(FilenamePattern pattern);
+    /// Downloads sorted into Videos / Music / Playlists / Channels (default on).
+    [[nodiscard]] bool organiseDownloads() const;
+    void setOrganiseDownloads(bool enabled);
     [[nodiscard]] VideoQuality defaultQuality() const;
     void setDefaultQuality(VideoQuality quality);
     [[nodiscard]] Container defaultContainer() const;
