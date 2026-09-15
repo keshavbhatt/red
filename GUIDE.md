@@ -207,6 +207,11 @@ fails with a message about signing in, sign in on the YouTube page and retry.
 file name pattern, video quality, container, audio-only format, the embed and sponsor options
 the dialog starts with, how many downloads run at once, and a speed limit.
 
+**Folders**: downloads are sorted into `Videos`, `Music` (audio only), `Playlists/<playlist>`
+and `Channels/<channel>` under the download folder. Turn *Sort downloads into folders* off in
+*Settings → Downloads* to keep everything in one folder; playlists and channels still get a
+folder of their own then.
+
 ## Settings
 
 Press **Ctrl+,** or the rail's gear.
