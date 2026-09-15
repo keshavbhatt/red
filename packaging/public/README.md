@@ -8,7 +8,9 @@
 </p>
 
 <p align="center">
-  <a href="https://snapcraft.io/red-app"><img src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" alt="Get it from the Snap Store"></a>
+  <a href="https://snapcraft.io/red-app"><img src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" alt="Get it from the Snap Store" height="56"></a>
+  &nbsp;
+  <a href="https://flathub.org/apps/com.ktechpit.red"><img src="https://flathub.org/api/badge?locale=en" alt="Get it on Flathub" height="56"></a>
 </p>
 
 <p align="center">
@@ -23,9 +25,11 @@
 sudo snap install red-app
 ```
 
-**Flatpak**: bundles for x86_64 and aarch64 are attached to each
-[release](https://github.com/keshavbhatt/red/releases); install with
-`flatpak install red-x86_64.flatpak`. A Flathub listing follows.
+**Flatpak** (x86_64 and aarch64), from [Flathub](https://flathub.org/apps/com.ktechpit.red):
+
+```sh
+flatpak install flathub com.ktechpit.red
+```
 
 ## Features
 

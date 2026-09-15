@@ -26,11 +26,10 @@ open it from inside the app at any time: the **⋯** menu on the side rail → *
 sudo snap install red-app
 ```
 
-**Flatpak**: bundles for x86_64 and aarch64 are attached to each
-[release](https://github.com/keshavbhatt/red/releases):
+**Flatpak** (x86_64 and aarch64), from [Flathub](https://flathub.org/apps/com.ktechpit.red):
 
 ```sh
-flatpak install red-x86_64.flatpak
+flatpak install flathub com.ktechpit.red
 ```
 
 On the first start of each new version Red shows a short *What's new* sheet; press **Got it**
@@ -276,7 +275,7 @@ red --quit               quit the running instance
 red --profile <name>     a separate profile: own sign-in, settings and downloads
 ```
 
-Inside the snap the command is `red-app`.
+Inside the snap the command is `red-app`; with the Flatpak it is `flatpak run com.ktechpit.red`.
 
 ## Troubleshooting
 
