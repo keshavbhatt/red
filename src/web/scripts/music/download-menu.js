@@ -1,10 +1,10 @@
 // name:     music/download-menu
 // purpose:  YouTube Music's menus carry a Premium-only "Download" entry; in
 //           Music mode it downloads through Red instead of opening the upsell.
-// depends:  ytmusic-menu-popup-renderer and its item renderers' `data`
-//           (icon.iconType OFFLINE_DOWNLOAD, queueAddEndpoint / watchEndpoint
-//           video and playlist ids), the download glyph path as a fallback;
-//           the bridge's downloadRequested slot
+// depends:  ytmusic-menu-popup-renderer; the entry's own element
+//           (ytmusic-menu-service-item-download-renderer, offlineVideoEndpoint)
+//           or, for other shapes, icon.iconType OFFLINE_DOWNLOAD / the glyph and
+//           the neighbours' queueAddEndpoint ids; the bridge's downloadRequested
 // verified: 2026-09-15 against music.youtube.com
 // on-fail:  no-op; YouTube Music shows its own dialog
 (function () {
@@ -13,13 +13,17 @@
     if (!red || !red.isMusic || !red.isMusic()) {
         return;
     }
-    var ITEMS = 'ytmusic-menu-navigation-item-renderer, ytmusic-menu-service-item-renderer, ' +
+    var DOWNLOAD_ITEM = 'ytmusic-menu-service-item-download-renderer';
+    var ITEMS = DOWNLOAD_ITEM + ', ytmusic-menu-navigation-item-renderer, ytmusic-menu-service-item-renderer, ' +
                 'ytmusic-toggle-menu-service-item-renderer';
 
     // Language-independent: the item's InnerTube icon type (OFFLINE_DOWNLOAD),
     // or the download glyph itself (arrow into a tray) when the type is missing.
     var GLYPH = /M17 18v1H6v-1h11z|M19 9h-4V3H9v6H5l7 7 7-7/;
     function isDownloadItem(item) {
+        if (item.matches(DOWNLOAD_ITEM)) {
+            return true; // the entry has its own renderer, whatever the label says
+        }
         var d = item.data || {};
         var icon = (d.icon && d.icon.iconType) || '';
         if (icon) {
@@ -29,7 +33,15 @@
         return !!(path && GLYPH.test(path.getAttribute('d') || ''));
     }
     // The Download entry names nothing; its neighbours name the song or list.
-    function targetOf(popup) {
+    function targetOf(popup, clicked) {
+        var own = (clicked.data && clicked.data.serviceEndpoint) || {};
+        var offline = own.offlineVideoEndpoint || own.offlinePlaylistEndpoint || {};
+        if (offline.videoId) {
+            return 'https://www.youtube.com/watch?v=' + offline.videoId;
+        }
+        if (offline.playlistId) {
+            return 'https://www.youtube.com/playlist?list=' + offline.playlistId;
+        }
         var items = popup.querySelectorAll(ITEMS);
         var playlist = '';
         for (var i = 0; i < items.length; i++) {
@@ -64,7 +76,7 @@
                 return;
             }
             var popup = item.closest('ytmusic-menu-popup-renderer');
-            var url = popup ? targetOf(popup) : '';
+            var url = popup ? targetOf(popup, item) : '';
             if (!url) {
                 return;
             }
