@@ -51,6 +51,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Download progress bars move smoothly instead of jumping every second or so.
 - With *Advanced* picked and no stream chosen yet, the download dialog previewed an audio file
   name; it shows the video file now.
+- The Blocking page of Settings no longer runs past the dialog's right edge; the SponsorBlock
+  choices sit in one column.
 
 ## [10.2.0] - 2026-09-15
 

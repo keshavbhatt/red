@@ -416,12 +416,13 @@ QWidget* SettingsDialog::buildBlocking()
                                         static_cast<core::SponsorAction>(combo->currentData().toInt()));
         });
         m_sponsorCombos << combo;
-        grid->addWidget(label, row / 2, (row % 2) * 2);
-        grid->addWidget(combo, row / 2, (row % 2) * 2 + 1);
+        // One column: two label + drop-down pairs side by side were wider than
+        // the dialog's default size, and the page clipped on the right.
+        grid->addWidget(label, row, 0);
+        grid->addWidget(combo, row, 1);
         ++row;
     }
     grid->setColumnStretch(1, 1);
-    grid->setColumnStretch(3, 1);
     s->addLayout(grid);
     m_sponsorMarkers = new QCheckBox(tr("Show segment markers on the progress bar"), sponsor);
     connect(m_sponsorMarkers, &QCheckBox::toggled, this,
