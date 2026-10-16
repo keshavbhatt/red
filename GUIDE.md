@@ -104,6 +104,11 @@ the corner (it appears when you move the mouse), the window's close button, or C
 again. Closing the mini player never quits Red. *Settings → Playback* sets its size: small,
 medium or large.
 
+**Middle-click scrolling**: turn on *Settings → General → Scroll with the middle mouse button*
+(it takes effect after a restart). Then middle-click the page and move the mouse up or down; the
+further from where you clicked, the faster it scrolls. Click again to stop. It is off by default
+because on Linux the middle button pastes.
+
 **Screen** stays awake while a video plays, and playback keeps going while the window is hidden
 or minimised. Both are switches in *Settings → Playback*.
 
@@ -275,7 +280,8 @@ Press **Ctrl+,** or the rail's gear.
 
 - **General**: the mode Red opens in (YouTube by default, YouTube Music, TV mode, or the mode
   you used last), the YouTube start page (Home, Subscriptions, or where you left off), what
-  closing the window does, tray icon, side rail and its labels, download notifications.
+  closing the window does, tray icon, side rail and its labels, middle-click scrolling, download
+  notifications.
 - **Appearance**: theme, page zoom, interface scale.
 - **Playback**: autoplay, preferred codec, hardware decoding, screen and background playback,
   a playback progress bar behind Red's taskbar entry (off by default; Plasma and Unity-style
@@ -358,7 +364,8 @@ Support* extension is installed. KDE, Cinnamon, XFCE and MATE show it out of the
 desktop's portals for both; make sure `xdg-desktop-portal` and the portal backend for your
 desktop (`-gtk`, `-kde`, `-gnome`) are installed.
 
-**Media keys do nothing.** Another player may have claimed them; pause or close it. On GNOME
+**Media keys do nothing.** Another player may have claimed them; pause or close it. In YouTube
+Music, Next and Previous work from the desktop's media controls and headsets since 10.3.0. On GNOME
 the *Sound* or *Media* keys also need to be bound in the keyboard settings.
 
 **Something else.** *About Red → Copy* puts the diagnostics (versions, GPU, engine state) on
