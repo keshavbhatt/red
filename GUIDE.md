@@ -2,8 +2,8 @@
 
 Red is a desktop app for YouTube on Linux. This page walks through the window, playback, TV
 mode, blocking, downloads and the settings, and ends with a troubleshooting section. You can
-open it from inside the app at any time: the **⋯** menu on the side rail → **Online guide**, or
-**About Red → Online guide**.
+open it from inside the app at any time: the **More** menu at the bottom of the side rail →
+**Online guide**, or **About Red → Online guide**.
 
 - [Install and first start](#install-and-first-start)
 - [The window](#the-window)
@@ -32,25 +32,49 @@ sudo snap install red-app
 flatpak install flathub com.ktechpit.red
 ```
 
-On the first start of each new version Red shows a short *What's new* sheet; press **Got it**
-or Esc to close it. The full history is in the [changelog](CHANGELOG.md).
+<img src="screenshots/guide/welcome.png" alt="Welcome to Red" width="631">
+
+The very first start shows a short welcome: the three ways to watch, downloading, the mini
+player and blocking, each with its shortcut. *Get started* closes it; **More → Show me around**
+opens it again any time.
+
+After an update, the first start shows a short *What's new* sheet instead; press **Got it** or
+Esc to close it. The full history is in the [changelog](CHANGELOG.md).
 
 ## The window
 
 ![Red in desktop mode](screenshots/guide/desktop.png)
 
-Red shows the YouTube site with a slim rail on the left. From top to bottom the rail has the
-Red logo (**Home**), **Back**, **Forward** and **Reload**, then **Download this** (the current video, playlist or
-channel), **Downloads** (opens the queue beside the page), **Mini player**, **TV mode**,
-**Music mode**, and at
-the bottom **Settings** and the **⋯** menu.
+Red shows the YouTube site with a rail on the left. From top to bottom the rail has:
 
-<img src="screenshots/guide/menu.png" alt="The ⋯ menu" width="283">
+- **Home** (the Red logo).
+- The **mode switch**: **YouTube**, **YouTube Music** and **TV mode**. The mode you are in is
+  lit; click another to switch (Ctrl+1, Ctrl+2, Ctrl+3). See [TV mode](#tv-mode) and
+  [Music mode](#music-mode).
+- **Back**, **Forward** and **Reload**.
+- **Download this** when the page is a video, playlist or channel (its icon turns red), or
+  **Download from link** anywhere else.
+- **Downloads**, the queue beside the page, with a count of what is running.
+- **Mini player**, which says *Play a video first* until something plays.
+- At the bottom: **Settings**, **More** and **Hide labels**.
 
-The ⋯ menu holds everything that is not on the rail: download from a pasted link, copy the
-current video link, full screen, zoom, the keyboard shortcuts sheet, this guide, the log folder
-and *About Red*. Every rail button has a shortcut (press **F1** for the list), and the rail can
-be hidden in *Settings → General* if you prefer shortcuts alone.
+The rail shows a label next to each icon. **Hide labels** turns it into a narrow strip of icons
+(hover one for its name and shortcut), and **Show labels** in the same place brings the labels
+back. The same switch is in *Settings → General*. In a short window the rail scrolls with the
+mouse wheel.
+
+<img src="screenshots/guide/menu.png" alt="The More menu" width="295">
+
+The **More** menu (or **F10**) holds everything that is not on the rail: download from a pasted
+link, copy the current video link, full screen, zoom, the keyboard shortcuts sheet, *Show me
+around*, this guide, the log folder and *About Red*. Every rail button has a shortcut (press
+**F1** for the list), and the rail can be hidden in *Settings → General* if you prefer shortcuts
+alone; F10 still opens the menu then.
+
+**Keyboard**: **F6** moves the keyboard between the page, the rail and the Downloads panel
+(Shift+F6 goes back). On the rail the arrow keys move, Enter or Space presses a button and Esc
+returns to the page. A dashed ring shows where the keyboard is. Clicking a rail button leaves
+the keyboard on the page, so YouTube's own keys keep working.
 
 ## Watching
 
@@ -65,16 +89,20 @@ dialogs.
 smartwatch, a Bluetooth headset) play, pause and skip. Red also appears as a player in the
 desktop's media widget (MPRIS).
 
-<img src="screenshots/guide/tray.png" alt="Tray menu" width="244">
+<img src="screenshots/guide/tray.png" alt="Tray menu" width="260">
 
 **Tray icon**: shows what is playing, with play / pause, previous and next. Closing the window
 can either quit Red or leave it in the tray, still playing (*Settings → General → When closing
 the window*). On GNOME the tray needs the *AppIndicator and KStatusNotifierItem Support*
 extension.
 
-**Mini player** (Ctrl+Shift+M, or the rail button) pops the current video into a small
-always-on-top window while you work. It is available while a video plays; close it to return
-to the main window. Its size is in *Settings → Playback*.
+**Mini player** (Ctrl+Shift+M, or the rail button) shrinks Red into a small always-on-top
+window with just the video while you work. It is available while something plays. A video gets
+a wide window, a Short a tall one that fits it, and YouTube Music its own phone-style player
+(see [Music mode](#music-mode)). To get the full window back press **Esc**, the round button in
+the corner (it appears when you move the mouse), the window's close button, or Ctrl+Shift+M
+again. Closing the mini player never quits Red. *Settings → Playback* sets its size: small,
+medium or large.
 
 **Screen** stays awake while a video plays, and playback keeps going while the window is hidden
 or minimised. Both are switches in *Settings → Playback*.
@@ -87,15 +115,19 @@ with a working driver; see [Troubleshooting](#troubleshooting) if video turns bl
 
 ![TV mode](screenshots/guide/tv.png)
 
-**Ctrl+T** (or the rail button) switches to YouTube's living-room interface, the one on smart
-TVs and consoles, full screen by default. The video you were watching carries over, and so does
-your sign-in. Ctrl+T switches back.
+**TV mode** on the rail's mode switch (or **Ctrl+3**) switches to YouTube's living-room
+interface, the one on smart TVs and consoles, full screen by default. The video you were
+watching carries over, and so does your sign-in.
+
+To leave, press **Ctrl+T**, or move the mouse and click **Back to YouTube** in the top left
+corner. The button also shows for a few seconds when TV mode starts. Ctrl+T works both ways:
+from YouTube it opens TV mode, in TV mode it goes back.
 
 | Keys | Action |
 |---|---|
 | Arrows, Enter | Navigate, select |
 | Esc, Backspace, right click | Back |
-| Ctrl+T | Back to desktop mode |
+| Ctrl+T, or the Back to YouTube button | Back to YouTube |
 | Ctrl+D | Download the current video |
 | + / −, M | Volume, mute |
 | A / D, S | Playback speed down / up, reset |
@@ -104,18 +136,19 @@ your sign-in. Ctrl+T switches back.
 A **gamepad** works as on a console: the left stick or D-pad moves, **A** selects, **B** goes
 back, **LT / RT** seek. Plug it in before or after starting Red; nothing needs pairing.
 
-*Settings → TV mode* can start Red in TV mode, keep it windowed, hide Shorts, allow resolutions
-above the screen size and use the lighter low-memory interface.
+*Settings → TV mode* can keep it windowed, hide Shorts, allow resolutions above the screen size
+and use the lighter low-memory interface. To open Red in TV mode, set *Settings → General →
+Open Red in* to *TV mode*.
 
 ## Music mode
 
 ![Music mode](screenshots/guide/music.png)
 
-**Ctrl+M** (or the rail button) switches the window to YouTube Music. Your sign-in carries
-over, and so does the video you were watching, as its track. Music keeps playing while you
-browse your library, playlists and search results, and the tray, media keys and the desktop's
-media controls follow along with the album name and cover. Ctrl+M switches back; Ctrl+T goes
-straight to TV mode.
+**YouTube Music** on the rail's mode switch (or **Ctrl+2**) switches the window to YouTube
+Music. Your sign-in carries over, and so does the video you were watching, as its track. Music
+keeps playing while you browse your library, playlists and search results, and the tray, media
+keys and the desktop's media controls follow along with the album name and cover. **YouTube** on
+the mode switch (Ctrl+1, or Ctrl+M) goes back.
 
 What changes in Music mode:
 
@@ -124,10 +157,13 @@ What changes in Music mode:
   bar) opens the same dialog instead of a Premium offer.
   Playlist pages download as a whole. Choosing *Video* here does not change the default the
   other modes use.
-- The mini player is off (YouTube Music has its own player bar), and the screen is allowed to
-  sleep while music plays.
+- The **mini player** turns the window into a tall, phone-style YouTube Music player: the art or
+  video, the title, the seek bar, the controls and the Up next queue. It opens YouTube Music's
+  player page for you and puts it back when you leave.
+- The screen is allowed to sleep while music plays.
 - Links to YouTube Music from the desktop site open here instead of in a separate window, and
-  `red --music` starts Red in this mode. The mode is remembered across launches like TV mode.
+  `red --music` starts Red in this mode. To open Red here every time, set *Settings → General →
+  Open Red in* to *YouTube Music*.
 
 ## Blocking
 
@@ -153,7 +189,7 @@ itself. Nothing needs installing first.
 
 **Starting a download**
 
-- On a video, playlist or channel page press **Ctrl+D** or the rail's download button.
+- On a video, playlist or channel page press **Ctrl+D** or the rail's **Download this**.
 - Paste a link: **Ctrl+N** (or the panel's *Paste a link…*). A link already on the clipboard
   is filled in.
 - From a terminal: `red --download <link>`. Red is single-instance, so this hands the link to
@@ -193,11 +229,21 @@ entry range, so a channel with a thousand videos is not fetched by accident. You
 
 ![Downloads panel](screenshots/guide/downloads.png)
 
-**Ctrl+J** shows the panel beside the page. Each entry has pause, resume, retry and remove;
-finished entries offer *Show in folder* and *Open*. The panel's ⋯ menu pauses or resumes
-everything, clears finished entries, opens the download folder and the engine sheet. A desktop
-notification with *Show in folder* appears when a download finishes (switch in *Settings →
-General*). The queue survives a restart; unfinished downloads can be resumed or retried.
+**Ctrl+J** shows the panel beside the page; in a window narrower than about 900 pixels it opens
+over the page instead, and Esc closes it. When you queue a download where the panel cannot show
+(full screen, the mini player, TV mode, a narrow window), a short *Download added* message
+appears instead, and *Already in your downloads* if the same download is already queued.
+
+Hovering an entry shows its buttons. **Right-click** an entry (or press the Menu key) for every
+action it offers: *Open*, *Show in folder*, *Pause*, *Resume*, *Retry*, *Cancel*, *Copy link*,
+*Copy error* and *Remove from list*. From the keyboard, **Enter** opens a finished file, retries
+a failed download or resumes a paused one, **Delete** removes a finished entry and **Space**
+pauses or resumes. A failed download shows its whole reason on the entry.
+
+The panel's ⋯ menu pauses or resumes everything, clears finished entries, opens the download
+folder and the engine sheet. A desktop notification with *Show in folder* appears when a
+download finishes (switch in *Settings → General*). The queue survives a restart; unfinished
+downloads can be resumed or retried.
 
 **Age-restricted and rate-limited videos**: Red reuses your YouTube sign-in for downloads
 (*Settings → Downloads → Use my YouTube sign-in for downloads*, on by default). If a download
@@ -227,8 +273,9 @@ Press **Ctrl+,** or the rail's gear.
   </tr>
 </table>
 
-- **General**: start page (Home, Subscriptions, or where you left off), what closing the
-  window does, tray icon, side rail, download notifications.
+- **General**: the mode Red opens in (YouTube by default, YouTube Music, TV mode, or the mode
+  you used last), the YouTube start page (Home, Subscriptions, or where you left off), what
+  closing the window does, tray icon, side rail and its labels, download notifications.
 - **Appearance**: theme, page zoom, interface scale.
 - **Playback**: autoplay, preferred codec, hardware decoding, screen and background playback,
   a playback progress bar behind Red's taskbar entry (off by default; Plasma and Unity-style
@@ -236,11 +283,11 @@ Press **Ctrl+,** or the rail's gear.
 - **Blocking**: see [Blocking](#blocking).
 - **Downloads**: see [Downloads](#downloads).
 - **TV mode**: see [TV mode](#tv-mode).
-- **Music mode** has no settings page; see [Music mode](#music-mode).
+- **YouTube Music** has no settings page of its own; see [Music mode](#music-mode).
 - **Advanced**: hardware acceleration, the identity used on Google's sign-in pages, a custom
   user agent, clear cache, sign out and clear the session, reset site permissions (microphone,
   camera, location), the log folder, diagnostics, and *Reset all settings* (keeps your sign-in
-  and downloads).
+  and downloads). Each of these confirms under its button when it is done.
 
 ## Keyboard shortcuts
 
@@ -257,13 +304,17 @@ Press **Ctrl+,** or the rail's gear.
 | Ctrl+D | Download this video / playlist / channel |
 | Ctrl+N | Download from a pasted link |
 | Ctrl+J | Downloads panel |
-| Ctrl+Shift+M | Mini player |
-| Ctrl+T | TV mode |
-| Ctrl+M | Music mode |
+| Ctrl+Shift+M | Mini player (Esc returns) |
+| Ctrl+1 / Ctrl+2 / Ctrl+3 | YouTube / YouTube Music / TV mode |
+| Ctrl+T | TV mode on / off |
+| Ctrl+M | YouTube Music on / off |
+| F6 / Shift+F6 | Move the keyboard between the page, the rail and the Downloads panel |
+| F10 | The More menu |
 | F11 | Full screen |
 | Ctrl++ / Ctrl+- / Ctrl+0 | Zoom in / out / reset |
 | Ctrl+W | Hide the window (to the tray) |
 | Ctrl+, | Settings |
+| F1 | This list |
 | Ctrl+Q | Quit |
 | Play/Pause, Next, Previous media keys | Playback |
 
@@ -294,9 +345,10 @@ take effect after a restart. Red does this by itself when the GPU keeps crashing
 Advanced → Sign-in identity* on its default (Firefox on Google's pages). If a sign-in attempt
 still loops, use *Sign out and clear session…* on the same page and sign in again.
 
-**A download fails.** Open the Downloads panel, press *Retry* first. If it fails again open
-the engine sheet (panel ⋯ → *Download engine…*) and *Check for updates*; YouTube changes often
-and the engine follows within a day. A message about age restriction or rate limits means the
+**A download fails.** Open the Downloads panel; the failed entry shows the reason. Press *Retry*
+first. If it fails again open the engine sheet (panel ⋯ → *Download engine…*) and *Check for
+updates*; YouTube changes often and the engine follows within a day. To report it, right-click
+the entry and choose *Copy error*. A message about age restriction or rate limits means the
 download needs your sign-in; see [Downloads](#downloads).
 
 **No tray icon.** GNOME hides tray icons unless the *AppIndicator and KStatusNotifierItem
@@ -310,7 +362,7 @@ desktop (`-gtk`, `-kde`, `-gnome`) are installed.
 the *Sound* or *Media* keys also need to be bound in the keyboard settings.
 
 **Something else.** *About Red → Copy* puts the diagnostics (versions, GPU, engine state) on
-the clipboard, and *Open log folder* in the ⋯ menu shows the log. Attach both to an
+the clipboard, and *Open log folder* in the More menu shows the log. Attach both to an
 [issue](https://github.com/keshavbhatt/red/issues) or email them to
 [connect@ktechpit.com](mailto:connect@ktechpit.com).
 
