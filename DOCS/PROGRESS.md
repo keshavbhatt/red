@@ -30,7 +30,8 @@ Newest first. One entry per working session.
   pill) do the same. `RED_DEBUG_OPEN=mini|mini-close` verify it headless.
 * Owner request: the mini player fits Shorts (9:16, `contain` lifted on the Short's slot) and works
   in Music mode around YouTube Music's own player page (ADR-016). Verified over CDP and grabs.
-  Found: YouTube Music replaced `ytmusic-player-bar` with `ytmusic-miniplayer` (audit item 20).
+  Seen signed out: YouTube Music's `ytmusic-miniplayer` bar instead of `ytmusic-player-bar`
+  (an experiment, it seems); next / previous still work for the owner.
 * Open from the audit: downloads panel below 900 px, first-run welcome, keyboard and
   screen-reader access to the rail and panel.
 

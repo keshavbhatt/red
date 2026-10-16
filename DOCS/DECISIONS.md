@@ -365,6 +365,7 @@ whenever something plays. The restore button sits top left in Music (the chevron
 menu is top right). Window minimum in the mini player: 200×180.
 
 **Consequences.** YouTube Music's DOM moved from `ytmusic-player-bar` to `ytmusic-miniplayer`
-(`is-wiz-miniplayer-enabled`); `media-session.js` still looks for the old bar for next /
-previous availability (UX audit item 20).
+(`is-wiz-miniplayer-enabled`) in a signed-out profile, apparently an experiment: next / previous
+still work for the owner. If it rolls out, `media-session.js` must read Next / Previous from
+`ytmusic-miniplayer` instead of `ytmusic-player-bar`.
 
