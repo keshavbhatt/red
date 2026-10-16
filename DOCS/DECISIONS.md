@@ -319,3 +319,26 @@ first explicit choice. `WebProfile` writes the resolved launch mode back to `las
 until they pick "The mode I used last". Leanback's own "Exit" still returns to YouTube (or
 quits after `--tv`), worded by YouTube.
 
+## ADR-015: a rail with labels (2026-10-16)
+
+**Context.** The rail was 52 px of icons whose only labels were hover tooltips: slow to learn,
+useless on touch, and Download / Downloads / Mini player / the modes look alike. Hiding the rail
+stranded the More menu (Online guide, Account, Open log folder), while Settings claimed
+everything stayed reachable. The Download button's idle tooltip ("Open a video…") did not match
+its click (the paste-a-link sheet). UX audit 2026-10-16, items 3, 6, 7, 17.
+
+**Decision.** `ui::RailButton` (a `QToolButton`) draws either the square icon button or, expanded,
+the style sheet background plus the icon at its collapsed x position and a label beside it, with
+an optional muted second line. Sizes are set in code; the style sheet no longer pins 40 px.
+`window/railLabels` (default on, so new users see the names) is toggled by *Hide labels* /
+*Show labels* at the bottom of the rail and in Settings, General; the rail only emits
+`expandRequested`, `MainWindow` stores it. Labels: the action text without "…"; Download is
+*Download this* or *Download from link* by page; Reload becomes *Stop* while loading; the mini
+player shows why it is off. F10 (`Actions::menu`) opens the More menu from the rail, or as a
+pop-up at the window corner when the rail is hidden. The rail's content sits in a scroll area
+(scroll bars off, wheel scrolls) so a short window clips instead of overlapping buttons.
+
+**Consequences.** The expanded rail takes 148 px more from the page; the downloads panel still
+folds below 900 px of window width (audit item 5). The labels toggle adds one row, so on short
+windows more of the rail sits below the fold.
+

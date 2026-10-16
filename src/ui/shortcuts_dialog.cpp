@@ -78,7 +78,7 @@ ShortcutsDialog::ShortcutsDialog(const Actions& a, const core::ThemeService& the
              rows({a.miniPlayer, a.fullScreen, a.zoomIn, a.zoomOut, a.zoomReset, a.showHide}));
     addGroup(right, tr("Downloads"), rows({a.download, a.downloadUrl, a.downloads}));
     addGroup(right, tr("Playback"), rows({a.playPause, a.next, a.previous}));
-    addGroup(right, tr("App"), rows({a.settings, a.shortcuts, a.quit}));
+    addGroup(right, tr("App"), rows({a.settings, a.menu, a.shortcuts, a.quit}));
     // YouTube's own player keys work as long as the page has focus.
     addGroup(right, tr("On the page (YouTube)"),
              {{tr("Play / pause"), u"K"_s},

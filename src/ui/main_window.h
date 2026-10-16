@@ -125,6 +125,7 @@ private:
     QShortcut* m_toggleTv = nullptr;    ///< Ctrl+T: TV mode on / off
     QShortcut* m_toggleMusic = nullptr; ///< Ctrl+M: Music mode on / off
     TvExitButton* m_tvExit = nullptr;
+    QMenu* m_overflow = nullptr; ///< the rail's More menu (F10 opens it without the rail)
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     QByteArray m_geometryBeforeFullScreen;

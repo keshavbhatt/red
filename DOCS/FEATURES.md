@@ -14,7 +14,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 
 | # | Feature | Red v9 | Decision | Status / class |
 |---|---|---|---|---|
-| S1 | Single main window, YouTube fills it, native chrome is a slim **left rail** (see DESIGN.md) | side panel + splitter | KEEP | done — `ui::MainWindow`, `ui::SideRail` |
+| S1 | Single main window, YouTube fills it, native chrome is a slim **left rail** (see DESIGN.md), icons only or with labels (default), F10 for its menu | side panel + splitter | KEEP | done, `ui::MainWindow`, `ui::SideRail`, `ui::RailButton`, ADR-015 |
 | S2 | Persist window geometry/state; restore last page (setting) | yes | KEEP | done — `MainWindow` |
 | S3 | Single instance; second launch forwards URL / `--tv` / `--download` commands | RunGuard, no forwarding | KEEP | done — `app::SingleInstance` (from whatsie) |
 | S4 | System tray: show/hide, play/pause, next, downloads, TV mode, quit; close-to-tray optional (default quit) | none | KEEP | done — `ui::TrayController` |

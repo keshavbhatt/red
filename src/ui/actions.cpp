@@ -61,6 +61,7 @@ Actions::Actions(QWidget* owner)
     showHide = make(owner, tr("Hide window"), {QKeySequence(Qt::CTRL | Qt::Key_W)});
     settings = make(owner, tr("Settings…"), {QKeySequence(Qt::CTRL | Qt::Key_Comma)});
     shortcuts = make(owner, tr("Keyboard shortcuts"), {QKeySequence(Qt::Key_F1)});
+    menu = make(owner, tr("Menu"), {QKeySequence(Qt::Key_F10)});
     onlineGuide = make(owner, tr("Online guide"));
     openLogFolder = make(owner, tr("Open log folder"));
     about = make(owner, tr("About Red"));
@@ -84,10 +85,10 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,      back,        forward,     reload,    download,   downloadUrl, downloads,
-            copyLink,  miniPlayer,  youtubeMode, musicMode, tvMode,     playPause,   next,
-            previous,  zoomIn,      zoomOut,     zoomReset, fullScreen, showHide,    settings,
-            shortcuts, onlineGuide, account,     about,     quit};
+    return {home,     back,       forward,     reload,    download,   downloadUrl, downloads,
+            copyLink, miniPlayer, youtubeMode, musicMode, tvMode,     playPause,   next,
+            previous, zoomIn,     zoomOut,     zoomReset, fullScreen, showHide,    settings,
+            menu,     shortcuts,  onlineGuide, account,   about,      quit};
 }
 
 } // namespace red::ui

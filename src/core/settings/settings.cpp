@@ -19,6 +19,7 @@ namespace {
 // ---- Defaults: the single source of truth ---------------------------------
 constexpr CloseAction kDefaultCloseAction = CloseAction::Quit;
 constexpr bool kDefaultShowRail = true;
+constexpr bool kDefaultRailLabels = true; ///< new users see what each button is
 constexpr AppMode kDefaultMode = AppMode::Desktop;
 constexpr bool kDefaultDownloadsPanelOpen = false;
 constexpr StartMode kDefaultStartMode = StartMode::Desktop;
@@ -205,6 +206,18 @@ void Settings::setShowRail(bool show)
 {
     if (storeBool(keys::kShowRail, kDefaultShowRail, show)) {
         Q_EMIT showRailChanged(show);
+    }
+}
+
+bool Settings::railLabels() const
+{
+    return boolValue(keys::kRailLabels, kDefaultRailLabels);
+}
+
+void Settings::setRailLabels(bool show)
+{
+    if (storeBool(keys::kRailLabels, kDefaultRailLabels, show)) {
+        Q_EMIT railLabelsChanged(show);
     }
 }
 
@@ -991,6 +1004,7 @@ void Settings::resetToDefaults()
     m_store->sync();
     Q_EMIT closeActionChanged(closeAction());
     Q_EMIT showRailChanged(showRail());
+    Q_EMIT railLabelsChanged(railLabels());
     Q_EMIT startModeChanged(startMode());
     Q_EMIT startPageChanged(startPage());
     Q_EMIT notifyOnDownloadFinishChanged(notifyOnDownloadFinish());

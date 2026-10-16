@@ -11,11 +11,17 @@ versions follow [Semantic Versioning](https://semver.org/).
 - TV mode shows a **Back to YouTube** button when it starts and whenever the mouse moves.
 - Settings, General: **Open Red in** picks the mode Red starts in: YouTube, YouTube Music,
   TV mode or the mode used last.
+- The side rail shows **labels** next to its icons. *Hide labels* at the bottom of the rail (or
+  Settings, General) brings back the narrow icons-only rail.
+- F10 opens the rail's menu, also when the rail is hidden.
 
 ### Changed
 - Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it
   closed. "Start Red in TV mode" carries over as *Open Red in: TV mode*.
 - The window title names the mode in YouTube Music and TV mode.
+- The rail's Download button says what a click does: *Download this* on a video, playlist or
+  channel, *Download from link* elsewhere. The mini player button says why it is unavailable.
+- In a short window the rail scrolls instead of squeezing its buttons together.
 
 ## [10.2.0] - 2026-09-15
 

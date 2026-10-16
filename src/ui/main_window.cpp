@@ -154,7 +154,7 @@ void MainWindow::setupUi()
     layout->addWidget(m_splitter, 1);
     setCentralWidget(central);
 
-    auto* overflow = new QMenu(this);
+    auto* overflow = m_overflow = new QMenu(this);
     overflow->addAction(m_actions->downloadUrl);
     overflow->addAction(m_actions->copyLink);
     overflow->addAction(m_actions->fullScreen);
@@ -171,6 +171,9 @@ void MainWindow::setupUi()
     overflow->addSeparator();
     overflow->addAction(m_actions->quit);
     m_rail->setMenu(overflow);
+    m_rail->setExpanded(m_settings.railLabels());
+    connect(m_rail, &SideRail::expandRequested, &m_settings, &core::Settings::setRailLabels);
+    connect(&m_settings, &core::Settings::railLabelsChanged, m_rail, &SideRail::setExpanded);
 
     m_exitFullScreen = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     m_exitFullScreen->setContext(Qt::WindowShortcut);
@@ -252,6 +255,13 @@ void MainWindow::connectActions()
     connect(a.fullScreen, &QAction::toggled, this, &MainWindow::setFullScreenMode);
     connect(a.showHide, &QAction::triggered, this, &MainWindow::toggleVisibility);
     connect(a.settings, &QAction::triggered, this, &MainWindow::showSettings);
+    connect(a.menu, &QAction::triggered, this, [this] {
+        if (m_rail->isVisible()) {
+            m_rail->showMenu();
+        } else {
+            m_overflow->popup(mapToGlobal(QPoint(16, 16)));
+        }
+    });
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
     connect(a.openLogFolder, &QAction::triggered, this,
@@ -490,6 +500,10 @@ void MainWindow::applyChrome()
                   .arg(m_actions->miniPlayer->shortcut().toString(QKeySequence::NativeText))
         : music ? tr("The mini player is not available in Music mode")
                 : tr("Play a video to use the mini player"));
+    // With labels on, the reason sits under the greyed-out label.
+    m_rail->setMiniPlayerHint(m_actions->miniPlayer->isEnabled() ? QString()
+                              : music                            ? tr("Not in YouTube Music")
+                                                                 : tr("Play a video first"));
 }
 
 void MainWindow::setDownloadsPanelVisible(bool visible)

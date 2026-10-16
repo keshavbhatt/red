@@ -175,6 +175,9 @@ public:
     void setCloseAction(CloseAction action);
     [[nodiscard]] bool showRail() const;
     void setShowRail(bool show);
+    /// The rail shows a label next to each icon (wide rail) or icons only.
+    [[nodiscard]] bool railLabels() const;
+    void setRailLabels(bool show);
     [[nodiscard]] AppMode lastMode() const;
     void setLastMode(AppMode mode);
     [[nodiscard]] QString lastUrl() const;
@@ -334,6 +337,7 @@ public:
 Q_SIGNALS:
     void closeActionChanged(red::core::CloseAction action);
     void showRailChanged(bool show);
+    void railLabelsChanged(bool show);
     void startModeChanged(red::core::StartMode mode);
     void startPageChanged(red::core::StartPage page);
     void notifyOnDownloadFinishChanged(bool enabled);

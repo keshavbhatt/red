@@ -54,6 +54,12 @@ private Q_SLOTS:
         QVERIFY(m_settings->tvFullscreen());
         QVERIFY(m_settings->tvGamepad());
         QCOMPARE(m_settings->lastMode(), AppMode::Desktop);
+        QVERIFY(m_settings->railLabels()); // new users see what each rail button is
+        QSignalSpy labels(m_settings.get(), &Settings::railLabelsChanged);
+        m_settings->setRailLabels(false);
+        m_settings->setRailLabels(false);
+        QCOMPARE(labels.count(), 1);
+        QVERIFY(!m_settings->railLabels());
         QCOMPARE(m_settings->zoomFactor(), 1.0);
         QCOMPARE(m_settings->sponsorAction(u"sponsor"_s), SponsorAction::Skip);
         QCOMPARE(m_settings->sponsorAction(u"filler"_s), SponsorAction::Off);

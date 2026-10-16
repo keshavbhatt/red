@@ -50,7 +50,11 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
 └──┴────────────────────────────────────────────────────┴─────────────┘
 ```
 
-**Left rail** (48 px, brand surface, 1 px border on the page side). Top to bottom:
+**Left rail** (brand surface, 1 px border on the page side): 52 px icons only, or 200 px with
+a label beside each icon (`window/railLabels`, default on; *Hide labels* / *Show labels* toggle
+at the bottom, ADR-015). The icon keeps its x position in both widths; a disabled button can
+carry a muted second line (mini player: "Play a video first"). The content scrolls (wheel) when
+the window is shorter than the buttons. Top to bottom:
 
 | Item | Icon | Action / shortcut |
 |---|---|---|
@@ -64,7 +68,8 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
 | Mini player | picture icon | Ctrl+Shift+M |
 | — spacer — | | |
 | Settings | gear | Ctrl+, |
-| Menu | ⋮ | About, Shortcuts, Open log folder, Quit |
+| Menu | ⋮ | F10 (also with the rail hidden) · About, Shortcuts, Open log folder, Quit |
+| Labels toggle | sidebar glyph | *Hide labels* / *Show labels* |
 
 The rail hides in fullscreen, in TV mode and in mini-player mode. Setting "Show side rail"
 keeps everything reachable via shortcuts and the tray.

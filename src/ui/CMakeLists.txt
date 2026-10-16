@@ -40,6 +40,8 @@ qt_add_library(red_ui STATIC
     permission_prompt.h
     red_style.cpp
     red_style.h
+    rail_button.cpp
+    rail_button.h
     settings_dialog.cpp
     settings_dialog.h
     shortcuts_dialog.cpp

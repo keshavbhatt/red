@@ -44,6 +44,7 @@ public:
     QAction* fullScreen = nullptr;
     QAction* showHide = nullptr;
     QAction* settings = nullptr;
+    QAction* menu = nullptr; ///< F10: the rail's More menu, also with the rail hidden
     QAction* shortcuts = nullptr;
     QAction* onlineGuide = nullptr;
     QAction* openLogFolder = nullptr;

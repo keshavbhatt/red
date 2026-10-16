@@ -3,13 +3,14 @@
 #include "core/theme/theme_service.h"
 #include "ui/actions.h"
 #include "ui/icons.h"
+#include "ui/rail_button.h"
 #include "ui/red_style.h"
 
 #include <QAction>
 #include <QLabel>
 #include <QMenu>
+#include <QScrollArea>
 #include <QStyle>
-#include <QToolButton>
 #include <QVBoxLayout>
 
 using namespace Qt::StringLiterals;
@@ -18,8 +19,19 @@ namespace red::ui {
 
 namespace {
 constexpr int kRailWidth = 52;
+constexpr int kExpandedWidth = 200;
+constexpr int kSideMargin = 6;
+constexpr int kButtonSide = 40;
+constexpr int kModeButtonSide = 36;
 constexpr int kIconSize = 22;
 constexpr int kModeIconSize = 20;
+constexpr int kSeparatorWidth = 24;
+
+QString withShortcut(const QString& text, const QAction* action)
+{
+    const QString keys = action->shortcut().toString(QKeySequence::NativeText);
+    return keys.isEmpty() ? text : u"%1  (%2)"_s.arg(text, keys);
+}
 } // namespace
 
 SideRail::SideRail(Actions& actions, core::ThemeService& theme, QWidget* parent)
@@ -28,30 +40,33 @@ SideRail::SideRail(Actions& actions, core::ThemeService& theme, QWidget* parent)
     , m_theme(theme)
 {
     setProperty("redRail", true);
-    setFixedWidth(kRailWidth);
     setupUi();
+    applyWidths();
     applyIcons();
+    setDownloadable(false);
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
             [this](Qt::ColorScheme) { applyIcons(); });
 }
 
-QToolButton* SideRail::makeButton(QAction* action, const QString& icon)
+RailButton* SideRail::makeButton(QAction* action, const QString& icon, int side)
 {
-    auto* button = new QToolButton(this);
-    button->setDefaultAction(action);
+    auto* button = new RailButton(side, this);
+    if (action != nullptr) {
+        button->setDefaultAction(action);
+        // On the action, not the button: the button re-copies the action's
+        // tooltip on every action change and would otherwise drop the shortcut.
+        if (action->toolTip().isEmpty() || action->toolTip() == action->text()) {
+            QString text = action->text();
+            action->setToolTip(withShortcut(text.remove(u'…').replace(u"&&"_s, u"&"_s), action));
+        }
+        button->setToolTip(action->toolTip());
+    }
     button->setProperty("redRailButton", true);
     button->setProperty("redIcon", icon);
     button->setIconSize(QSize(kIconSize, kIconSize));
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
     button->setCursor(Qt::PointingHandCursor);
     button->setFocusPolicy(Qt::NoFocus);
-    const QString shortcut = action->shortcut().toString(QKeySequence::NativeText);
-    // On the action, not the button: the button re-copies the action's tooltip
-    // on every action change and would otherwise drop the shortcut hint.
-    if (action->toolTip().isEmpty() || action->toolTip() == action->text()) {
-        action->setToolTip(shortcut.isEmpty() ? action->text() : u"%1  (%2)"_s.arg(action->text(), shortcut));
-    }
-    button->setToolTip(action->toolTip());
     return button;
 }
 
@@ -59,14 +74,14 @@ QToolButton* SideRail::makeButton(QAction* action, const QString& icon)
 /// says where Red is, and the way back to YouTube is the top button.
 QWidget* SideRail::makeModeSwitch()
 {
-    auto* group = new QFrame(this);
-    group->setProperty("redModeSwitch", true);
-    auto* layout = new QVBoxLayout(group);
+    m_modeSwitch = new QFrame(this);
+    m_modeSwitch->setProperty("redModeSwitch", true);
+    auto* layout = new QVBoxLayout(m_modeSwitch);
     layout->setContentsMargins(1, 1, 1, 1);
     layout->setSpacing(1);
-    const auto add = [this, group, layout](QAction* action, const QString& icon) {
-        QToolButton* button = makeButton(action, icon);
-        button->setParent(group);
+    const auto add = [this, layout](QAction* action, const QString& icon) {
+        RailButton* button = makeButton(action, icon, kModeButtonSide);
+        button->setParent(m_modeSwitch);
         button->setProperty("redModeButton", true);
         button->setIconSize(QSize(kModeIconSize, kModeIconSize));
         layout->addWidget(button, 0, Qt::AlignHCenter);
@@ -75,19 +90,45 @@ QWidget* SideRail::makeModeSwitch()
     m_youtube = add(m_actions.youtubeMode, u"youtube"_s);
     m_music = add(m_actions.musicMode, u"music"_s);
     m_tv = add(m_actions.tvMode, u"tv"_s);
-    return group;
+    return m_modeSwitch;
 }
 
 void SideRail::setupUi()
 {
-    auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(6, 8, 6, 8);
+    // In a window shorter than the rail's buttons the rail scrolls (wheel)
+    // instead of squeezing them on top of each other.
+    auto* outer = new QVBoxLayout(this);
+    outer->setContentsMargins(0, 0, 0, 0);
+    auto* scroll = new QScrollArea(this);
+    scroll->setObjectName(u"railScroll"_s);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setWidgetResizable(true);
+    scroll->viewport()->setAutoFillBackground(false);
+    auto* content = new QWidget(scroll);
+    content->setAutoFillBackground(false);
+    scroll->setWidget(content);
+    scroll->setStyleSheet(
+        u"QScrollArea#railScroll, QScrollArea#railScroll > QWidget > QWidget { background: transparent; }"_s);
+    outer->addWidget(scroll);
+
+    auto* layout = new QVBoxLayout(content);
+    layout->setContentsMargins(kSideMargin, 8, kSideMargin, 8);
     layout->setSpacing(4);
     layout->setAlignment(Qt::AlignHCenter);
+    const auto separator = [this, layout] {
+        auto* line = new QFrame(this);
+        line->setProperty("redSeparator", true);
+        m_separators << line;
+        layout->addSpacing(4);
+        layout->addWidget(line, 0, Qt::AlignHCenter);
+        layout->addSpacing(4);
+    };
 
     m_logo = makeButton(m_actions.home, u"logo"_s);
     m_logo->setIconSize(QSize(28, 28));
-    m_logo->setToolTip(tr("Home  (%1)").arg(m_actions.home->shortcut().toString(QKeySequence::NativeText)));
+    m_logo->setToolTip(withShortcut(tr("Home"), m_actions.home));
     layout->addWidget(m_logo, 0, Qt::AlignHCenter);
     layout->addSpacing(6);
     layout->addWidget(makeModeSwitch(), 0, Qt::AlignHCenter);
@@ -99,31 +140,20 @@ void SideRail::setupUi()
     layout->addWidget(m_back, 0, Qt::AlignHCenter);
     layout->addWidget(m_forward, 0, Qt::AlignHCenter);
     layout->addWidget(m_reload, 0, Qt::AlignHCenter);
-
-    auto* sep1 = new QFrame(this);
-    sep1->setProperty("redSeparator", true);
-    sep1->setFixedWidth(24);
-    layout->addSpacing(4);
-    layout->addWidget(sep1, 0, Qt::AlignHCenter);
-    layout->addSpacing(4);
+    separator();
 
     m_download = makeButton(m_actions.download, u"download"_s);
     layout->addWidget(m_download, 0, Qt::AlignHCenter);
-
-    // Downloads button with a count badge overlaid on its corner.
-    auto* downloadsHost = new QWidget(this);
-    downloadsHost->setFixedSize(40, 40);
+    // The count badge rides on the Downloads button: its top right corner
+    // when collapsed, the end of the label row when expanded.
     m_downloads = makeButton(m_actions.downloads, u"downloads"_s);
-    m_downloads->setParent(downloadsHost);
-    m_downloads->move(0, 0);
-    m_badge = new QLabel(downloadsHost);
+    m_badge = new QLabel(m_downloads);
     m_badge->setAlignment(Qt::AlignCenter);
     m_badge->setFixedHeight(16);
     m_badge->setMinimumWidth(16);
-    m_badge->move(22, 2);
+    m_badge->setAttribute(Qt::WA_TransparentForMouseEvents);
     m_badge->hide();
-    layout->addWidget(downloadsHost, 0, Qt::AlignHCenter);
-
+    layout->addWidget(m_downloads, 0, Qt::AlignHCenter);
     m_miniPlayer = makeButton(m_actions.miniPlayer, u"miniplayer"_s);
     layout->addWidget(m_miniPlayer, 0, Qt::AlignHCenter);
 
@@ -131,15 +161,51 @@ void SideRail::setupUi()
 
     m_settings = makeButton(m_actions.settings, u"settings"_s);
     layout->addWidget(m_settings, 0, Qt::AlignHCenter);
-    m_menu = new QToolButton(this);
-    m_menu->setProperty("redRailButton", true);
-    m_menu->setProperty("redIcon", u"more"_s);
-    m_menu->setIconSize(QSize(kIconSize, kIconSize));
+    m_menu = makeButton(nullptr, u"more"_s);
+    m_menu->setLabel(tr("More"));
+    m_menu->setToolTip(tr("More  (F10)"));
+    m_menu->setAccessibleName(tr("More"));
     m_menu->setPopupMode(QToolButton::InstantPopup);
-    m_menu->setCursor(Qt::PointingHandCursor);
-    m_menu->setFocusPolicy(Qt::NoFocus);
-    m_menu->setToolTip(tr("More"));
     layout->addWidget(m_menu, 0, Qt::AlignHCenter);
+    m_labels = makeButton(nullptr, u"sidebar"_s);
+    m_labels->setLabel(tr("Hide labels"));
+    connect(m_labels, &QToolButton::clicked, this, [this] { Q_EMIT expandRequested(!m_expanded); });
+    layout->addWidget(m_labels, 0, Qt::AlignHCenter);
+}
+
+QList<RailButton*> SideRail::buttons() const
+{
+    return {m_logo,      m_back,       m_forward,  m_reload, m_download,
+            m_downloads, m_miniPlayer, m_settings, m_menu,   m_labels};
+}
+
+void SideRail::setExpanded(bool expanded)
+{
+    if (expanded == m_expanded) {
+        return;
+    }
+    m_expanded = expanded;
+    applyWidths();
+}
+
+void SideRail::applyWidths()
+{
+    setFixedWidth(m_expanded ? kExpandedWidth : kRailWidth);
+    const int inner = kExpandedWidth - 2 * kSideMargin;
+    for (RailButton* b : buttons()) {
+        b->setExpanded(m_expanded, inner);
+    }
+    m_modeSwitch->setFixedWidth(m_expanded ? inner : kButtonSide);
+    for (RailButton* b : {m_youtube, m_music, m_tv}) {
+        b->setExpanded(m_expanded, inner - 4); // inside the group's border and margin
+    }
+    for (QFrame* line : m_separators) {
+        line->setFixedWidth(m_expanded ? inner - 16 : kSeparatorWidth);
+    }
+    const QString labelsTip = m_expanded ? tr("Hide labels") : tr("Show labels");
+    m_labels->setToolTip(labelsTip);
+    m_labels->setAccessibleName(labelsTip);
+    placeBadge();
 }
 
 void SideRail::setMenu(QMenu* menu)
@@ -155,10 +221,8 @@ void SideRail::showMenu()
 void SideRail::applyIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QList<QToolButton*> buttons{m_back,       m_forward,  m_reload, m_downloads,
-                                      m_miniPlayer, m_settings, m_menu};
     // A QToolButton re-syncs icon and text from its default action on every
-    // action change (checked, enabled…) — so the icon has to live on the action,
+    // action change (checked, enabled…), so the icon has to live on the action,
     // or a toggle turns the button into its text label.
     const auto setIcon = [](QToolButton* b, const QIcon& icon) {
         if (QAction* action = b->defaultAction(); action != nullptr) {
@@ -166,11 +230,12 @@ void SideRail::applyIcons()
         }
         b->setIcon(icon);
     };
-    for (QToolButton* b : buttons) {
+    for (RailButton* b : buttons()) {
         setIcon(b, icons::themed(b->property("redIcon").toString(), t.text, t.muted));
+        b->setColors(t.text, t.muted);
     }
     // The active mode's glyph turns brand red (the action's checked state).
-    for (QToolButton* b : {m_youtube, m_music, m_tv}) {
+    for (RailButton* b : {m_youtube, m_music, m_tv}) {
         QIcon icon = icons::themed(b->property("redIcon").toString(), t.text, t.muted);
         for (const int size : {16, 20, 24, 32}) {
             for (const qreal dpr : {1.0, 2.0}) {
@@ -179,10 +244,12 @@ void SideRail::applyIcons()
             }
         }
         setIcon(b, icon);
+        b->setColors(t.text, t.muted);
     }
     setIcon(m_logo, icons::brand());
     setIcon(m_reload, icons::themed(m_loading ? u"stop"_s : u"reload"_s, t.text, t.muted));
     setIcon(m_download, icons::themed(u"download"_s, m_downloadable ? t.accentText : t.text, t.muted));
+    m_download->setColors(m_downloadable ? t.accentText : t.text, t.muted);
     m_download->setProperty("redAccent", m_downloadable);
     m_download->style()->unpolish(m_download);
     m_download->style()->polish(m_download);
@@ -191,16 +258,15 @@ void SideRail::applyIcons()
             t.accent.name(), t.accentText.name()));
 }
 
+/// The button says what a click does: download this page, or (nothing to
+/// download here) paste a link.
 void SideRail::setDownloadable(bool downloadable)
 {
-    if (m_downloadable == downloadable) {
-        return;
-    }
     m_downloadable = downloadable;
-    m_actions.download->setToolTip(
-        downloadable ? tr("Download this video  (%1)")
-                           .arg(m_actions.download->shortcut().toString(QKeySequence::NativeText))
-                     : tr("Open a video, playlist or channel to download it"));
+    m_download->setLabel(downloadable ? tr("Download this") : tr("Download from link"));
+    m_actions.download->setToolTip(downloadable
+                                       ? withShortcut(tr("Download this page"), m_actions.download)
+                                       : withShortcut(tr("Download from a link"), m_actions.downloadUrl));
     applyIcons();
 }
 
@@ -208,13 +274,23 @@ void SideRail::setActiveDownloads(int count)
 {
     if (count <= 0) {
         m_badge->hide();
+        m_downloads->setAccessibleName(tr("Downloads"));
         return;
     }
     m_badge->setText(count > 99 ? u"99+"_s : QString::number(count));
     m_badge->adjustSize();
-    m_badge->move(40 - m_badge->width() - 1, 1);
+    m_downloads->setAccessibleName(tr("Downloads, %n active", nullptr, count));
+    placeBadge();
     m_badge->show();
     m_badge->raise();
+}
+
+void SideRail::placeBadge()
+{
+    const int x =
+        m_expanded ? m_downloads->width() - m_badge->width() - 10 : kButtonSide - m_badge->width() - 1;
+    const int y = m_expanded ? (m_downloads->height() - m_badge->height()) / 2 : 1;
+    m_badge->move(x, y);
 }
 
 void SideRail::setLoading(bool loading)
@@ -223,8 +299,14 @@ void SideRail::setLoading(bool loading)
         return;
     }
     m_loading = loading;
-    m_reload->setToolTip(loading ? tr("Stop loading") : tr("Reload  (F5)"));
+    m_reload->setLabel(loading ? tr("Stop") : QString());
+    m_reload->setToolTip(loading ? tr("Stop loading") : withShortcut(tr("Reload"), m_actions.reload));
     applyIcons();
+}
+
+void SideRail::setMiniPlayerHint(const QString& hint)
+{
+    m_miniPlayer->setHint(hint);
 }
 
 } // namespace red::ui

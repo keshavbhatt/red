@@ -250,11 +250,21 @@ QWidget* SettingsDialog::buildGeneral()
     connect(m_trayEnabled, &QCheckBox::toggled, this, [this](bool on) { m_settings.setTrayEnabled(on); });
     v->addWidget(m_trayEnabled);
     m_showRail = new QCheckBox(tr("Show the side rail"), integration);
-    connect(m_showRail, &QCheckBox::toggled, this, [this](bool on) { m_settings.setShowRail(on); });
+    connect(m_showRail, &QCheckBox::toggled, this, [this](bool on) {
+        m_settings.setShowRail(on);
+        m_railLabels->setEnabled(on);
+    });
     v->addWidget(m_showRail);
-    v->addWidget(mutedLabel(
-        tr("Everything on the rail is also reachable with keyboard shortcuts (F1) and from the tray."),
-        integration));
+    m_railLabels = new QCheckBox(tr("Show labels next to the rail's icons"), integration);
+    connect(m_railLabels, &QCheckBox::toggled, this, [this](bool on) { m_settings.setRailLabels(on); });
+    v->addWidget(m_railLabels);
+    connect(&m_settings, &core::Settings::railLabelsChanged, m_railLabels, [this](bool on) {
+        const QSignalBlocker blocker(m_railLabels); // the rail's own toggle, while Settings is open
+        m_railLabels->setChecked(on);
+    });
+    v->addWidget(mutedLabel(tr("Without the rail, F10 opens its menu and every other button has a keyboard "
+                               "shortcut (F1 lists them)."),
+                            integration));
     m_notify = new QCheckBox(tr("Notify me when a download finishes"), integration);
     connect(m_notify, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setNotifyOnDownloadFinish(on); });
@@ -701,6 +711,8 @@ void SettingsDialog::loadValues()
     m_closeAction->setEnabled(m_trayAvailable);
     m_trayEnabled->setChecked(m_settings.trayEnabled());
     m_showRail->setChecked(m_settings.showRail());
+    m_railLabels->setChecked(m_settings.railLabels());
+    m_railLabels->setEnabled(m_settings.showRail());
     m_notify->setChecked(m_settings.notifyOnDownloadFinish());
     m_theme_->setCurrentIndex(m_theme_->findData(static_cast<int>(m_settings.theme())));
     m_zoom->setValue(m_settings.zoomFactor() * 100);

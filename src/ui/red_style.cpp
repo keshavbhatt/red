@@ -153,10 +153,11 @@ QToolButton:checked { background: {{hover}}; }
 QToolButton::menu-indicator { image: none; }
 
 /* Rail buttons: square, rounded, the active one carries the accent bar. */
+/* Sizes come from ui::RailButton: 40 px square, or the rail's width with labels. */
 QToolButton[redRailButton="true"] {
     background: transparent; border: none; border-radius: 10px; padding: 0; margin: 0;
-    min-width: 40px; max-width: 40px; min-height: 40px; max-height: 40px;
 }
+QToolButton[redRailButton="true"]::menu-indicator { image: none; width: 0; }
 QToolButton[redRailButton="true"]:hover { background: {{hover}}; }
 QToolButton[redRailButton="true"]:checked { background: {{hover}}; }
 QToolButton[redRailButton="true"][redAccent="true"] { background: {{accent}}; }
@@ -164,9 +165,7 @@ QToolButton[redRailButton="true"][redAccent="true"]:hover { background: {{accent
 QToolButton[redRailButton="true"]:disabled { background: transparent; }
 /* The mode switch: three smaller rail buttons in one outlined group. */
 QFrame[redModeSwitch="true"] { border: 1px solid {{border}}; border-radius: 12px; background: transparent; }
-QToolButton[redRailButton="true"][redModeButton="true"] {
-    min-width: 36px; max-width: 36px; min-height: 36px; max-height: 36px; border-radius: 10px;
-}
+QToolButton[redRailButton="true"][redModeButton="true"] { border-radius: 10px; }
 
 /* Check boxes and radios. */
 QCheckBox, QRadioButton { spacing: 8px; }
