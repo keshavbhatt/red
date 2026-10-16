@@ -19,6 +19,12 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The mini player works in YouTube Music: a tall window with YouTube Music's own player (art,
   title, seek bar, controls and the queue).
 - Shorts open the mini player in a tall window that fits the video.
+- In a window narrower than 900 px the Downloads panel opens over the page instead of not at
+  all; Esc closes it.
+- "Download added" appears where the Downloads panel can't (full screen, the mini player, TV
+  mode, a narrow window), and "Already in your downloads" when the same download is queued.
+- Settings confirms Clear cache, Copy diagnostics, Reset site permissions and Reset all settings
+  right under the buttons.
 
 ### Changed
 - Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it

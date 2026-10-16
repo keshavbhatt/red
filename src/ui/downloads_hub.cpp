@@ -155,7 +155,7 @@ void DownloadsHub::wireQueue()
     connect(m_queue, &core::DownloadQueue::jobFinished, this, &DownloadsHub::handleJobFinished);
     connect(m_queue, &core::DownloadQueue::jobAdded, this, [this](quint64 id) {
         keepThumbnail(id);
-        Q_EMIT showPanelRequested();
+        m_lastAddedId = id;
     });
     connect(m_queue, &core::DownloadQueue::jobRemoved, m_thumbnails, &ThumbnailCache::forget);
     connect(m_thumbnails, &ThumbnailCache::ready, this, [this](const QString& url) {
@@ -222,9 +222,15 @@ void DownloadsHub::openDialog(const QUrl& url, bool audioOnly)
     // dialog stays open so fewer entries can be picked.
     dialog->setAdmission([this](int items) { return m_license.canDownload(items); });
     connect(dialog, &QDialog::accepted, this, [this, dialog] {
-        m_license.spendDownloads(dialog->selectedEntryCount());
-        const quint64 id = m_queue->add(dialog->job());
-        qCInfo(lcUi) << "queued download" << id << dialog->job().url;
+        const core::DownloadJob job = dialog->job();
+        m_lastAddedId = 0;
+        const quint64 id = m_queue->add(job);
+        const bool added = id == m_lastAddedId;
+        if (added) {
+            m_license.spendDownloads(dialog->selectedEntryCount()); // a duplicate costs nothing
+        }
+        qCInfo(lcUi) << (added ? "queued download" : "already queued") << id << job.url;
+        Q_EMIT downloadAdded(job.title, !added);
     });
     dialog->show();
     // Developer aid (headless verification): accept the dialog with its

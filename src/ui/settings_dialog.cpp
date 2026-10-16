@@ -655,34 +655,42 @@ QWidget* SettingsDialog::buildAdvanced()
     i->addRow(QString(), mutedLabel(tr("Changes apply to the next page load. TV mode uses its own identity."),
                                     identity));
 
-    auto* storage = new QWidget(this);
-    auto* s = new QHBoxLayout(storage);
+    auto* storageButtons = new QWidget(this);
+    auto* s = new QHBoxLayout(storageButtons);
     s->setContentsMargins(0, 0, 0, 0);
     s->setSpacing(8);
-    auto* clearCache = new QPushButton(tr("Clear cache"), storage);
-    connect(clearCache, &QPushButton::clicked, this, &SettingsDialog::clearCacheRequested);
+    auto* clearCache = new QPushButton(tr("Clear cache"), storageButtons);
+    connect(clearCache, &QPushButton::clicked, this, [this] {
+        Q_EMIT clearCacheRequested();
+        showStatus(m_storageStatus, tr("Cache cleared."));
+    });
     s->addWidget(clearCache);
-    auto* clearSession = new QPushButton(tr("Sign out and clear session…"), storage);
+    auto* clearSession = new QPushButton(tr("Sign out and clear session…"), storageButtons);
     connect(clearSession, &QPushButton::clicked, this, &SettingsDialog::clearSessionRequested);
     s->addWidget(clearSession);
-    auto* resetPermissions = new QPushButton(tr("Reset site permissions"), storage);
+    auto* resetPermissions = new QPushButton(tr("Reset site permissions"), storageButtons);
     resetPermissions->setToolTip(
         tr("Forget the microphone, camera and location answers; YouTube asks again."));
     connect(resetPermissions, &QPushButton::clicked, this, &SettingsDialog::resetPermissionsRequested);
     s->addWidget(resetPermissions);
     s->addStretch(1);
+    m_storageStatus = mutedLabel(QString(), this);
+    QWidget* storage = withStatus(storageButtons, m_storageStatus);
 
-    auto* support = new QWidget(this);
-    auto* su = new QHBoxLayout(support);
+    auto* supportButtons = new QWidget(this);
+    auto* su = new QHBoxLayout(supportButtons);
     su->setContentsMargins(0, 0, 0, 0);
     su->setSpacing(8);
-    auto* logs = new QPushButton(tr("Open log folder"), support);
+    auto* logs = new QPushButton(tr("Open log folder"), supportButtons);
     connect(logs, &QPushButton::clicked, this, &SettingsDialog::openLogFolderRequested);
     su->addWidget(logs);
-    auto* diag = new QPushButton(tr("Copy diagnostics"), support);
-    connect(diag, &QPushButton::clicked, this, &SettingsDialog::copyDiagnosticsRequested);
+    auto* diag = new QPushButton(tr("Copy diagnostics"), supportButtons);
+    connect(diag, &QPushButton::clicked, this, [this] {
+        Q_EMIT copyDiagnosticsRequested();
+        showStatus(m_supportStatus, tr("Diagnostics copied to the clipboard."));
+    });
     su->addWidget(diag);
-    auto* reset = new QPushButton(tr("Reset all settings…"), support);
+    auto* reset = new QPushButton(tr("Reset all settings…"), supportButtons);
     connect(reset, &QPushButton::clicked, this, [this] {
         if (MessageSheet::confirm(
                 this, MessageSheet::Tone::Warning, tr("Reset all settings?"),
@@ -690,14 +698,47 @@ QWidget* SettingsDialog::buildAdvanced()
                 tr("Reset"))) {
             m_settings.resetToDefaults();
             loadValues();
+            showStatus(m_supportStatus, tr("Every setting is back to its default."));
         }
     });
     su->addWidget(reset);
     su->addStretch(1);
+    m_supportStatus = mutedLabel(QString(), this);
+    QWidget* support = withStatus(supportButtons, m_supportStatus);
 
     return wrapPage(tr("Advanced"), tr("Graphics, identity, storage and support."),
                     {makeCard(tr("Graphics"), graphics), makeCard(tr("Identity"), identity),
                      makeCard(tr("Storage"), storage), makeCard(tr("Support"), support)});
+}
+
+/// A row of buttons with a confirmation line under it, hidden until used.
+QWidget* SettingsDialog::withStatus(QWidget* buttons, QLabel* status)
+{
+    auto* host = new QWidget(this);
+    auto* v = new QVBoxLayout(host);
+    v->setContentsMargins(0, 0, 0, 0);
+    v->setSpacing(8);
+    v->addWidget(buttons);
+    status->hide();
+    v->addWidget(status);
+    return host;
+}
+
+/// Confirms an action that otherwise leaves no trace, for a few seconds.
+void SettingsDialog::showStatus(QLabel* status, const QString& text)
+{
+    status->setText(text);
+    status->show();
+    QTimer::singleShot(5000, status, [status, text] {
+        if (status->text() == text) {
+            status->hide();
+        }
+    });
+}
+
+void SettingsDialog::showStorageStatus(const QString& text)
+{
+    showStatus(m_storageStatus, text);
 }
 
 // ---- values ----------------------------------------------------------------

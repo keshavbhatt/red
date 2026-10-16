@@ -74,7 +74,11 @@ the window is shorter than the buttons. Top to bottom:
 The rail hides in fullscreen, in TV mode and in mini-player mode. Setting "Show side rail"
 keeps everything reachable via shortcuts and the tray.
 
-**Downloads panel** (right, 380 px, `panel` surface, border-left):
+**Downloads panel** (right, 380 px, `panel` surface, border-left). Docked beside the page from
+900 px of window width; narrower, it floats over the page's right side (Esc, Ctrl+J or ✕ close
+it) and is not reopened at start. Where it cannot show (full screen, mini player, TV, or closed in
+a narrow window) a queued download raises a hint: "Download added: <title>" or "Already in your
+downloads: <title>".
 * Header: "Downloads" · engine chip (● yt-dlp 2026.08.19 / "Setting up…" / "Update available")
   · `+ New` (paste-URL dialog) · ⋮ (Pause all, Resume all, Clear finished, Open folder, Engine…).
 * Cards (88 px): 96×54 thumbnail with a state-coloured 3 px left bar, title (2 lines),

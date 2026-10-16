@@ -62,6 +62,8 @@
 #include <QWebEnginePermission>
 #include <QtEnvironmentVariables>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
@@ -179,6 +181,12 @@ void MainWindow::setupUi()
         setFullScreenMode(false);
     });
 
+    m_closePanelOverlay = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    m_closePanelOverlay->setContext(Qt::WindowShortcut);
+    m_closePanelOverlay->setEnabled(false);
+    connect(m_closePanelOverlay, &QShortcut::activated, this,
+            [this] { m_actions->downloads->setChecked(false); });
+
     m_exitMiniPlayer = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     m_exitMiniPlayer->setContext(Qt::WindowShortcut);
     m_exitMiniPlayer->setEnabled(false); // full screen and the mini player never overlap
@@ -276,6 +284,7 @@ void MainWindow::connectActions()
             [this](const core::MediaState&) { applyChrome(); });
     connect(m_media, &MediaController::raiseRequested, this, &MainWindow::showAndRaise);
     connect(m_downloads, &DownloadsHub::activeCountChanged, m_rail, &SideRail::setActiveDownloads);
+    connect(m_downloads, &DownloadsHub::downloadAdded, this, &MainWindow::announceDownload);
     connect(m_downloads, &DownloadsHub::showPanelRequested, this, [this] {
         if (!m_panelVisible && !isFullScreen() && !m_miniPlayer && m_webView->mode() != core::AppMode::Tv) {
             m_actions->downloads->setChecked(true);
@@ -347,7 +356,8 @@ void MainWindow::start(std::optional<core::AppMode> requested)
     } else {
         setMode(mode); // switches the profile and loads the mode's start page
     }
-    if (m_settings.downloadsPanelOpen() && mode != core::AppMode::Tv) {
+    // Reopened only where it docks: a floating panel would cover the page at start.
+    if (m_settings.downloadsPanelOpen() && mode != core::AppMode::Tv && width() >= kPanelFoldWidth) {
         m_actions->downloads->setChecked(true);
     }
     show();
@@ -478,13 +488,7 @@ void MainWindow::toggleVisibility()
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
-    // The panel needs room next to the page; below ~900 px it folds away and
-    // comes back with the width (the user's choice is kept in m_panelVisible).
-    const bool fits = width() >= kPanelFoldWidth;
-    if (m_downloads->panel()->isVisible() != (fits && m_panelVisible && !isFullScreen() && !m_miniPlayer &&
-                                              m_webView->mode() != core::AppMode::Tv)) {
-        applyChrome();
-    }
+    placeDownloadsPanel(); // docked or floating follows the width
 }
 
 void MainWindow::applyChrome()
@@ -495,7 +499,7 @@ void MainWindow::applyChrome()
     const bool bare = isFullScreen() || m_miniPlayer || tv;
     m_rail->setVisible(!bare && m_settings.showRail());
     m_tvExit->setActive(tv && !m_miniPlayer);
-    m_downloads->panel()->setVisible(!bare && m_panelVisible && width() >= kPanelFoldWidth);
+    placeDownloadsPanel();
     m_actions->downloads->setEnabled(!tv && !m_miniPlayer);
     // The mini player only makes sense with a video on screen (FEATURES D6);
     // while it is on it stays enabled so it can always be turned off. YouTube
@@ -514,6 +518,57 @@ void MainWindow::applyChrome()
     m_rail->setMiniPlayerHint(m_actions->miniPlayer->isEnabled() ? QString()
                               : music                            ? tr("Play a song first")
                                                                  : tr("Play a video first"));
+}
+
+/// The downloads panel docks beside the page when the window has room
+/// (kPanelFoldWidth); in a narrower window it floats over the page's right
+/// side instead, so the Downloads button always shows it. Esc, Ctrl+J or its
+/// close button put it away.
+void MainWindow::placeDownloadsPanel()
+{
+    QWidget* panel = m_downloads->panel();
+    const bool wanted =
+        m_panelVisible && !isFullScreen() && !m_miniPlayer && m_webView->mode() != core::AppMode::Tv;
+    const bool docked = width() >= kPanelFoldWidth;
+    if (docked && panel->parentWidget() != m_splitter) {
+        m_splitter->addWidget(panel);
+        m_splitter->setStretchFactor(1, 0);
+    } else if (!docked && panel->parentWidget() == m_splitter) {
+        panel->setParent(centralWidget()); // out of the splitter, hidden until placed
+    }
+    const bool floating = wanted && !docked;
+    if (floating) {
+        const QRect area = centralWidget()->rect();
+        panel->setGeometry(area.right() + 1 - panel->width(), area.top(), panel->width(), area.height());
+        panel->show();
+        panel->raise();
+    } else {
+        panel->setVisible(wanted && docked);
+    }
+    m_closePanelOverlay->setEnabled(floating);
+}
+
+/// A download was queued: the docked panel shows it; where the panel cannot
+/// dock (narrow window, full screen, mini player, TV mode) a hint says so.
+void MainWindow::announceDownload(const QString& title, bool alreadyQueued)
+{
+    const bool bare = isFullScreen() || m_miniPlayer || m_webView->mode() == core::AppMode::Tv;
+    const bool docks = !bare && width() >= kPanelFoldWidth;
+    if (docks && !m_panelVisible) {
+        m_actions->downloads->setChecked(true);
+    }
+    const bool onScreen = !bare && m_panelVisible;
+    if (onScreen && !alreadyQueued) {
+        return; // the new card is right there
+    }
+    const QString name = fontMetrics().elidedText(title.isEmpty() ? tr("your download") : title,
+                                                  Qt::ElideRight, std::max(80, width() / 2 - 60));
+    QString text =
+        alreadyQueued ? tr("Already in your downloads: %1").arg(name) : tr("Download added: %1").arg(name);
+    if (!bare && !m_panelVisible) {
+        text += tr("  ·  Ctrl+J: downloads");
+    }
+    m_hint->showHint(text);
 }
 
 void MainWindow::setDownloadsPanelVisible(bool visible)
@@ -645,7 +700,7 @@ void MainWindow::setMiniPlayer(bool on)
                                      ? OverlayButton::Corner::TopLeft
                                      : OverlayButton::Corner::TopRight);
         m_exitMiniPlayer->setEnabled(true);
-        m_miniRestore->setActive(true); // after the resize: it sits in the small window's corner
+        m_miniRestore->setActive(true);           // after the resize: it sits in the small window's corner
         m_hint->showHint(tr("Esc: full window")); // short: a Short's window is 225 px wide
         qCInfo(lcUi) << "mini player on";
     } else {
@@ -729,8 +784,9 @@ void MainWindow::showSettings()
     connect(m_settingsDialog, &SettingsDialog::clearCacheRequested, this, &MainWindow::clearCache);
     connect(m_settingsDialog, &SettingsDialog::resetPermissionsRequested, this, [this] {
         const int n = m_webView->permissions().resetAll();
-        m_hint->showHint(n > 0 ? tr("%n site permission(s) reset", nullptr, n)
-                               : tr("No site permissions stored"));
+        // In the dialog: a hint on the window would sit behind Settings.
+        m_settingsDialog->showStorageStatus(n > 0 ? tr("%n site permission(s) reset.", nullptr, n)
+                                                  : tr("No site permissions were stored."));
     });
     connect(m_settingsDialog, &SettingsDialog::clearSessionRequested, this, &MainWindow::confirmClearSession);
     connect(m_settingsDialog, &SettingsDialog::openLogFolderRequested, m_actions->openLogFolder,
@@ -776,6 +832,10 @@ void MainWindow::debugOpen(const QString& what)
         if (what == u"mini-close"_s) { // the window's close button: back to the full window
             QTimer::singleShot(3000, this, &QWidget::close);
         }
+    } else if (what == u"downloads"_s) {
+        m_actions->downloads->setChecked(true);
+    } else if (what == u"announce"_s) {
+        announceDownload(u"Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film"_s, false);
     } else if (what == u"menu"_s) {
         m_rail->showMenu();
     } else if (what == u"tray"_s) {

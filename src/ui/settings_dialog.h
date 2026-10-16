@@ -37,6 +37,10 @@ public:
                    web::RequestInterceptor& interceptor, bool trayAvailable, QWidget* parent = nullptr);
     ~SettingsDialog() override = default;
 
+    /// A confirmation under the Storage buttons (Advanced), e.g. how many site
+    /// permissions a reset forgot.
+    void showStorageStatus(const QString& text);
+
     void showPage(int index);
     enum Page
     {
@@ -87,6 +91,11 @@ private:
     QStackedWidget* m_pages = nullptr;
 
     // general
+    QWidget* withStatus(QWidget* buttons, QLabel* status);
+    void showStatus(QLabel* status, const QString& text);
+
+    QLabel* m_storageStatus = nullptr;
+    QLabel* m_supportStatus = nullptr;
     QComboBox* m_startMode = nullptr;
     QComboBox* m_startPage = nullptr;
     QComboBox* m_closeAction = nullptr;

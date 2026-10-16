@@ -32,7 +32,11 @@ Newest first. One entry per working session.
   in Music mode around YouTube Music's own player page (ADR-016). Verified over CDP and grabs.
   Seen signed out: YouTube Music's `ytmusic-miniplayer` bar instead of `ytmusic-player-bar`
   (an experiment, it seems); next / previous still work for the owner.
-* Open from the audit: downloads panel below 900 px, first-run welcome, keyboard and
+* Fourth slice: the downloads panel floats over the page below 900 px instead of folding
+  silently; a "Download added" / "Already in your downloads" hint where it cannot show; a
+  duplicate no longer spends a free download; Settings confirms its silent actions inline.
+  `RED_DEBUG_OPEN=downloads|announce` verify it.
+* Open from the audit: first-run welcome, keyboard and
   screen-reader access to the rail and panel.
 
 ## 2026-09-13 — Session 3 (packaging, public repo)

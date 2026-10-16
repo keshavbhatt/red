@@ -71,6 +71,9 @@ public:
 Q_SIGNALS:
     void activeCountChanged(int count);
     void showPanelRequested();
+    /// The user queued a download (`alreadyQueued`: the same one was in the
+    /// list already, nothing new was added).
+    void downloadAdded(const QString& title, bool alreadyQueued);
 
 private:
     void wireEngine();
@@ -105,6 +108,7 @@ private:
     };
     QList<PendingRequest> m_pending; ///< waiting for the engine
     QHash<quint64, quint64> m_notificationJobs;
+    quint64 m_lastAddedId = 0; ///< set by jobAdded: tells a new job from an ignored duplicate
     QHash<QString, QList<quint64>>
         m_awaitingThumbnail; ///< url → jobs waiting for keep()             ///< notification id → job id
     QHash<QString, QPointer<DownloadDialog>> m_openDialogs; ///< one dialog per URL

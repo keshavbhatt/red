@@ -94,6 +94,8 @@ private:
     void applyChrome();
     void syncModeActions();
     void fitMiniPlayer();
+    void placeDownloadsPanel();
+    void announceDownload(const QString& title, bool alreadyQueued);
     void requestDownload(const QUrl& url);
     void applyPageBackground();
     void handleRenderProcessGaveUp();
@@ -124,12 +126,13 @@ private:
     DownloadsHub* m_downloads = nullptr;
     web::FullScreenHint* m_hint = nullptr;
     QShortcut* m_exitFullScreen = nullptr;
-    QShortcut* m_toggleTv = nullptr;        ///< Ctrl+T: TV mode on / off
-    QShortcut* m_toggleMusic = nullptr;     ///< Ctrl+M: Music mode on / off
-    OverlayButton* m_tvExit = nullptr;      ///< "Back to YouTube" in TV mode
-    OverlayButton* m_miniRestore = nullptr; ///< back to the full window from the mini player
-    QShortcut* m_exitMiniPlayer = nullptr;  ///< Esc in the mini player
-    QMenu* m_overflow = nullptr;            ///< the rail's More menu (F10 opens it without the rail)
+    QShortcut* m_toggleTv = nullptr;          ///< Ctrl+T: TV mode on / off
+    QShortcut* m_toggleMusic = nullptr;       ///< Ctrl+M: Music mode on / off
+    OverlayButton* m_tvExit = nullptr;        ///< "Back to YouTube" in TV mode
+    OverlayButton* m_miniRestore = nullptr;   ///< back to the full window from the mini player
+    QShortcut* m_exitMiniPlayer = nullptr;    ///< Esc in the mini player
+    QShortcut* m_closePanelOverlay = nullptr; ///< Esc while the panel floats over the page
+    QMenu* m_overflow = nullptr;              ///< the rail's More menu (F10 opens it without the rail)
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     QByteArray m_geometryBeforeFullScreen;
