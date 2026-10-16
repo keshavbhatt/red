@@ -29,12 +29,15 @@ protected:
     void enterEvent(QEnterEvent* event) override;
     void leaveEvent(QEvent* event) override;
     void changeEvent(QEvent* event) override;
+    void focusInEvent(QFocusEvent* event) override;
+    void focusOutEvent(QFocusEvent* event) override;
 
 private:
     QString m_icon;
     QString m_hint;
     core::ThemeService& m_theme;
     bool m_hover = false;
+    bool m_keyboardFocus = false; ///< reached with Tab: draw the focus outline
 };
 
 } // namespace red::ui

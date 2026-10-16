@@ -5,6 +5,7 @@
 #include "ui/red_style.h"
 
 #include <QEvent>
+#include <QFocusEvent>
 #include <QPainter>
 #include <QPainterPath>
 
@@ -56,8 +57,16 @@ void KindCard::paintEvent(QPaintEvent* /*event*/)
     path.addRoundedRect(r, kRadius, kRadius);
     const bool on = isChecked();
     p.fillPath(path, on ? t.hover : (m_hover ? t.elevated : t.panel));
-    p.setPen(QPen(on ? t.control : (hasFocus() ? t.link : t.border), on ? 2 : 1));
+    p.setPen(QPen(on ? t.control : t.border, on ? 2 : 1));
     p.drawPath(path);
+    // Keyboard focus is a dashed neutral outline inside the border, so it never
+    // reads as the solid blue of the picked card. Mouse users never see it.
+    if (m_keyboardFocus && hasFocus()) {
+        QPainterPath ring;
+        ring.addRoundedRect(r.adjusted(3, 3, -3, -3), kRadius - 3, kRadius - 3);
+        p.setPen(QPen(t.muted, 1, Qt::DashLine));
+        p.drawPath(ring);
+    }
 
     const QColor fg = isEnabled() ? t.text : t.muted;
     const QPixmap icon = icons::pixmap(m_icon, on ? t.control : fg, kIcon, devicePixelRatioF());
@@ -94,6 +103,21 @@ void KindCard::leaveEvent(QEvent* event)
     m_hover = false;
     update();
     QAbstractButton::leaveEvent(event);
+}
+
+void KindCard::focusInEvent(QFocusEvent* event)
+{
+    const Qt::FocusReason reason = event->reason();
+    m_keyboardFocus = reason == Qt::TabFocusReason || reason == Qt::BacktabFocusReason;
+    update();
+    QAbstractButton::focusInEvent(event);
+}
+
+void KindCard::focusOutEvent(QFocusEvent* event)
+{
+    m_keyboardFocus = false;
+    update();
+    QAbstractButton::focusOutEvent(event);
 }
 
 void KindCard::changeEvent(QEvent* event)

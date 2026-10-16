@@ -251,7 +251,11 @@ QString expectedExtension(const DownloadOptions& options)
         return ext.isEmpty() ? u"opus"_s : ext; // YouTube's best audio stream is Opus
     }
     case DownloadOptions::Kind::Custom:
-        return options.customVideoFormat.isEmpty() ? u"opus"_s : containerExtension(options.container);
+        // Only an audio stream: an audio file. Nothing picked yet: show the
+        // video container, which the Advanced table's first pick usually is.
+        return options.customVideoFormat.isEmpty() && !options.customAudioFormat.isEmpty()
+                   ? u"opus"_s
+                   : containerExtension(options.container);
     case DownloadOptions::Kind::Video:
         return containerExtension(options.container);
     }

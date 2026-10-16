@@ -83,6 +83,8 @@ private Q_SLOTS:
         c.customAudioFormat = u"140"_s;
         QCOMPARE(formatSelector(c), u"140"_s);
         QCOMPARE(expectedExtension(c), u"opus"_s);
+        c.customAudioFormat.clear(); // nothing picked yet: not an audio file
+        QCOMPARE(expectedExtension(c), u"mkv"_s);
     }
 
     void playlistSubtitlesSponsorsAndLimits()
