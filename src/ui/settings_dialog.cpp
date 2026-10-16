@@ -350,13 +350,15 @@ QWidget* SettingsDialog::buildPlayback()
             [this](bool on) { m_settings.setTaskbarProgress(on); });
     g->addRow(tr("Taskbar"), m_taskbarProgress);
     m_miniSize = new QComboBox(behaviour);
-    m_miniSize->addItem(tr("Small (400 × 225)"), static_cast<int>(core::MiniPlayerSize::Small));
-    m_miniSize->addItem(tr("Medium (480 × 270)"), static_cast<int>(core::MiniPlayerSize::Medium));
-    m_miniSize->addItem(tr("Large (640 × 360)"), static_cast<int>(core::MiniPlayerSize::Large));
+    m_miniSize->addItem(tr("Small"), static_cast<int>(core::MiniPlayerSize::Small));
+    m_miniSize->addItem(tr("Medium"), static_cast<int>(core::MiniPlayerSize::Medium));
+    m_miniSize->addItem(tr("Large"), static_cast<int>(core::MiniPlayerSize::Large));
     connect(m_miniSize, &QComboBox::currentIndexChanged, this, [this](int) {
         m_settings.setMiniPlayerSize(static_cast<core::MiniPlayerSize>(m_miniSize->currentData().toInt()));
     });
     g->addRow(tr("Mini player size"), m_miniSize);
+    g->addRow(QString(),
+              mutedLabel(tr("Videos get a wide window; Shorts and YouTube Music a tall one."), behaviour));
     return wrapPage(tr("Playback"), tr("How videos play."),
                     {makeCard(tr("Player"), player), makeCard(tr("Behaviour"), behaviour)});
 }

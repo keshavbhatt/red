@@ -54,6 +54,7 @@ qt_add_resources(red_web "scripts"
         scripts/tv/input.js
         scripts/tv/gamepad.js
         scripts/music/download-menu.js
+        scripts/music/mini-player.js
 )
 
 target_link_libraries(red_web

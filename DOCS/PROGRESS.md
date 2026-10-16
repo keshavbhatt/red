@@ -28,6 +28,9 @@ Newest first. One entry per working session.
 * Third slice: the mini player's close button restores the full window instead of quitting;
   Esc and a corner restore button (`ui::OverlayButton`, shared with the TV *Back to YouTube*
   pill) do the same. `RED_DEBUG_OPEN=mini|mini-close` verify it headless.
+* Owner request: the mini player fits Shorts (9:16, `contain` lifted on the Short's slot) and works
+  in Music mode around YouTube Music's own player page (ADR-016). Verified over CDP and grabs.
+  Found: YouTube Music replaced `ytmusic-player-bar` with `ytmusic-miniplayer` (audit item 20).
 * Open from the audit: downloads panel below 900 px, first-run welcome, keyboard and
   screen-reader access to the rail and panel.
 

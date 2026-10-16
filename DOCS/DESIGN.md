@@ -161,7 +161,9 @@ move, fading after 3 s; it is the visible way out while the rail is hidden.
 
 ## 6. Mini player
 
-Ctrl+Shift+M shrinks the window to 480×270 (setting: small/medium/large), always-on-top,
+Ctrl+Shift+M shrinks the window to fit what plays (setting: small/medium/large): 480×270 for a
+video, 270×480 for a Short (9:16, re-fitted when Shorts and videos swap), 360×640 for YouTube
+Music, whose own responsive player page fills it (`core::mini_player_policy`). Always-on-top,
 rail hidden, page in `red-mini` state (masthead/guide/comments hidden, player fills the
 viewport, controls on hover). Ctrl+Shift+M, Esc, the tray, the window's close button or the
 round restore button in the top right corner (`ui::OverlayButton`, shown on entry and on every

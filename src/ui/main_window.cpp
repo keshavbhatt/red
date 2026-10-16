@@ -1,6 +1,7 @@
 #include "ui/main_window.h"
 
 #include "core/log_sink.h"
+#include "core/mini_player_policy.h"
 #include "core/notifications/notification_service.h"
 #include "core/theme/theme_service.h"
 #include "core/youtube_url.h"
@@ -70,18 +71,6 @@ constexpr QSize kDefaultSize(1280, 800);
 constexpr QSize kMinimumSize(640, 420);
 constexpr int kPanelFoldWidth = 900;
 
-QSize miniPlayerSize(core::MiniPlayerSize size)
-{
-    switch (size) {
-    case core::MiniPlayerSize::Small:
-        return {400, 225};
-    case core::MiniPlayerSize::Large:
-        return {640, 360};
-    case core::MiniPlayerSize::Medium:
-        break;
-    }
-    return {480, 270};
-}
 } // namespace
 
 MainWindow::MainWindow(core::Settings& settings, core::ThemeService& theme, const QString& appVersion,
@@ -331,6 +320,7 @@ void MainWindow::connectWebView()
         setWindowTitle(bare ? app : clean + u" - "_s + app);
     });
     connect(m_webView->page(), &QWebEnginePage::urlChanged, this, [this](const QUrl&) {
+        fitMiniPlayer(); // a Short and a video want different windows
         m_actions->back->setEnabled(m_webView->history()->canGoBack());
         m_actions->forward->setEnabled(m_webView->history()->canGoForward());
     });
@@ -511,16 +501,18 @@ void MainWindow::applyChrome()
     // while it is on it stays enabled so it can always be turned off. YouTube
     // Music has its own player bar, so it is off there.
     const bool hasVideo = m_media->state().hasMedia() && !m_media->state().videoId.isEmpty();
-    m_actions->miniPlayer->setEnabled(!tv && !music && (m_miniPlayer || hasVideo));
+    // YouTube Music: any playing track (its player page shows the art or video).
+    const bool hasPlayer = music ? m_media->state().hasMedia() : hasVideo;
+    m_actions->miniPlayer->setEnabled(!tv && (m_miniPlayer || hasPlayer));
     m_actions->miniPlayer->setToolTip(
         m_actions->miniPlayer->isEnabled()
             ? tr("Mini player  (%1)")
                   .arg(m_actions->miniPlayer->shortcut().toString(QKeySequence::NativeText))
-        : music ? tr("The mini player is not available in Music mode")
+        : music ? tr("Play a song to use the mini player")
                 : tr("Play a video to use the mini player"));
     // With labels on, the reason sits under the greyed-out label.
     m_rail->setMiniPlayerHint(m_actions->miniPlayer->isEnabled() ? QString()
-                              : music                            ? tr("Not in YouTube Music")
+                              : music                            ? tr("Play a song first")
                                                                  : tr("Play a video first"));
 }
 
@@ -570,7 +562,7 @@ void MainWindow::setMode(core::AppMode mode, std::optional<QUrl> target)
         syncModeActions();
         return;
     }
-    if (mode != core::AppMode::Desktop && m_miniPlayer) {
+    if (mode != before && m_miniPlayer) { // each mode has its own mini window
         m_actions->miniPlayer->setChecked(false);
     }
     m_webView->setMode(mode, std::move(target));
@@ -612,6 +604,21 @@ void MainWindow::requestDownload(const QUrl& url)
     m_downloads->requestDownload(url, audio);
 }
 
+/// While the mini player is on, a move between a Short and a video (desktop)
+/// changes the window between tall and wide.
+void MainWindow::fitMiniPlayer()
+{
+    if (!m_miniPlayer) {
+        return;
+    }
+    const core::MiniPlayerShape shape = core::miniPlayerShape(m_webView->mode(), m_webView->url());
+    if (shape == m_miniShape) {
+        return;
+    }
+    m_miniShape = shape;
+    resize(core::miniPlayerSize(m_settings.miniPlayerSize(), shape));
+}
+
 void MainWindow::setMiniPlayer(bool on)
 {
     if (on == m_miniPlayer) {
@@ -627,13 +634,19 @@ void MainWindow::setMiniPlayer(bool on)
         applyChrome();
         m_webView->setMiniPlayer(true);
         setWindowFlag(Qt::WindowStaysOnTopHint, true);
-        setMinimumSize(320, 180);
+        setMinimumSize(200, 180); // a Short at Small is 225 px wide
         showNormal();
-        resize(miniPlayerSize(m_settings.miniPlayerSize()));
+        m_miniShape = core::miniPlayerShape(m_webView->mode(), m_webView->url());
+        resize(core::miniPlayerSize(m_settings.miniPlayerSize(), m_miniShape));
         show();
+        // YouTube Music's player page has its menu top right and the (hidden)
+        // collapse chevron top left: the restore button takes the chevron's place.
+        m_miniRestore->setCorner(m_miniShape == core::MiniPlayerShape::Music
+                                     ? OverlayButton::Corner::TopLeft
+                                     : OverlayButton::Corner::TopRight);
         m_exitMiniPlayer->setEnabled(true);
         m_miniRestore->setActive(true); // after the resize: it sits in the small window's corner
-        m_hint->showHint(tr("Mini player  ·  Esc: full window"));
+        m_hint->showHint(tr("Esc: full window")); // short: a Short's window is 225 px wide
         qCInfo(lcUi) << "mini player on";
     } else {
         m_exitMiniPlayer->setEnabled(false);

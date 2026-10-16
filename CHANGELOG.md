@@ -16,6 +16,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - F10 opens the rail's menu, also when the rail is hidden.
 - The mini player has a button in its corner (it shows when the mouse moves) and Esc to go back
   to the full window.
+- The mini player works in YouTube Music: a tall window with YouTube Music's own player (art,
+  title, seek bar, controls and the queue).
+- Shorts open the mini player in a tall window that fits the video.
 
 ### Changed
 - Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it

@@ -30,6 +30,7 @@ public:
     /// On while its mode is on: shows the button now, then again whenever the
     /// mouse moves over the host.
     void setActive(bool active);
+    void setCorner(Corner corner) { m_corner = corner; }
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;

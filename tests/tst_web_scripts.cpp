@@ -72,7 +72,10 @@ private Q_SLOTS:
         QVERIFY(music.contains(u":/scripts/background-play.js"_s));
         QVERIFY(!music.contains(u":/scripts/hide-shorts.js"_s));
         QVERIFY(!music.contains(u":/scripts/theme-control.js"_s));
-        QVERIFY(!music.contains(u":/scripts/mini-player.js"_s));
+        QVERIFY(!music.contains(u":/scripts/mini-player.js"_s)); // the desktop page's own
+        QVERIFY(music.contains(u":/scripts/music/mini-player.js"_s));
+        QVERIFY(!ScriptBundle::bootstrapResources(AppMode::Desktop)
+                     .contains(u":/scripts/music/mini-player.js"_s));
         QVERIFY(!music.contains(u":/scripts/dislikes.js"_s));
         QVERIFY(!music.contains(u":/scripts/tv/gamepad.js"_s));
         QVERIFY(ScriptBundle::bootstrapResources(AppMode::Tv).contains(u":/scripts/hide-shorts.js"_s));

@@ -342,3 +342,29 @@ pop-up at the window corner when the rail is hidden. The rail's content sits in 
 folds below 900 px of window width (audit item 5). The labels toggle adds one row, so on short
 windows more of the rail sits below the fold.
 
+## ADR-016: the mini player fits Shorts and YouTube Music (2026-10-16)
+
+**Context.** The mini player was a 16:9 window around `#movie_player`. A Short (9:16, player
+`#shorts-player`) ended up letterboxed in a wide window or not filled at all, and Music mode had
+no mini player (ADR-013: "Mini player disabled"). YouTube Music has a responsive player page:
+at about 360×640 it is a phone-style player with the art or video, title, seek bar, controls and
+the Up next / Lyrics tabs. Owner request, 2026-10-16.
+
+**Decision.** `core::mini_player_policy` maps the content to a shape (Wide, Shorts, Music) and a
+shape plus the size setting to a window size; the window re-fits on navigation while the mini
+player is on, and a mode switch turns the mini player off. `mini-player.js` marks Shorts pages
+with `html.red-shorts`: the watch-page rules are scoped to `:not(.red-shorts)` (the parked
+`#movie_player` would otherwise cover the Short), and `#shorts-player` is fixed to the window
+with the action column, arrows and title overlay hidden. Each Short's slot
+(`.reel-video-in-sequence-new`) has `contain: size layout`, which makes it the containing block
+of fixed descendants, so the mini player lifts it. Music mode loads `music/mini-player.js`: it
+opens the player page by clicking the visible `ytmusic-miniplayer` bar's title (the bar exists
+twice; one copy is parked at zero size), retries while the layout reflows, hides the collapse
+chevron, and closes the page again on exit if it opened it. The mini player is offered in Music
+whenever something plays. The restore button sits top left in Music (the chevron's place; the
+menu is top right). Window minimum in the mini player: 200×180.
+
+**Consequences.** YouTube Music's DOM moved from `ytmusic-player-bar` to `ytmusic-miniplayer`
+(`is-wiz-miniplayer-enabled`); `media-session.js` still looks for the old bar for next /
+previous availability (UX audit item 20).
+

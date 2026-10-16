@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/mini_player_policy.h"
 #include "core/settings/settings.h"
 
 #include <QMainWindow>
@@ -92,6 +93,7 @@ private:
     void setDownloadsPanelVisible(bool visible);
     void applyChrome();
     void syncModeActions();
+    void fitMiniPlayer();
     void requestDownload(const QUrl& url);
     void applyPageBackground();
     void handleRenderProcessGaveUp();
@@ -132,6 +134,7 @@ private:
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     QByteArray m_geometryBeforeFullScreen;
     QByteArray m_geometryBeforeMini;
+    core::MiniPlayerShape m_miniShape = core::MiniPlayerShape::Wide;
     Qt::WindowStates m_stateBeforeMini = Qt::WindowNoState;
     bool m_miniPlayer = false;
     bool m_panelVisible = false;

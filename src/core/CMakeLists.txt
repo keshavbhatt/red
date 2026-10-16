@@ -55,6 +55,8 @@ qt_add_library(red_core STATIC
     licensing/legacy_account.h
     youtube_url.cpp
     youtube_url.h
+    mini_player_policy.cpp
+    mini_player_policy.h
     zoom_policy.cpp
     zoom_policy.h
 )

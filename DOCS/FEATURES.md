@@ -37,7 +37,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | D3 | Autoplay without gesture (setting) | yes | KEEP | profile attribute |
 | D4 | Preferred video codec (Auto / H.264 / VP9 / AV1) — h264ify-style, big CPU saver | none | KEEP | done — `codec-preference.js` |
 | D5 | Hardware video decoding toggle (VA-API flags, restart) | none | KEEP | done — `core::chromium_flags` |
-| D6 | **Mini player**: compact always-on-top window with the player fullbleed (Ctrl+Shift+M) | none | KEEP | done, `MainWindow::setMiniPlayer`, `mini-player.js`; only offered while a video is on screen (2026-09-07); close button, Esc and a corner restore button return to the full window (2026-10-16) |
+| D6 | **Mini player**: compact always-on-top window with the player fullbleed (Ctrl+Shift+M) | none | KEEP | done, `MainWindow::setMiniPlayer`, `mini-player.js`; only offered while a video is on screen (2026-09-07); close button, Esc and a corner restore button return to the full window; Shorts get a 9:16 window, YouTube Music a tall one (`core::mini_player_policy`, ADR-016) (2026-10-16) |
 | D7 | MPRIS media controls (media keys, KDE/GNOME applets): play/pause/next/prev/seek, metadata + artwork | none | KEEP | done — `platform::MprisService`, `media-session.js` |
 | D8 | Keep screen awake while playing (Chromium wake lock; own inhibit as fallback) | none | KEEP | done — `platform::ScreenInhibitor` |
 | D9 | Hide Shorts (feed + guide) | none | KEEP | done — `hide-shorts.js` + response filter |
@@ -108,7 +108,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | M3 | Media keys, tray now-playing, MPRIS with album and the music.youtube.com URL; reporting continues on every page | done, `media-session.js` (no "parked" rule in Music, `ytmusic-player-bar` transport) |
 | M4 | Background play, ad and tracker blocking, SponsorBlock share the desktop scripts | done, common script set only |
 | M5 | Downloads preselect *Audio only* without changing the desktop default; Ctrl+D downloads the playing track from any page | done, `DownloadDialog::preselectKind`, `WebView::downloadableUrl` media fallback |
-| M6 | Mini player off, screen not kept awake, page background dark (YouTube Music is dark-only) | done |
+| M6 | Mini player as a tall window around YouTube Music's own responsive player page (ADR-016), screen not kept awake, page background dark (YouTube Music is dark-only) | done, `music/mini-player.js` |
 | M9 | The Premium-only *Download* entry in YouTube Music's menus (song rows, queue, player bar) downloads through Red: the video or playlist id comes from the neighbouring queue entries | done, `music/download-menu.js` |
 | M7 | Album pages (`/browse/MPREb_`) downloadable | LATER |
 | M8 | SponsorBlock markers on YouTube Music's own progress bar; segments off the watch page | LATER |
