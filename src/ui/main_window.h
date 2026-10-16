@@ -36,7 +36,7 @@ class SideRail;
 class ThemeApplier;
 class AccountDialog;
 class TrayController;
-class TvExitButton;
+class OverlayButton;
 
 /// Top-level window (DESIGN.md §2): rail | page | downloads panel. Owns the
 /// controllers and implements the window-level behaviours (modes, fullscreen,
@@ -122,10 +122,12 @@ private:
     DownloadsHub* m_downloads = nullptr;
     web::FullScreenHint* m_hint = nullptr;
     QShortcut* m_exitFullScreen = nullptr;
-    QShortcut* m_toggleTv = nullptr;    ///< Ctrl+T: TV mode on / off
-    QShortcut* m_toggleMusic = nullptr; ///< Ctrl+M: Music mode on / off
-    TvExitButton* m_tvExit = nullptr;
-    QMenu* m_overflow = nullptr; ///< the rail's More menu (F10 opens it without the rail)
+    QShortcut* m_toggleTv = nullptr;        ///< Ctrl+T: TV mode on / off
+    QShortcut* m_toggleMusic = nullptr;     ///< Ctrl+M: Music mode on / off
+    OverlayButton* m_tvExit = nullptr;      ///< "Back to YouTube" in TV mode
+    OverlayButton* m_miniRestore = nullptr; ///< back to the full window from the mini player
+    QShortcut* m_exitMiniPlayer = nullptr;  ///< Esc in the mini player
+    QMenu* m_overflow = nullptr;            ///< the rail's More menu (F10 opens it without the rail)
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     QByteArray m_geometryBeforeFullScreen;

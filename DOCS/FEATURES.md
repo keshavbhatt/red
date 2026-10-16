@@ -37,7 +37,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | D3 | Autoplay without gesture (setting) | yes | KEEP | profile attribute |
 | D4 | Preferred video codec (Auto / H.264 / VP9 / AV1) — h264ify-style, big CPU saver | none | KEEP | done — `codec-preference.js` |
 | D5 | Hardware video decoding toggle (VA-API flags, restart) | none | KEEP | done — `core::chromium_flags` |
-| D6 | **Mini player**: compact always-on-top window with the player fullbleed (Ctrl+Shift+M) | none | KEEP | done — `MainWindow::setMiniPlayer`, `mini-player.js`; only offered while a video is on screen (2026-09-07) |
+| D6 | **Mini player**: compact always-on-top window with the player fullbleed (Ctrl+Shift+M) | none | KEEP | done, `MainWindow::setMiniPlayer`, `mini-player.js`; only offered while a video is on screen (2026-09-07); close button, Esc and a corner restore button return to the full window (2026-10-16) |
 | D7 | MPRIS media controls (media keys, KDE/GNOME applets): play/pause/next/prev/seek, metadata + artwork | none | KEEP | done — `platform::MprisService`, `media-session.js` |
 | D8 | Keep screen awake while playing (Chromium wake lock; own inhibit as fallback) | none | KEEP | done — `platform::ScreenInhibitor` |
 | D9 | Hide Shorts (feed + guide) | none | KEEP | done — `hide-shorts.js` + response filter |

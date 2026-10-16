@@ -25,8 +25,11 @@ Newest first. One entry per working session.
   F10 for the rail's menu with the rail hidden, Download / mini player labels that say what a
   click does or why it can't, and a scrolling rail in short windows (the mode switch from the
   first slice squeezed at 420 px). Verified with grabs in a separate `--profile uxtest`.
-* Open from the audit: mini player close/restore, downloads panel below 900 px, first-run
-  welcome, keyboard and screen-reader access to the rail and panel.
+* Third slice: the mini player's close button restores the full window instead of quitting;
+  Esc and a corner restore button (`ui::OverlayButton`, shared with the TV *Back to YouTube*
+  pill) do the same. `RED_DEBUG_OPEN=mini|mini-close` verify it headless.
+* Open from the audit: downloads panel below 900 px, first-run welcome, keyboard and
+  screen-reader access to the rail and panel.
 
 ## 2026-09-13 — Session 3 (packaging, public repo)
 

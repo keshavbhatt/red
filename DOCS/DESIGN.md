@@ -163,7 +163,10 @@ move, fading after 3 s; it is the visible way out while the rail is hidden.
 
 Ctrl+Shift+M shrinks the window to 480×270 (setting: small/medium/large), always-on-top,
 rail hidden, page in `red-mini` state (masthead/guide/comments hidden, player fills the
-viewport, controls on hover). Ctrl+Shift+M or the tray restores the previous geometry.
+viewport, controls on hover). Ctrl+Shift+M, Esc, the tray, the window's close button or the
+round restore button in the top right corner (`ui::OverlayButton`, shown on entry and on every
+mouse move, hidden after 3 s) restore the previous geometry. Closing the mini player never quits;
+Quit (menu, tray, Ctrl+Q) still does.
 
 ## 7. Empty / error / first-run states
 

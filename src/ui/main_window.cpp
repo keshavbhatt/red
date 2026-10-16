@@ -22,13 +22,13 @@
 #include "ui/logging.h"
 #include "ui/media_controller.h"
 #include "ui/message_sheet.h"
+#include "ui/overlay_button.h"
 #include "ui/permission_prompt.h"
 #include "ui/settings_dialog.h"
 #include "ui/shortcuts_dialog.h"
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
-#include "ui/tv_exit_button.h"
 #include "ui/whats_new_dialog.h"
 #include "web/bridge.h"
 #include "web/cookie_exporter.h"
@@ -135,8 +135,13 @@ void MainWindow::setupUi()
     m_tray = new TrayController(m_settings, *m_actions, this);
     m_media = new MediaController(m_settings, *m_webView, QApplication::desktopFileName(), this);
     m_hint = new web::FullScreenHint(this);
-    m_tvExit = new TvExitButton(this);
+    m_tvExit = new OverlayButton(this, u"back"_s, tr("Back to YouTube"), OverlayButton::Corner::TopLeft, 24);
+    m_tvExit->setToolTip(tr("Leave TV mode  (Ctrl+T)"));
     connect(m_tvExit, &QToolButton::clicked, this, [this] { setMode(core::AppMode::Desktop); });
+    m_miniRestore = new OverlayButton(this, u"restore"_s, QString(), OverlayButton::Corner::TopRight, 8);
+    m_miniRestore->setToolTip(tr("Back to the full window  (Esc)"));
+    m_miniRestore->setAccessibleName(tr("Back to the full window"));
+    connect(m_miniRestore, &QToolButton::clicked, this, [this] { m_actions->miniPlayer->setChecked(false); });
 
     auto* central = new QWidget(this);
     auto* layout = new QHBoxLayout(central);
@@ -184,6 +189,12 @@ void MainWindow::setupUi()
         }
         setFullScreenMode(false);
     });
+
+    m_exitMiniPlayer = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    m_exitMiniPlayer->setContext(Qt::WindowShortcut);
+    m_exitMiniPlayer->setEnabled(false); // full screen and the mini player never overlap
+    connect(m_exitMiniPlayer, &QShortcut::activated, this,
+            [this] { m_actions->miniPlayer->setChecked(false); });
 
     applyPageBackground();
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
@@ -395,6 +406,13 @@ void MainWindow::saveWindowState()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    // The mini player's close button means "back to the big window", not quit
+    // (Quit from the menu, the tray or Ctrl+Q still quits).
+    if (!m_quitting && m_miniPlayer) {
+        event->ignore();
+        m_actions->miniPlayer->setChecked(false);
+        return;
+    }
     if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray &&
         m_tray->isAvailable()) {
         event->ignore();
@@ -613,9 +631,13 @@ void MainWindow::setMiniPlayer(bool on)
         showNormal();
         resize(miniPlayerSize(m_settings.miniPlayerSize()));
         show();
-        m_hint->showHint(tr("Mini player  ·  Ctrl+Shift+M to restore"));
+        m_exitMiniPlayer->setEnabled(true);
+        m_miniRestore->setActive(true); // after the resize: it sits in the small window's corner
+        m_hint->showHint(tr("Mini player  ·  Esc: full window"));
         qCInfo(lcUi) << "mini player on";
     } else {
+        m_exitMiniPlayer->setEnabled(false);
+        m_miniRestore->setActive(false);
         m_webView->setMiniPlayer(false);
         setWindowFlag(Qt::WindowStaysOnTopHint, false);
         setMinimumSize(kMinimumSize);
@@ -736,6 +758,11 @@ void MainWindow::debugOpen(const QString& what)
         maybeShowWhatsNew(true);
     } else if (what == u"link"_s) {
         m_actions->downloadUrl->trigger();
+    } else if (what == u"mini"_s || what == u"mini-close"_s) {
+        m_actions->miniPlayer->setChecked(true);
+        if (what == u"mini-close"_s) { // the window's close button: back to the full window
+            QTimer::singleShot(3000, this, &QWidget::close);
+        }
     } else if (what == u"menu"_s) {
         m_rail->showMenu();
     } else if (what == u"tray"_s) {

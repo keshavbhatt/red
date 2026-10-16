@@ -14,6 +14,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The side rail shows **labels** next to its icons. *Hide labels* at the bottom of the rail (or
   Settings, General) brings back the narrow icons-only rail.
 - F10 opens the rail's menu, also when the rail is hidden.
+- The mini player has a button in its corner (it shows when the mouse moves) and Esc to go back
+  to the full window.
 
 ### Changed
 - Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it
@@ -22,6 +24,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The rail's Download button says what a click does: *Download this* on a video, playlist or
   channel, *Download from link* elsewhere. The mini player button says why it is unavailable.
 - In a short window the rail scrolls instead of squeezing its buttons together.
+
+### Fixed
+- Closing the mini player's window returns to the full window instead of quitting Red.
 
 ## [10.2.0] - 2026-09-15
 
