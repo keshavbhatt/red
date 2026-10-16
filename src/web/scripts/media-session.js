@@ -4,8 +4,9 @@
 // depends:  the main <video> element; navigator.mediaSession.metadata (set by
 //           YouTube); the public player API on #movie_player /
 //           .html5-video-player (getVideoData, nextVideo, previousVideo, seekTo);
-//           on YouTube Music the transport buttons in ytmusic-player-bar
-// verified: 2026-09-14
+//           on YouTube Music the transport buttons in ytmusic-player-bar when
+//           that bar exists (otherwise nextVideo / previousVideo)
+// verified: 2026-09-14 (YouTube Music without ytmusic-player-bar: 2026-10-17)
 // on-fail:  no-op (no media state → tray/MPRIS show nothing)
 (function () {
     'use strict';
@@ -37,6 +38,19 @@
     }
     function enabled(el) {
         return !!el && !el.disabled && el.getAttribute('aria-disabled') !== 'true';
+    }
+    // Next / previous available? YouTube Music always has somewhere to go (the
+    // queue, then its radio; previous goes back or restarts), and some of its
+    // layouts have no ytmusic-player-bar at all (the ytmusic-miniplayer bar is
+    // rolled out per session): without that bar, trust the queue. Reporting
+    // false there greyed out the desktop's media controls and stopped headset
+    // buttons, which honour CanGoNext (public issue #15).
+    function canGo(which, hasMedia) {
+        if (music()) {
+            var bar = musicBar();
+            return bar ? enabled(transport(which)) : hasMedia;
+        }
+        return enabled(transport(which));
     }
     function findVideo() {
         var p = player();
@@ -107,8 +121,8 @@
             duration: v && isFinite(v.duration) ? v.duration : 0,
             position: v ? v.currentTime : 0,
             live: !!(v && v.duration === Infinity),
-            canGoNext: enabled(transport('next')),
-            canGoPrevious: enabled(transport('previous'))
+            canGoNext: canGo('next', !!id),
+            canGoPrevious: canGo('previous', !!id)
         };
         return s;
     }
