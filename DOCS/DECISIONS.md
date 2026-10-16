@@ -294,3 +294,28 @@ slot; the two checkable actions connect on `triggered` and are re-synced under a
 pages are not downloadable yet (M7). SponsorBlock segments are still fetched only on `/watch`
 and markers are not drawn on YouTube Music's bar (M8). `yt-navigate-finish` does not fire on
 YouTube Music, so the media reporter watches the URL from its tick.
+
+## ADR-014: a mode switch and an explicit start mode (2026-10-16)
+
+**Context.** TV and Music were two checkable rail buttons; Desktop was "neither checked", so the
+way back was to click the lit button again or know Ctrl+T / Ctrl+M. TV mode hides the rail, so
+the only visible instruction was a 3.5 s hint. `window/lastMode` was also the launch mode, so
+closing Red in TV mode reopened it full screen with no chrome. UX audit 2026-10-16, items 1, 2,
+12, 13.
+
+**Decision.** Three checkable actions in one exclusive `QActionGroup` (`youtubeMode`,
+`musicMode`, `tvMode`, Ctrl+1/2/3) drive an outlined mode switch at the top of the rail and
+radio items in the tray; picking the active mode does nothing. Ctrl+T and Ctrl+M stay as
+on/off toggles (window `QShortcut`s), because the hints, the TV controls card and the guide
+teach them. TV mode gets `ui::TvExitButton`, a *Back to YouTube* pill shown on entry and on
+mouse movement (application event filter, active only in TV mode). `general/startMode`
+(YouTube, YouTube Music, TV, Last used; default YouTube) picks the launch mode through
+`Settings::startupMode()`; `tv/startInTvMode` seeds it once (true → TV) and is removed on the
+first explicit choice. `WebProfile` writes the resolved launch mode back to `lastMode`, so
+"Last used" never resurrects a mode from an older session. The window title carries the mode
+(`Red Music`, `Red TV`).
+
+**Consequences.** Upgraders who relied on reopening in their last mode now open in YouTube
+until they pick "The mode I used last". Leanback's own "Exit" still returns to YouTube (or
+quits after `--tv`), worded by YouTube.
+

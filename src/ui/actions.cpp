@@ -1,6 +1,7 @@
 #include "ui/actions.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QKeySequence>
 #include <QWidget>
 
@@ -42,8 +43,10 @@ Actions::Actions(QWidget* owner)
     downloads = make(owner, tr("Downloads"), {QKeySequence(Qt::CTRL | Qt::Key_J)});
     copyLink = make(owner, tr("Copy video link"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C)});
     miniPlayer = make(owner, tr("Mini player"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M)});
-    tvMode = make(owner, tr("TV mode"), {QKeySequence(Qt::CTRL | Qt::Key_T)});
-    musicMode = make(owner, tr("Music mode"), {QKeySequence(Qt::CTRL | Qt::Key_M)});
+    // Ctrl+1/2/3 pick a mode; Ctrl+T and Ctrl+M stay as on/off toggles (MainWindow).
+    youtubeMode = make(owner, tr("YouTube"), {QKeySequence(Qt::CTRL | Qt::Key_1)});
+    musicMode = make(owner, tr("YouTube Music"), {QKeySequence(Qt::CTRL | Qt::Key_2)});
+    tvMode = make(owner, tr("TV mode"), {QKeySequence(Qt::CTRL | Qt::Key_3)});
     playPause = make(owner, tr("Play / Pause"),
                      {QKeySequence(Qt::Key_MediaTogglePlayPause), QKeySequence(Qt::Key_MediaPlay)});
     next = make(owner, tr("Next video"), {QKeySequence(Qt::Key_MediaNext)});
@@ -65,8 +68,13 @@ Actions::Actions(QWidget* owner)
     quit = make(owner, tr("Quit"), {QKeySequence::Quit});
 
     miniPlayer->setCheckable(true);
-    tvMode->setCheckable(true);
-    musicMode->setCheckable(true);
+    modes = new QActionGroup(this);
+    modes->setExclusive(true);
+    for (QAction* mode : {youtubeMode, musicMode, tvMode}) {
+        mode->setCheckable(true);
+        modes->addAction(mode);
+    }
+    youtubeMode->setChecked(true);
     downloads->setCheckable(true);
     fullScreen->setCheckable(true);
     quit->setMenuRole(QAction::QuitRole);
@@ -76,10 +84,10 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,        back,       forward,   reload,     download,  downloadUrl, downloads,
-            copyLink,    miniPlayer, tvMode,    musicMode,  playPause, next,        previous,
-            zoomIn,      zoomOut,    zoomReset, fullScreen, showHide,  settings,    shortcuts,
-            onlineGuide, account,    about,     quit};
+    return {home,      back,        forward,     reload,    download,   downloadUrl, downloads,
+            copyLink,  miniPlayer,  youtubeMode, musicMode, tvMode,     playPause,   next,
+            previous,  zoomIn,      zoomOut,     zoomReset, fullScreen, showHide,    settings,
+            shortcuts, onlineGuide, account,     about,     quit};
 }
 
 } // namespace red::ui

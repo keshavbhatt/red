@@ -19,6 +19,7 @@ namespace red::ui {
 namespace {
 constexpr int kRailWidth = 52;
 constexpr int kIconSize = 22;
+constexpr int kModeIconSize = 20;
 } // namespace
 
 SideRail::SideRail(Actions& actions, core::ThemeService& theme, QWidget* parent)
@@ -54,6 +55,29 @@ QToolButton* SideRail::makeButton(QAction* action, const QString& icon)
     return button;
 }
 
+/// The three modes stacked in one outlined group, the active one lit: always
+/// says where Red is, and the way back to YouTube is the top button.
+QWidget* SideRail::makeModeSwitch()
+{
+    auto* group = new QFrame(this);
+    group->setProperty("redModeSwitch", true);
+    auto* layout = new QVBoxLayout(group);
+    layout->setContentsMargins(1, 1, 1, 1);
+    layout->setSpacing(1);
+    const auto add = [this, group, layout](QAction* action, const QString& icon) {
+        QToolButton* button = makeButton(action, icon);
+        button->setParent(group);
+        button->setProperty("redModeButton", true);
+        button->setIconSize(QSize(kModeIconSize, kModeIconSize));
+        layout->addWidget(button, 0, Qt::AlignHCenter);
+        return button;
+    };
+    m_youtube = add(m_actions.youtubeMode, u"youtube"_s);
+    m_music = add(m_actions.musicMode, u"music"_s);
+    m_tv = add(m_actions.tvMode, u"tv"_s);
+    return group;
+}
+
 void SideRail::setupUi()
 {
     auto* layout = new QVBoxLayout(this);
@@ -65,6 +89,8 @@ void SideRail::setupUi()
     m_logo->setIconSize(QSize(28, 28));
     m_logo->setToolTip(tr("Home  (%1)").arg(m_actions.home->shortcut().toString(QKeySequence::NativeText)));
     layout->addWidget(m_logo, 0, Qt::AlignHCenter);
+    layout->addSpacing(6);
+    layout->addWidget(makeModeSwitch(), 0, Qt::AlignHCenter);
     layout->addSpacing(6);
 
     m_back = makeButton(m_actions.back, u"back"_s);
@@ -99,11 +125,7 @@ void SideRail::setupUi()
     layout->addWidget(downloadsHost, 0, Qt::AlignHCenter);
 
     m_miniPlayer = makeButton(m_actions.miniPlayer, u"miniplayer"_s);
-    m_tv = makeButton(m_actions.tvMode, u"tv"_s);
-    m_music = makeButton(m_actions.musicMode, u"music"_s);
     layout->addWidget(m_miniPlayer, 0, Qt::AlignHCenter);
-    layout->addWidget(m_tv, 0, Qt::AlignHCenter);
-    layout->addWidget(m_music, 0, Qt::AlignHCenter);
 
     layout->addStretch(1);
 
@@ -133,8 +155,8 @@ void SideRail::showMenu()
 void SideRail::applyIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QList<QToolButton*> buttons{m_back, m_forward, m_reload,   m_downloads, m_miniPlayer,
-                                      m_tv,   m_music,   m_settings, m_menu};
+    const QList<QToolButton*> buttons{m_back,       m_forward,  m_reload, m_downloads,
+                                      m_miniPlayer, m_settings, m_menu};
     // A QToolButton re-syncs icon and text from its default action on every
     // action change (checked, enabled…) — so the icon has to live on the action,
     // or a toggle turns the button into its text label.
@@ -146,6 +168,17 @@ void SideRail::applyIcons()
     };
     for (QToolButton* b : buttons) {
         setIcon(b, icons::themed(b->property("redIcon").toString(), t.text, t.muted));
+    }
+    // The active mode's glyph turns brand red (the action's checked state).
+    for (QToolButton* b : {m_youtube, m_music, m_tv}) {
+        QIcon icon = icons::themed(b->property("redIcon").toString(), t.text, t.muted);
+        for (const int size : {16, 20, 24, 32}) {
+            for (const qreal dpr : {1.0, 2.0}) {
+                icon.addPixmap(icons::pixmap(b->property("redIcon").toString(), t.accent, size, dpr),
+                               QIcon::Normal, QIcon::On);
+            }
+        }
+        setIcon(b, icon);
     }
     setIcon(m_logo, icons::brand());
     setIcon(m_reload, icons::themed(m_loading ? u"stop"_s : u"reload"_s, t.text, t.muted));

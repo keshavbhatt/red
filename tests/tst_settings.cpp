@@ -1,5 +1,6 @@
 #include "core/settings/settings.h"
 
+#include <QSettings>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -108,6 +109,40 @@ private Q_SLOTS:
         QCOMPARE(again.downloadDirectory(), u"/tmp/red-test"_s);
         QCOMPARE(again.lastMode(), AppMode::Tv);
         QCOMPARE(again.subtitleLanguages(), (QStringList{u"en"_s, u"de"_s}));
+    }
+
+    void startModeDefaultsToYouTube()
+    {
+        // A mode left open last time no longer decides the next launch.
+        m_settings->setLastMode(AppMode::Tv);
+        QCOMPARE(m_settings->startMode(), StartMode::Desktop);
+        QCOMPARE(m_settings->startupMode(), AppMode::Desktop);
+        m_settings->setStartMode(StartMode::LastUsed);
+        QCOMPARE(m_settings->startupMode(), AppMode::Tv);
+        m_settings->setStartMode(StartMode::Music);
+        QCOMPARE(m_settings->startupMode(), AppMode::Music);
+        QSignalSpy changed(m_settings.get(), &Settings::startModeChanged);
+        m_settings->setStartMode(StartMode::Music);
+        QCOMPARE(changed.count(), 0);
+        m_settings->resetToDefaults();
+        QCOMPARE(m_settings->startMode(), StartMode::Desktop);
+    }
+
+    void startModeMigratesStartInTv()
+    {
+        const QString path = m_dir->filePath(u"legacy.ini"_s);
+        {
+            QSettings legacy(path, QSettings::IniFormat);
+            legacy.setValue(u"tv/startInTvMode"_s, true);
+        }
+        Settings settings(path);
+        QCOMPARE(settings.startMode(), StartMode::Tv);
+        QCOMPARE(settings.startupMode(), AppMode::Tv);
+        settings.setStartMode(StartMode::Desktop); // the old key goes with the first choice
+        settings.sync();
+        QSettings after(path, QSettings::IniFormat);
+        QVERIFY(!after.contains(u"tv/startInTvMode"_s));
+        QCOMPARE(Settings(path).startMode(), StartMode::Desktop);
     }
 
     void musicModeRoundTrip()

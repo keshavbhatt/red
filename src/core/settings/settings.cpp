@@ -21,6 +21,7 @@ constexpr CloseAction kDefaultCloseAction = CloseAction::Quit;
 constexpr bool kDefaultShowRail = true;
 constexpr AppMode kDefaultMode = AppMode::Desktop;
 constexpr bool kDefaultDownloadsPanelOpen = false;
+constexpr StartMode kDefaultStartMode = StartMode::Desktop;
 constexpr StartPage kDefaultStartPage = StartPage::Home;
 constexpr bool kDefaultNotifyOnDownloadFinish = true;
 constexpr bool kDefaultTrayEnabled = true;
@@ -53,7 +54,6 @@ constexpr bool kDefaultEmbedMetadata = true;
 constexpr bool kDefaultRemoveSponsors = false;
 constexpr bool kDefaultEngineAutoUpdate = true;
 constexpr bool kDefaultEngineUseSystem = false;
-constexpr bool kDefaultTvStart = false;
 constexpr bool kDefaultTvFullscreen = true;
 constexpr bool kDefaultTvGamepad = true;
 constexpr bool kDefaultTvHideShorts = false;
@@ -249,6 +249,40 @@ void Settings::setDownloadsPanelOpen(bool open)
 }
 
 // ---- general/ --------------------------------------------------------------
+
+StartMode Settings::startMode() const
+{
+    if (!m_store->contains(keys::kStartMode)) {
+        // "Start Red in TV mode" was the only start choice before; honour it.
+        return boolValue(keys::kLegacyTvStartInTvMode, false) ? StartMode::Tv : kDefaultStartMode;
+    }
+    return enumFromInt(intValue(keys::kStartMode, static_cast<int>(kDefaultStartMode)), kDefaultStartMode, 4);
+}
+
+void Settings::setStartMode(StartMode mode)
+{
+    const StartMode before = startMode();
+    m_store->remove(keys::kLegacyTvStartInTvMode);
+    m_store->setValue(keys::kStartMode, static_cast<int>(mode));
+    if (before != mode) {
+        Q_EMIT startModeChanged(mode);
+    }
+}
+
+AppMode Settings::startupMode() const
+{
+    switch (startMode()) {
+    case StartMode::Music:
+        return AppMode::Music;
+    case StartMode::Tv:
+        return AppMode::Tv;
+    case StartMode::LastUsed:
+        return lastMode();
+    case StartMode::Desktop:
+        break;
+    }
+    return AppMode::Desktop;
+}
 
 StartPage Settings::startPage() const
 {
@@ -771,18 +805,6 @@ void Settings::setEngineLastCheck(const QDateTime& when)
 
 // ---- tv/ -------------------------------------------------------------------
 
-bool Settings::tvStartInTvMode() const
-{
-    return boolValue(keys::kTvStartInTvMode, kDefaultTvStart);
-}
-
-void Settings::setTvStartInTvMode(bool enabled)
-{
-    if (storeBool(keys::kTvStartInTvMode, kDefaultTvStart, enabled)) {
-        Q_EMIT tvConfigChanged();
-    }
-}
-
 bool Settings::tvFullscreen() const
 {
     return boolValue(keys::kTvFullscreen, kDefaultTvFullscreen);
@@ -969,6 +991,7 @@ void Settings::resetToDefaults()
     m_store->sync();
     Q_EMIT closeActionChanged(closeAction());
     Q_EMIT showRailChanged(showRail());
+    Q_EMIT startModeChanged(startMode());
     Q_EMIT startPageChanged(startPage());
     Q_EMIT notifyOnDownloadFinishChanged(notifyOnDownloadFinish());
     Q_EMIT trayEnabledChanged(trayEnabled());

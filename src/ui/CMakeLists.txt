@@ -52,6 +52,8 @@ qt_add_library(red_ui STATIC
     thumbnail_cache.cpp
     thumbnail_cache.h
     tray_controller.cpp
+    tv_exit_button.cpp
+    tv_exit_button.h
     tray_controller.h
     whats_new_dialog.cpp
     whats_new_dialog.h

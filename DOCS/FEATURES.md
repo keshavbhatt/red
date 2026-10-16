@@ -53,7 +53,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | # | Feature | Prior art | Decision | Status / class |
 |---|---|---|---|---|
 | T1 | Load `youtube.com/tv` with the PS4/Cobalt UA split (navigator vs wire) | yes | KEEP | done — `web::TvMode`, `web::RequestInterceptor` |
-| T2 | Switch modes at runtime (rail button, Ctrl+T, `--tv`); remember last mode; "start in TV mode" | n/a | KEEP | done — `ui::MainWindow` |
+| T2 | Switch modes at runtime (rail mode switch, tray, Ctrl+3 / Ctrl+T toggle, `--tv`, *Back to YouTube* pill); "Open Red in" start mode (YouTube default, or last used) | n/a | KEEP | done, `ui::MainWindow`, `ui::SideRail`, `ui::TvExitButton`, ADR-014 |
 | T3 | 16:9 content, fullscreen by default in TV mode, window chrome hidden | yes | KEEP | done — `MainWindow` |
 | T4 | Keyboard: arrows/Enter/Esc/Backspace native; right-click = back; hotkeys copy URL, captions, volume, speed | yes | KEEP | done — `tv/input.js` |
 | T5 | Gamepad → key events (Standard Gamepad map, repeat, stick) | yes | KEEP | done — `tv/gamepad.js` |
@@ -103,7 +103,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 
 | # | Feature | Status |
 |---|---|---|
-| M1 | Third `AppMode`: rail button, Ctrl+M, `red --music`, desktop action, remembered across launches (`window/lastMode`), own "where I left off" (`window/lastMusicUrl`) | done, ADR-013 |
+| M1 | Third `AppMode`: rail mode switch, Ctrl+2 / Ctrl+M toggle, `red --music`, desktop action, "Open Red in" choice (ADR-014), own "where I left off" (`window/lastMusicUrl`) | done, ADR-013 |
 | M2 | YouTube Music links (masthead app picker, `target=_blank`) open in the main view instead of a pop-up | done, `WebPage` `newWindowRequested`, pop-up first-navigation safety net |
 | M3 | Media keys, tray now-playing, MPRIS with album and the music.youtube.com URL; reporting continues on every page | done, `media-session.js` (no "parked" rule in Music, `ytmusic-player-bar` transport) |
 | M4 | Background play, ad and tracker blocking, SponsorBlock share the desktop scripts | done, common script set only |

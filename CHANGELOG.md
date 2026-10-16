@@ -3,6 +3,20 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
+## [10.3.0] - unreleased
+
+### Added
+- A **mode switch** at the top of the rail: YouTube, YouTube Music and TV, with the current one
+  lit. The tray menu has the same three, and Ctrl+1, Ctrl+2 and Ctrl+3 pick them directly.
+- TV mode shows a **Back to YouTube** button when it starts and whenever the mouse moves.
+- Settings, General: **Open Red in** picks the mode Red starts in: YouTube, YouTube Music,
+  TV mode or the mode used last.
+
+### Changed
+- Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it
+  closed. "Start Red in TV mode" carries over as *Open Red in: TV mode*.
+- The window title names the mode in YouTube Music and TV mode.
+
 ## [10.2.0] - 2026-09-15
 
 ### Added

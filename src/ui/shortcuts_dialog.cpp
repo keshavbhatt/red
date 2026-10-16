@@ -69,14 +69,16 @@ ShortcutsDialog::ShortcutsDialog(const Actions& a, const core::ThemeService& the
         }
         return out;
     };
-    // Left column: getting around and the window. Right: media and downloads.
+    // Left column: getting around, modes and the window. Right: downloads, media and the app.
     addGroup(left, tr("Navigate"), rows({a.home, a.back, a.forward, a.reload, a.copyLink}));
+    addGroup(left, tr("Mode"),
+             rows({a.youtubeMode, a.musicMode, a.tvMode}) +
+                 QList<Row>{{tr("TV mode on / off"), u"Ctrl+T"_s}, {tr("Music mode on / off"), u"Ctrl+M"_s}});
     addGroup(left, tr("View"),
-             rows({a.tvMode, a.musicMode, a.miniPlayer, a.fullScreen, a.zoomIn, a.zoomOut, a.zoomReset,
-                   a.showHide}));
-    addGroup(left, tr("App"), rows({a.settings, a.shortcuts, a.quit}));
+             rows({a.miniPlayer, a.fullScreen, a.zoomIn, a.zoomOut, a.zoomReset, a.showHide}));
     addGroup(right, tr("Downloads"), rows({a.download, a.downloadUrl, a.downloads}));
     addGroup(right, tr("Playback"), rows({a.playPause, a.next, a.previous}));
+    addGroup(right, tr("App"), rows({a.settings, a.shortcuts, a.quit}));
     // YouTube's own player keys work as long as the page has focus.
     addGroup(right, tr("On the page (YouTube)"),
              {{tr("Play / pause"), u"K"_s},

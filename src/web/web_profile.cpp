@@ -58,11 +58,14 @@ WebProfile::WebProfile(core::Settings& settings, const QString& appVersion, QObj
     : QWebEngineProfile(QString::fromLatin1(kProfileName), parent)
     , m_settings(settings)
     , m_appVersion(appVersion)
-    , m_mode(settings.tvStartInTvMode() ? core::AppMode::Tv : settings.lastMode())
+    , m_mode(settings.startupMode())
     , m_bridge(std::make_unique<Bridge>())
     , m_scripts(std::make_unique<ScriptBundle>(*this))
     , m_interceptor(std::make_unique<RequestInterceptor>())
 {
+    // The launch mode is the mode Red is in, whatever the start setting picked:
+    // "Last used" must not reopen a mode from an older session.
+    m_settings.setLastMode(m_mode);
     configureStorage();
     // After the storage path: the exporter asks the store to load every
     // persisted cookie, and before configureStorage() that store is empty

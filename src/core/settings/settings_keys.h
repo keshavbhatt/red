@@ -21,6 +21,7 @@ inline constexpr QLatin1StringView kLastMusicUrl{"window/lastMusicUrl"};
 inline constexpr QLatin1StringView kDownloadsPanelOpen{"window/downloadsPanelOpen"};
 
 // general/
+inline constexpr QLatin1StringView kStartMode{"general/startMode"};
 inline constexpr QLatin1StringView kStartPage{"general/startPage"};
 inline constexpr QLatin1StringView kNotifyOnDownloadFinish{"general/notifyOnDownloadFinish"};
 inline constexpr QLatin1StringView kTrayEnabled{"general/trayEnabled"};
@@ -72,7 +73,8 @@ inline constexpr QLatin1StringView kEngineSystemPath{"engine/systemPath"};
 inline constexpr QLatin1StringView kEngineLastCheck{"engine/lastCheck"};
 
 // tv/
-inline constexpr QLatin1StringView kTvStartInTvMode{"tv/startInTvMode"};
+/// Before 10.3 "Start Red in TV mode"; read once to seed general/startMode.
+inline constexpr QLatin1StringView kLegacyTvStartInTvMode{"tv/startInTvMode"};
 inline constexpr QLatin1StringView kTvFullscreen{"tv/fullscreen"};
 inline constexpr QLatin1StringView kTvGamepad{"tv/gamepad"};
 inline constexpr QLatin1StringView kTvHideShorts{"tv/hideShorts"};

@@ -216,6 +216,15 @@ QWidget* SettingsDialog::buildGeneral()
 {
     auto* startup = new QWidget(this);
     auto* f = form(startup);
+    m_startMode = new QComboBox(startup);
+    m_startMode->addItem(tr("YouTube"), static_cast<int>(core::StartMode::Desktop));
+    m_startMode->addItem(tr("YouTube Music"), static_cast<int>(core::StartMode::Music));
+    m_startMode->addItem(tr("TV mode"), static_cast<int>(core::StartMode::Tv));
+    m_startMode->addItem(tr("The mode I used last"), static_cast<int>(core::StartMode::LastUsed));
+    connect(m_startMode, &QComboBox::currentIndexChanged, this, [this](int) {
+        m_settings.setStartMode(static_cast<core::StartMode>(m_startMode->currentData().toInt()));
+    });
+    f->addRow(tr("Open Red in"), m_startMode);
     m_startPage = new QComboBox(startup);
     m_startPage->addItem(tr("Home"), static_cast<int>(core::StartPage::Home));
     m_startPage->addItem(tr("Subscriptions"), static_cast<int>(core::StartPage::Subscriptions));
@@ -223,7 +232,7 @@ QWidget* SettingsDialog::buildGeneral()
     connect(m_startPage, &QComboBox::currentIndexChanged, this, [this](int) {
         m_settings.setStartPage(static_cast<core::StartPage>(m_startPage->currentData().toInt()));
     });
-    f->addRow(tr("Start page"), m_startPage);
+    f->addRow(tr("YouTube start page"), m_startPage);
     m_closeAction = new QComboBox(startup);
     m_closeAction->addItem(tr("Quit Red"), static_cast<int>(core::CloseAction::Quit));
     m_closeAction->addItem(tr("Keep running in the tray"),
@@ -547,12 +556,10 @@ QWidget* SettingsDialog::buildTv()
     v->setContentsMargins(0, 0, 0, 0);
     v->setSpacing(10);
     v->addWidget(
-        mutedLabel(tr("TV mode shows YouTube's living-room interface — the one on smart TVs and consoles — "
-                      "with keyboard, mouse and gamepad control. Toggle it with Ctrl+T."),
+        mutedLabel(tr("TV mode shows YouTube's living-room interface, the one on smart TVs and consoles, "
+                      "with keyboard, mouse and gamepad control. Switch to it with the TV button on the rail "
+                      "or Ctrl+T; to open Red in it, see General."),
                    tv));
-    m_tvStart = new QCheckBox(tr("Start Red in TV mode"), tv);
-    connect(m_tvStart, &QCheckBox::toggled, this, [this](bool on) { m_settings.setTvStartInTvMode(on); });
-    v->addWidget(m_tvStart);
     m_tvFullscreen = new QCheckBox(tr("Go full screen when entering TV mode"), tv);
     connect(m_tvFullscreen, &QCheckBox::toggled, this, [this](bool on) { m_settings.setTvFullscreen(on); });
     v->addWidget(m_tvFullscreen);
@@ -577,7 +584,7 @@ QWidget* SettingsDialog::buildTv()
     const QList<QPair<QString, QString>> rows{
         {tr("Arrows / Enter"), tr("Navigate / select")},
         {tr("Esc, Backspace, right click"), tr("Back")},
-        {tr("Ctrl+T"), tr("Back to desktop mode")},
+        {tr("Ctrl+T, or the Back to YouTube button"), tr("Back to YouTube")},
         {tr("Ctrl+D"), tr("Download the current video")},
         {tr("+ / −, M"), tr("Volume, mute")},
         {tr("A / D, S"), tr("Playback speed down / up, reset")},
@@ -685,9 +692,10 @@ QWidget* SettingsDialog::buildAdvanced()
 
 void SettingsDialog::loadValues()
 {
-    const QSignalBlocker b1(m_startPage), b2(m_closeAction), b3(m_theme_), b4(m_zoom), b5(m_scale),
-        b6(m_codec), b7(m_miniSize), b8(m_quality), b9(m_container), b10(m_audioFormat), b11(m_concurrent),
-        b12(m_speedLimit), b13(m_hwAccel), b14(m_signInUa), b15(m_pattern);
+    const QSignalBlocker b0(m_startMode), b1(m_startPage), b2(m_closeAction), b3(m_theme_), b4(m_zoom),
+        b5(m_scale), b6(m_codec), b7(m_miniSize), b8(m_quality), b9(m_container), b10(m_audioFormat),
+        b11(m_concurrent), b12(m_speedLimit), b13(m_hwAccel), b14(m_signInUa), b15(m_pattern);
+    m_startMode->setCurrentIndex(m_startMode->findData(static_cast<int>(m_settings.startMode())));
     m_startPage->setCurrentIndex(m_startPage->findData(static_cast<int>(m_settings.startPage())));
     m_closeAction->setCurrentIndex(m_closeAction->findData(static_cast<int>(m_settings.closeAction())));
     m_closeAction->setEnabled(m_trayAvailable);
@@ -732,7 +740,6 @@ void SettingsDialog::loadValues()
     m_engineUseSystem->setChecked(m_settings.engineUseSystem());
     m_engineSystemPath->setText(m_settings.engineSystemPath());
     m_engineSystemPath->setEnabled(m_settings.engineUseSystem());
-    m_tvStart->setChecked(m_settings.tvStartInTvMode());
     m_tvFullscreen->setChecked(m_settings.tvFullscreen());
     m_tvGamepad->setChecked(m_settings.tvGamepad());
     m_tvHideShorts->setChecked(m_settings.tvHideShorts());

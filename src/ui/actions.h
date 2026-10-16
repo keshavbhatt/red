@@ -4,6 +4,7 @@
 #include <QObject>
 
 class QAction;
+class QActionGroup;
 class QWidget;
 
 namespace red::ui {
@@ -29,8 +30,11 @@ public:
     QAction* downloads = nullptr;
     QAction* copyLink = nullptr;
     QAction* miniPlayer = nullptr;
-    QAction* tvMode = nullptr;
+    /// The three modes, one checked at a time (the rail's mode switch, the tray).
+    QAction* youtubeMode = nullptr;
     QAction* musicMode = nullptr;
+    QAction* tvMode = nullptr;
+    QActionGroup* modes = nullptr;
     QAction* playPause = nullptr;
     QAction* next = nullptr;
     QAction* previous = nullptr;

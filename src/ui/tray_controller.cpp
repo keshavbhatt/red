@@ -49,8 +49,10 @@ void TrayController::buildMenu()
     m_menu->addAction(m_actions.showHide);
     m_menu->addAction(m_actions.downloads);
     m_menu->addAction(m_actions.miniPlayer);
-    m_menu->addAction(m_actions.tvMode);
+    m_menu->addSeparator();
+    m_menu->addAction(m_actions.youtubeMode); // an exclusive group: radio items
     m_menu->addAction(m_actions.musicMode);
+    m_menu->addAction(m_actions.tvMode);
     m_menu->addSeparator();
     m_menu->addAction(m_actions.settings);
     m_menu->addAction(m_actions.about);

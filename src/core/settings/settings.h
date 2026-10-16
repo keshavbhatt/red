@@ -35,6 +35,16 @@ enum class StartPage
     LastVisited,
 };
 
+/// Which mode a new launch opens in (Settings > General). A mode asked for on
+/// the command line wins over it.
+enum class StartMode
+{
+    Desktop,
+    Music,
+    Tv,
+    LastUsed, ///< the mode Red was in when it last closed
+};
+
 enum class AppMode
 {
     Desktop,
@@ -176,6 +186,10 @@ public:
     void setDownloadsPanelOpen(bool open);
 
     // general/
+    [[nodiscard]] StartMode startMode() const;
+    void setStartMode(StartMode mode);
+    /// The mode a launch opens in: startMode() with LastUsed resolved.
+    [[nodiscard]] AppMode startupMode() const;
     [[nodiscard]] StartPage startPage() const;
     void setStartPage(StartPage page);
     [[nodiscard]] bool notifyOnDownloadFinish() const;
@@ -278,8 +292,6 @@ public:
     void setEngineLastCheck(const QDateTime& when);
 
     // tv/
-    [[nodiscard]] bool tvStartInTvMode() const;
-    void setTvStartInTvMode(bool enabled);
     [[nodiscard]] bool tvFullscreen() const;
     void setTvFullscreen(bool enabled);
     [[nodiscard]] bool tvGamepad() const;
@@ -322,6 +334,7 @@ public:
 Q_SIGNALS:
     void closeActionChanged(red::core::CloseAction action);
     void showRailChanged(bool show);
+    void startModeChanged(red::core::StartMode mode);
     void startPageChanged(red::core::StartPage page);
     void notifyOnDownloadFinishChanged(bool enabled);
     void trayEnabledChanged(bool enabled);

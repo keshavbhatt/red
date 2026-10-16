@@ -55,13 +55,13 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
 | Item | Icon | Action / shortcut |
 |---|---|---|
 | Red mark | logo | click → Home (`https://www.youtube.com/`) · Ctrl+H |
+| **Mode switch** | YouTube / music / tv in one outlined group, active glyph in `accent` | Ctrl+1 / Ctrl+2 / Ctrl+3 select; Ctrl+M and Ctrl+T toggle Music and TV (ADR-014) |
 | Back / Forward | chevrons | Alt+←/→ (disabled when unavailable) |
 | Reload | ↻ | F5 (becomes ✕ "stop" while loading) |
 | — | | |
 | **Download** | ⤓ in a red pill when the page is a video/playlist/channel | Ctrl+D · opens the Download dialog for the current page |
 | Downloads | list icon with a badge (active count) | Ctrl+J · toggles the panel |
 | Mini player | picture icon | Ctrl+Shift+M |
-| TV mode | tv icon | Ctrl+T |
 | — spacer — | | |
 | Settings | gear | Ctrl+, |
 | Menu | ⋮ | About, Shortcuts, Open log folder, Quit |
@@ -129,7 +129,7 @@ Modal, 640 px wide, `panel` surface, 12 px radius.
 Dialog 860×600, left navigation list (icon + label) on `bg`, content on `panel` in a scroll
 area with grouped cards (title 14/500, rows label-left control-right, 12 px gaps):
 
-* **General** — Start page (Home / Subscriptions / Last visited), When closing (Quit / Keep in
+* **General**: Open Red in (YouTube / YouTube Music / TV mode / Last used), YouTube start page (Home / Subscriptions / Last visited), When closing (Quit / Keep in
   tray), Show side rail, Notifications on download finish.
 * **Appearance** — Theme (System/Light/Dark), Page zoom, Interface scale (restart).
 * **Playback** — Autoplay without click, Preferred codec, Hardware video decoding (restart),
@@ -140,7 +140,7 @@ area with grouped cards (title 14/500, rows label-left control-right, 12 px gaps
   format, Concurrent downloads, Speed limit, Use my YouTube sign-in, Embed thumbnail, Embed
   metadata & chapters, Remove sponsor segments; **Engine card**: yt-dlp version · JS runtime ·
   ffmpeg, "Check for updates", "Update now", "Auto-update daily", "Use system yt-dlp" (path).
-* **TV mode** — Start in TV mode, Fullscreen in TV mode, Gamepad support, Hide Shorts in TV,
+* **TV mode**: Fullscreen in TV mode, Gamepad support, Hide Shorts in TV,
   Unlock 4K, Low-memory mode; a shortcuts card.
 * **Advanced** — Hardware acceleration, User agent override, Clear cache, Sign out & clear
   session, Open log folder, Copy diagnostics, Reset settings.
@@ -149,8 +149,10 @@ area with grouped cards (title 14/500, rows label-left control-right, 12 px gaps
 
 The window drops the rail and status hints, keeps 16:9 content (letterboxed on other
 ratios with `bg`), enters fullscreen (setting), and the page becomes Leanback. A 3-second
-hint window "TV mode · Esc back · Ctrl+T desktop · Ctrl+D download" appears on entry (the
+hint window "TV mode · Esc back · Ctrl+T: back to YouTube · Ctrl+D download" appears on entry (the
 same mechanism as the fullscreen hint). Ctrl+T returns to desktop mode and restores geometry.
+A *Back to YouTube* pill (top left, `ui::TvExitButton`) shows on entry and on every mouse
+move, fading after 3 s; it is the visible way out while the rail is hidden.
 
 ## 6. Mini player
 

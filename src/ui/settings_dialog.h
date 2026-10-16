@@ -87,6 +87,7 @@ private:
     QStackedWidget* m_pages = nullptr;
 
     // general
+    QComboBox* m_startMode = nullptr;
     QComboBox* m_startPage = nullptr;
     QComboBox* m_closeAction = nullptr;
     QCheckBox* m_trayEnabled = nullptr;
@@ -132,7 +133,6 @@ private:
     QCheckBox* m_engineUseSystem = nullptr;
     QLineEdit* m_engineSystemPath = nullptr;
     // tv
-    QCheckBox* m_tvStart = nullptr;
     QCheckBox* m_tvFullscreen = nullptr;
     QCheckBox* m_tvGamepad = nullptr;
     QCheckBox* m_tvHideShorts = nullptr;

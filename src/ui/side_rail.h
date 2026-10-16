@@ -13,9 +13,10 @@ namespace red::ui {
 
 class Actions;
 
-/// The 48 px brand rail on the left of the window (DESIGN.md §2): navigation,
-/// the Download call-to-action, the downloads badge, mini player, TV mode,
-/// settings and the overflow menu. Pure presentation over Actions.
+/// The 48 px brand rail on the left of the window (DESIGN.md §2): the mode
+/// switch (YouTube, YouTube Music, TV), navigation, the Download
+/// call-to-action, the downloads badge, mini player, settings and the overflow
+/// menu. Pure presentation over Actions.
 class SideRail : public QFrame
 {
     Q_OBJECT
@@ -39,6 +40,7 @@ private:
     void setupUi();
     void applyIcons();
     QToolButton* makeButton(QAction* action, const QString& icon);
+    QWidget* makeModeSwitch();
 
     Actions& m_actions;
     core::ThemeService& m_theme;
@@ -49,8 +51,9 @@ private:
     QToolButton* m_download = nullptr;
     QToolButton* m_downloads = nullptr;
     QToolButton* m_miniPlayer = nullptr;
-    QToolButton* m_tv = nullptr;
+    QToolButton* m_youtube = nullptr;
     QToolButton* m_music = nullptr;
+    QToolButton* m_tv = nullptr;
     QToolButton* m_settings = nullptr;
     QToolButton* m_menu = nullptr;
     QLabel* m_badge = nullptr;

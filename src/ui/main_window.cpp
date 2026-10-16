@@ -28,6 +28,7 @@
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "ui/tv_exit_button.h"
 #include "ui/whats_new_dialog.h"
 #include "web/bridge.h"
 #include "web/cookie_exporter.h"
@@ -134,6 +135,8 @@ void MainWindow::setupUi()
     m_tray = new TrayController(m_settings, *m_actions, this);
     m_media = new MediaController(m_settings, *m_webView, QApplication::desktopFileName(), this);
     m_hint = new web::FullScreenHint(this);
+    m_tvExit = new TvExitButton(this);
+    connect(m_tvExit, &QToolButton::clicked, this, [this] { setMode(core::AppMode::Desktop); });
 
     auto* central = new QWidget(this);
     auto* layout = new QHBoxLayout(central);
@@ -225,12 +228,21 @@ void MainWindow::connectActions()
     });
     connect(a.downloads, &QAction::toggled, this, &MainWindow::setDownloadsPanelVisible);
     connect(a.miniPlayer, &QAction::toggled, this, &MainWindow::setMiniPlayer);
-    // triggered, not toggled: setMode syncs the checked states itself, and a
-    // shortcut on the active mode's action unchecks it, which means Desktop.
-    connect(a.tvMode, &QAction::triggered, this,
-            [this](bool on) { setMode(on ? core::AppMode::Tv : core::AppMode::Desktop); });
-    connect(a.musicMode, &QAction::triggered, this,
-            [this](bool on) { setMode(on ? core::AppMode::Music : core::AppMode::Desktop); });
+    // The mode switch selects; picking the mode Red is already in does nothing.
+    connect(a.youtubeMode, &QAction::triggered, this, [this] { setMode(core::AppMode::Desktop); });
+    connect(a.musicMode, &QAction::triggered, this, [this] { setMode(core::AppMode::Music); });
+    connect(a.tvMode, &QAction::triggered, this, [this] { setMode(core::AppMode::Tv); });
+    // The older keys stay toggles: Ctrl+T in TV mode (and Ctrl+M in Music) is
+    // the way back to YouTube that the hints and the TV controls list name.
+    const auto toggle = [this](QKeySequence keys, core::AppMode mode) {
+        auto* shortcut = new QShortcut(keys, this);
+        shortcut->setContext(Qt::WindowShortcut);
+        connect(shortcut, &QShortcut::activated, this,
+                [this, mode] { setMode(m_webView->mode() == mode ? core::AppMode::Desktop : mode); });
+        return shortcut;
+    };
+    m_toggleTv = toggle(QKeySequence(Qt::CTRL | Qt::Key_T), core::AppMode::Tv);
+    m_toggleMusic = toggle(QKeySequence(Qt::CTRL | Qt::Key_M), core::AppMode::Music);
     connect(a.playPause, &QAction::triggered, m_media, &MediaController::playPause);
     connect(a.next, &QAction::triggered, m_media, &MediaController::next);
     connect(a.previous, &QAction::triggered, m_media, &MediaController::previous);
@@ -291,7 +303,11 @@ void MainWindow::connectWebView()
                                   .remove(u" - YouTube"_s)
                                   .trimmed();
         const bool bare = clean.isEmpty() || clean == u"YouTube"_s || clean == u"YouTube Music"_s;
-        setWindowTitle(bare ? u"Red"_s : clean + u" — Red"_s);
+        // The mode in the title too: the task switcher shows where Red is.
+        const QString app = m_webView->mode() == core::AppMode::Music ? tr("Red Music")
+                            : m_webView->mode() == core::AppMode::Tv  ? tr("Red TV")
+                                                                      : u"Red"_s;
+        setWindowTitle(bare ? app : clean + u" - "_s + app);
     });
     connect(m_webView->page(), &QWebEnginePage::urlChanged, this, [this](const QUrl&) {
         m_actions->back->setEnabled(m_webView->history()->canGoBack());
@@ -314,8 +330,7 @@ void MainWindow::connectWebView()
 void MainWindow::start(std::optional<core::AppMode> requested)
 {
     m_startedInTv = requested == core::AppMode::Tv;
-    const core::AppMode mode =
-        requested.value_or(m_settings.tvStartInTvMode() ? core::AppMode::Tv : m_settings.lastMode());
+    const core::AppMode mode = requested.value_or(m_settings.startupMode());
     if (mode == core::AppMode::Desktop) {
         m_webView->loadStart();
     } else {
@@ -461,6 +476,7 @@ void MainWindow::applyChrome()
     const bool music = mode == core::AppMode::Music;
     const bool bare = isFullScreen() || m_miniPlayer || tv;
     m_rail->setVisible(!bare && m_settings.showRail());
+    m_tvExit->setActive(tv && !m_miniPlayer);
     m_downloads->panel()->setVisible(!bare && m_panelVisible && width() >= kPanelFoldWidth);
     m_actions->downloads->setEnabled(!tv && !m_miniPlayer);
     // The mini player only makes sense with a video on screen (FEATURES D6);
@@ -532,13 +548,13 @@ void MainWindow::setMode(core::AppMode mode, std::optional<QUrl> target)
         if (m_settings.tvFullscreen() && !isFullScreen()) {
             m_actions->fullScreen->setChecked(true);
         }
-        m_hint->showHint(tr("TV mode  ·  Esc: back  ·  Ctrl+T: desktop  ·  Ctrl+D: download"));
+        m_hint->showHint(tr("TV mode  ·  Esc: back  ·  Ctrl+T: back to YouTube  ·  Ctrl+D: download"));
     } else {
         if (before == core::AppMode::Tv && isFullScreen() && m_settings.tvFullscreen()) {
             m_actions->fullScreen->setChecked(false);
         }
         if (mode == core::AppMode::Music) {
-            m_hint->showHint(tr("Music mode  ·  Ctrl+M: desktop  ·  Ctrl+D: download the track"));
+            m_hint->showHint(tr("YouTube Music  ·  Ctrl+M: back to YouTube  ·  Ctrl+D: download the track"));
         } else {
             m_hint->hideHint();
         }
@@ -546,14 +562,15 @@ void MainWindow::setMode(core::AppMode mode, std::optional<QUrl> target)
     qCInfo(lcUi) << "mode:" << core::appModeName(mode);
 }
 
-/// The two mode actions reflect the current mode without firing.
+/// The mode switch reflects the current mode without firing.
 void MainWindow::syncModeActions()
 {
     const core::AppMode mode = m_webView->mode();
-    const QSignalBlocker tv(m_actions->tvMode);
-    const QSignalBlocker music(m_actions->musicMode);
-    m_actions->tvMode->setChecked(mode == core::AppMode::Tv);
-    m_actions->musicMode->setChecked(mode == core::AppMode::Music);
+    QAction* current = mode == core::AppMode::Tv      ? m_actions->tvMode
+                       : mode == core::AppMode::Music ? m_actions->musicMode
+                                                      : m_actions->youtubeMode;
+    const QSignalBlocker blocker(current);
+    current->setChecked(true); // the group unchecks the other two
 }
 
 /// Music (the mode, or a YouTube Music link) preselects Audio only.

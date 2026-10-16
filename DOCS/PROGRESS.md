@@ -14,6 +14,16 @@ Newest first. One entry per working session.
 | M5 Settings & polish | wip |
 | M6 Packaging | recipes + workflows ready (snap, Flatpak, tests); first run needs the repo pushed |
 
+## 2026-10-16: UX audit, mode switch
+
+* UX audit of reaching the main features (19 items, P0 to P2); the first slice landed: a mode
+  switch on the rail and in the tray (ADR-014), a *Back to YouTube* pill in TV mode, Settings,
+  General *Open Red in* (default YouTube; `tv/startInTvMode` migrated), the mode in the window
+  title. Verified with window grabs (rail in YouTube and Music, shortcuts sheet, Settings,
+  TV entry). `tst_settings` covers the default, Last used and the migration.
+* Open from the audit: expandable rail with labels, mini player close/restore, downloads panel
+  below 900 px, first-run welcome, keyboard and screen-reader access to the rail and panel.
+
 ## 2026-09-13 — Session 3 (packaging, public repo)
 
 * Red is proprietary (owner): every open-source/MIT claim removed; LICENSE is a proprietary
