@@ -42,10 +42,15 @@ public:
     void setMenu(QMenu* menu);
     /// Drops the overflow menu open (debug grabs).
     void showMenu();
+    /// F6 arrived here: keyboard focus on the first button that can take it.
+    void focusFirst();
+    [[nodiscard]] bool hasFocusInside() const;
 
 Q_SIGNALS:
     /// The labels toggle at the bottom was clicked; the owner stores the choice.
     void expandRequested(bool expanded);
+    /// Esc on a rail button: the owner hands focus back to the page.
+    void leaveRequested();
 
 private:
     void setupUi();
@@ -55,6 +60,9 @@ private:
     RailButton* makeButton(QAction* action, const QString& icon, int side = 40);
     QWidget* makeModeSwitch();
     [[nodiscard]] QList<RailButton*> buttons() const;
+    /// Top to bottom, the mode switch included: the keyboard's order.
+    [[nodiscard]] QList<RailButton*> keyboardOrder() const;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
     Actions& m_actions;
     core::ThemeService& m_theme;

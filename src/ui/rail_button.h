@@ -3,6 +3,8 @@
 #include <QColor>
 #include <QToolButton>
 
+class QPainter;
+
 namespace red::ui {
 
 /// A side rail button. Collapsed it is the plain square icon button; expanded
@@ -25,12 +27,18 @@ public:
     /// A second, muted line under the label while expanded; empty hides it.
     void setHint(const QString& hint);
     void setColors(const QColor& text, const QColor& muted);
+    /// Keyboard focus is arriving (F6, the arrows): draw the ring even if the
+    /// window is not active yet and no focus-in event comes.
+    void setKeyboardFocus();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void focusInEvent(QFocusEvent* event) override;
+    void focusOutEvent(QFocusEvent* event) override;
 
 private:
     [[nodiscard]] QString label() const;
+    void paintFocusRing(QPainter& painter) const;
 
     int m_side = 40;
     bool m_expanded = false;
@@ -38,6 +46,7 @@ private:
     QString m_hint;
     QColor m_text;
     QColor m_muted;
+    bool m_keyboardFocus = false; ///< reached with Tab / F6 / the arrows: draw the ring
 };
 
 } // namespace red::ui

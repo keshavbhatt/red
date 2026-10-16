@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
 
     // Developer aid:
     // RED_DEBUG_OPEN=about|bug|shortcuts|account|plans|link|whatsnew|menu|tray|mini|mini-close|
-    // downloads|announce|welcome opens that screen once the window is up (ADR-010).
+    // downloads|announce|welcome|focus|focus-panel opens that screen once the window is up (ADR-010).
     if (qEnvironmentVariableIsSet("RED_DEBUG_OPEN")) {
         const QString what = qEnvironmentVariable("RED_DEBUG_OPEN");
         QTimer::singleShot(1200, &window, [&window, what] { window.debugOpen(what); });

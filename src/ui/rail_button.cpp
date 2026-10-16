@@ -1,5 +1,7 @@
 #include "ui/rail_button.h"
 
+#include <QFocusEvent>
+#include <QPainterPath>
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 
@@ -59,10 +61,57 @@ QString RailButton::label() const
     return text.trimmed();
 }
 
+/// Keyboard focus only: a dashed neutral ring, as on the download cards. The
+/// mouse never moves focus here (Qt::TabFocus), so clicks leave no ring.
+void RailButton::paintFocusRing(QPainter& painter) const
+{
+    if (!m_keyboardFocus || !hasFocus()) {
+        return;
+    }
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPainterPath ring;
+    ring.addRoundedRect(QRectF(rect()).adjusted(1.5, 1.5, -1.5, -1.5), 9, 9);
+    painter.setPen(QPen(m_muted, 1, Qt::DashLine));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(ring);
+}
+
+void RailButton::focusInEvent(QFocusEvent* event)
+{
+    switch (event->reason()) {
+    case Qt::TabFocusReason:
+    case Qt::BacktabFocusReason:
+    case Qt::ShortcutFocusReason:
+    case Qt::OtherFocusReason:
+        m_keyboardFocus = true;
+        break;
+    case Qt::MouseFocusReason:
+        m_keyboardFocus = false;
+        break;
+    default:
+        break; // the window coming back keeps whatever it was
+    }
+    QToolButton::focusInEvent(event);
+}
+
+void RailButton::setKeyboardFocus()
+{
+    m_keyboardFocus = true;
+    update();
+}
+
+void RailButton::focusOutEvent(QFocusEvent* event)
+{
+    QToolButton::focusOutEvent(event);
+    update();
+}
+
 void RailButton::paintEvent(QPaintEvent* event)
 {
     if (!m_expanded) {
         QToolButton::paintEvent(event);
+        QPainter painter(this);
+        paintFocusRing(painter);
         return;
     }
     QStylePainter painter(this);
@@ -73,6 +122,7 @@ void RailButton::paintEvent(QPaintEvent* event)
     option.text.clear();
     option.icon = QIcon();
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
+    paintFocusRing(painter);
 
     const QSize iconSz = iconSize();
     const QRect iconRect((m_side - iconSz.width()) / 2, (height() - iconSz.height()) / 2, iconSz.width(),

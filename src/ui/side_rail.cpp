@@ -7,6 +7,8 @@
 #include "ui/red_style.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMenu>
 #include <QScrollArea>
@@ -66,7 +68,10 @@ RailButton* SideRail::makeButton(QAction* action, const QString& icon, int side)
     button->setIconSize(QSize(kIconSize, kIconSize));
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
     button->setCursor(Qt::PointingHandCursor);
-    button->setFocusPolicy(Qt::NoFocus);
+    // Tab and F6 reach it; a click does not take focus from the page, whose
+    // own keys (K, J, L, F…) need it.
+    button->setFocusPolicy(Qt::TabFocus);
+    button->installEventFilter(this);
     return button;
 }
 
@@ -177,6 +182,75 @@ QList<RailButton*> SideRail::buttons() const
 {
     return {m_logo,      m_back,       m_forward,  m_reload, m_download,
             m_downloads, m_miniPlayer, m_settings, m_menu,   m_labels};
+}
+
+QList<RailButton*> SideRail::keyboardOrder() const
+{
+    return {m_logo,     m_youtube,   m_music,      m_tv,       m_back, m_forward, m_reload,
+            m_download, m_downloads, m_miniPlayer, m_settings, m_menu, m_labels};
+}
+
+bool SideRail::hasFocusInside() const
+{
+    const QWidget* focus = QApplication::focusWidget();
+    return focus != nullptr && isAncestorOf(focus);
+}
+
+void SideRail::focusFirst()
+{
+    for (RailButton* b : keyboardOrder()) {
+        if (b->isVisible() && b->isEnabled()) {
+            b->setKeyboardFocus();
+            b->setFocus(Qt::ShortcutFocusReason);
+            return;
+        }
+    }
+}
+
+/// On a focused rail button: Up / Down walk the rail, Enter activates (Space
+/// does already), Esc goes back to the page.
+bool SideRail::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() != QEvent::KeyPress) {
+        return QFrame::eventFilter(watched, event);
+    }
+    auto* button = qobject_cast<RailButton*>(watched);
+    if (button == nullptr) {
+        return QFrame::eventFilter(watched, event);
+    }
+    const int key = static_cast<QKeyEvent*>(event)->key();
+    if (key == Qt::Key_Escape) {
+        Q_EMIT leaveRequested();
+        return true;
+    }
+    if (key == Qt::Key_Return || key == Qt::Key_Enter) {
+        if (button->menu() != nullptr) {
+            button->showMenu();
+        } else {
+            button->click();
+        }
+        return true;
+    }
+    if (key == Qt::Key_Up || key == Qt::Key_Down) {
+        QList<RailButton*> order;
+        for (RailButton* b : keyboardOrder()) {
+            if (b->isVisible() && b->isEnabled()) {
+                order << b;
+            }
+        }
+        const qsizetype at = order.indexOf(button);
+        if (at >= 0 && !order.isEmpty()) {
+            const qsizetype next = (at + (key == Qt::Key_Down ? 1 : order.size() - 1)) % order.size();
+            RailButton* target = order.at(next);
+            target->setKeyboardFocus();
+            target->setFocus(key == Qt::Key_Down ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+            if (auto* scroll = findChild<QScrollArea*>()) {
+                scroll->ensureWidgetVisible(target); // a short window scrolls the rail
+            }
+        }
+        return true;
+    }
+    return QFrame::eventFilter(watched, event);
 }
 
 void SideRail::setExpanded(bool expanded)

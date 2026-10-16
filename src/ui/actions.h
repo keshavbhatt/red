@@ -29,6 +29,7 @@ public:
     QAction* downloadUrl = nullptr;
     QAction* downloads = nullptr;
     QAction* copyLink = nullptr;
+    QAction* focusNext = nullptr; ///< F6: page, rail, downloads panel in turn (Shift+F6 back)
     QAction* miniPlayer = nullptr;
     /// The three modes, one checked at a time (the rail's mode switch, the tray).
     QAction* youtubeMode = nullptr;

@@ -43,7 +43,10 @@ Newest first. One entry per working session.
 * Sixth slice: download cards with a full right-click menu, keyboard actions, spoken names and
   the whole failure reason (items 10, 15); the rail's Download button is a red glyph instead of
   a filled pill (owner). Verified with a seeded download list in a test profile.
-* Open from the audit: keyboard access to the rail and panel (item 14), and items 16, 18, 19.
+* Seventh slice: keyboard access (item 14): F6 / Shift+F6 between page, rail and panel, Tab
+  focus on rail and panel buttons without taking focus on click, arrows / Enter / Esc on the rail,
+  dashed focus rings. `RED_DEBUG_OPEN=focus|focus-panel`.
+* Open from the audit: items 16, 18, 19 (minor).
 
 ## 2026-09-13 — Session 3 (packaging, public repo)
 

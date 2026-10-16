@@ -7,6 +7,7 @@
 #include "ui/red_style.h"
 #include "ui/thumbnail_cache.h"
 
+#include <QApplication>
 #include <QDir>
 #include <QFocusEvent>
 #include <QHBoxLayout>
@@ -107,7 +108,7 @@ void DownloadsPanel::setupUi()
     m_engineChip->setCursor(Qt::PointingHandCursor);
     m_engineChip->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_engineChip->setIconSize(QSize(14, 14));
-    m_engineChip->setFocusPolicy(Qt::NoFocus);
+    m_engineChip->setFocusPolicy(Qt::TabFocus);
     connect(m_engineChip, &QToolButton::clicked, this, &DownloadsPanel::engineRequested);
     headerLayout->addWidget(m_engineChip);
     headerLayout->addStretch(1);
@@ -116,7 +117,7 @@ void DownloadsPanel::setupUi()
     m_newButton->setAccessibleName(tr("Download from a link"));
     m_newButton->setCursor(Qt::PointingHandCursor);
     m_newButton->setIconSize(QSize(20, 20));
-    m_newButton->setFocusPolicy(Qt::NoFocus);
+    m_newButton->setFocusPolicy(Qt::TabFocus);
     connect(m_newButton, &QToolButton::clicked, this, &DownloadsPanel::newDownloadRequested);
     headerLayout->addWidget(m_newButton);
     m_moreButton = new QToolButton(header);
@@ -125,7 +126,7 @@ void DownloadsPanel::setupUi()
     m_moreButton->setAccessibleName(tr("More download actions"));
     m_moreButton->setCursor(Qt::PointingHandCursor);
     m_moreButton->setIconSize(QSize(20, 20));
-    m_moreButton->setFocusPolicy(Qt::NoFocus);
+    m_moreButton->setFocusPolicy(Qt::TabFocus);
     m_moreMenu = new QMenu(m_moreButton);
     m_moreMenu->addAction(tr("Pause all"), &m_queue, &core::DownloadQueue::pauseAll);
     m_moreMenu->addAction(tr("Resume all"), &m_queue, &core::DownloadQueue::resumeAll);
@@ -141,7 +142,7 @@ void DownloadsPanel::setupUi()
     m_closeButton->setAccessibleName(tr("Close the downloads panel"));
     m_closeButton->setCursor(Qt::PointingHandCursor);
     m_closeButton->setIconSize(QSize(18, 18));
-    m_closeButton->setFocusPolicy(Qt::NoFocus);
+    m_closeButton->setFocusPolicy(Qt::TabFocus);
     connect(m_closeButton, &QToolButton::clicked, this, &DownloadsPanel::closeRequested);
     headerLayout->addWidget(m_closeButton);
     root->addWidget(header);
@@ -162,6 +163,10 @@ void DownloadsPanel::setupUi()
     m_list->setContextMenuPolicy(Qt::CustomContextMenu);
     m_list->setAccessibleName(tr("Downloads"));
     m_list->installEventFilter(this);
+    for (QWidget* w :
+         std::initializer_list<QWidget*>{m_engineChip, m_newButton, m_moreButton, m_closeButton}) {
+        w->installEventFilter(this); // Esc: back to the page
+    }
     m_list->viewport()->installEventFilter(this);
     connect(m_list, &QWidget::customContextMenuRequested, this, [this](const QPoint& pos) {
         QModelIndex index = m_list->indexAt(pos);
@@ -217,7 +222,7 @@ void DownloadsPanel::setupUi()
     m_folderButton->setAccessibleName(tr("Open download folder"));
     m_folderButton->setCursor(Qt::PointingHandCursor);
     m_folderButton->setIconSize(QSize(18, 18));
-    m_folderButton->setFocusPolicy(Qt::NoFocus);
+    m_folderButton->setFocusPolicy(Qt::TabFocus);
     connect(m_folderButton, &QToolButton::clicked, this, &DownloadsPanel::openFolderRequested);
     footerLayout->addWidget(m_folderButton);
     m_folderLabel = new QLabel(footer);
@@ -226,10 +231,12 @@ void DownloadsPanel::setupUi()
     m_changeButton = new QToolButton(footer);
     m_changeButton->setText(tr("Change"));
     m_changeButton->setCursor(Qt::PointingHandCursor);
-    m_changeButton->setFocusPolicy(Qt::NoFocus);
+    m_changeButton->setFocusPolicy(Qt::TabFocus);
     connect(m_changeButton, &QToolButton::clicked, this, &DownloadsPanel::changeFolderRequested);
     footerLayout->addWidget(m_changeButton);
     root->addWidget(footer);
+    m_folderButton->installEventFilter(this);
+    m_changeButton->installEventFilter(this);
 }
 
 void DownloadsPanel::applyIcons()
@@ -289,7 +296,7 @@ void DownloadsPanel::setEngineStatus(const services::EngineManager::Status& stat
                                           status.ffmpegPath.isEmpty() ? tr("missing") : tr("ready"))
                                : status.error);
     m_engineChip->setStyleSheet(
-        u"QToolButton{border:1px solid %1;border-radius:11px;padding:2px 8px 2px 6px;color:%2;font-size:11px;font-weight:600;}QToolButton:hover{background:%3;}"_s
+        u"QToolButton{border:1px solid %1;border-radius:11px;padding:2px 8px 2px 6px;color:%2;font-size:11px;font-weight:600;}QToolButton:hover{background:%3;}QToolButton:focus{border-style:dashed;}"_s
             .arg(t.border.name(), color.name(), t.hover.name()));
 }
 
@@ -403,6 +410,11 @@ void DownloadsPanel::runPrimaryAction(const QModelIndex& index)
 /// shown only while the keyboard is in use.
 bool DownloadsPanel::eventFilter(QObject* watched, QEvent* event)
 {
+    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape &&
+        watched->isWidgetType() && isAncestorOf(static_cast<QWidget*>(watched))) {
+        Q_EMIT leaveRequested();
+        return true;
+    }
     if (watched == m_list->viewport() && event->type() == QEvent::MouseButtonPress && m_keyboard) {
         m_keyboard = false;
         m_delegate->setKeyboardFocus(false);
@@ -453,6 +465,21 @@ bool DownloadsPanel::eventFilter(QObject* watched, QEvent* event)
         }
     }
     return QFrame::eventFilter(watched, event);
+}
+
+void DownloadsPanel::focusFirst()
+{
+    if (m_stack->currentWidget() == m_list && m_queue.rowCount() > 0) {
+        m_list->setFocus(Qt::ShortcutFocusReason);
+    } else {
+        m_newButton->setFocus(Qt::ShortcutFocusReason);
+    }
+}
+
+bool DownloadsPanel::hasFocusInside() const
+{
+    const QWidget* focus = QApplication::focusWidget();
+    return focus != nullptr && isAncestorOf(focus);
 }
 
 } // namespace red::ui

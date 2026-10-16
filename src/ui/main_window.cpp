@@ -274,6 +274,14 @@ void MainWindow::connectActions()
     });
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(a.welcome, &QAction::triggered, this, &MainWindow::showWelcome);
+    connect(a.focusNext, &QAction::triggered, this, [this] { cycleFocus(1); });
+    m_focusPrevious = new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F6), this);
+    m_focusPrevious->setContext(Qt::WindowShortcut);
+    connect(m_focusPrevious, &QShortcut::activated, this, [this] { cycleFocus(-1); });
+    connect(m_rail, &SideRail::leaveRequested, this,
+            [this] { m_webView->setFocus(Qt::ShortcutFocusReason); });
+    connect(m_downloads->panel(), &DownloadsPanel::leaveRequested, this,
+            [this] { m_webView->setFocus(Qt::ShortcutFocusReason); });
     connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
     connect(a.openLogFolder, &QAction::triggered, this,
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
@@ -574,8 +582,44 @@ void MainWindow::announceDownload(const QString& title, bool alreadyQueued)
     m_hint->showHint(text);
 }
 
+void MainWindow::cycleFocus(int step)
+{
+    enum Region
+    {
+        Page,
+        Rail,
+        Panel,
+    };
+    QList<Region> regions{Page};
+    if (m_rail->isVisible()) {
+        regions << Rail;
+    }
+    if (m_downloads->panel()->isVisible()) {
+        regions << Panel;
+    }
+    const Region current = m_rail->hasFocusInside()                 ? Rail
+                           : m_downloads->panel()->hasFocusInside() ? Panel
+                                                                    : Page;
+    const qsizetype at = std::max<qsizetype>(0, regions.indexOf(current));
+    const qsizetype count = regions.size();
+    switch (regions.at((at + step + count) % count)) {
+    case Rail:
+        m_rail->focusFirst();
+        break;
+    case Panel:
+        m_downloads->panel()->focusFirst();
+        break;
+    case Page:
+        m_webView->setFocus(Qt::ShortcutFocusReason);
+        break;
+    }
+}
+
 void MainWindow::setDownloadsPanelVisible(bool visible)
 {
+    if (!visible && m_downloads->panel()->hasFocusInside()) {
+        m_webView->setFocus(Qt::ShortcutFocusReason); // not lost on a hidden widget
+    }
     m_panelVisible = visible;
     applyChrome();
 }
@@ -837,6 +881,12 @@ void MainWindow::debugOpen(const QString& what)
         if (what == u"mini-close"_s) { // the window's close button: back to the full window
             QTimer::singleShot(3000, this, &QWidget::close);
         }
+    } else if (what == u"focus"_s) { // F6 once: the rail
+        cycleFocus(1);
+    } else if (what == u"focus-panel"_s) { // the panel open, F6 twice
+        m_actions->downloads->setChecked(true);
+        cycleFocus(1);
+        cycleFocus(1);
     } else if (what == u"downloads"_s) {
         m_actions->downloads->setChecked(true);
     } else if (what == u"announce"_s) {

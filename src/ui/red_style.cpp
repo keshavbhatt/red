@@ -155,7 +155,9 @@ QPushButton[redFlat="true"]:hover, QToolButton[redFlat="true"]:hover { backgroun
 QPushButton[redFlat="true"]:pressed, QToolButton[redFlat="true"]:pressed { background: {{border}}; }
 /* Release notes in the What's new sheet: plain text on the card, not an input box. */
 QTextBrowser[redNotes="true"] { background: transparent; border: none; padding: 0; }
-QToolButton { background: transparent; border: none; border-radius: 8px; padding: 4px; }
+QToolButton { background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 3px; }
+/* Tool buttons take focus from the keyboard only (Qt::TabFocus): a dashed ring. */
+QToolButton:focus { border: 1px dashed {{muted}}; }
 QToolButton:hover { background: {{hover}}; }
 QToolButton:checked { background: {{hover}}; }
 QToolButton::menu-indicator { image: none; }

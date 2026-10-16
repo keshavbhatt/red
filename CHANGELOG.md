@@ -14,6 +14,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The side rail shows **labels** next to its icons. *Hide labels* at the bottom of the rail (or
   Settings, General) brings back the narrow icons-only rail.
 - F10 opens the rail's menu, also when the rail is hidden.
+- F6 (and Shift+F6) moves the keyboard between the page, the side rail and the Downloads panel.
+  On the rail the arrow keys move, Enter or Space presses and Esc returns to the page; Tab
+  reaches the Downloads panel's buttons. A dashed ring shows where the keyboard is.
 - A **welcome** on the first start shows the three modes, downloading, the mini player and
   blocking; *Show me around* in the rail's menu opens it again.
 - The mini player has a button in its corner (it shows when the mouse moves) and Esc to go back

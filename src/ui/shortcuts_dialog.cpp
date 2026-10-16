@@ -70,7 +70,7 @@ ShortcutsDialog::ShortcutsDialog(const Actions& a, const core::ThemeService& the
         return out;
     };
     // Left column: getting around, modes and the window. Right: downloads, media and the app.
-    addGroup(left, tr("Navigate"), rows({a.home, a.back, a.forward, a.reload, a.copyLink}));
+    addGroup(left, tr("Navigate"), rows({a.home, a.back, a.forward, a.reload, a.copyLink, a.focusNext}));
     addGroup(left, tr("Mode"),
              rows({a.youtubeMode, a.musicMode, a.tvMode}) +
                  QList<Row>{{tr("TV mode on / off"), u"Ctrl+T"_s}, {tr("Music mode on / off"), u"Ctrl+M"_s}});

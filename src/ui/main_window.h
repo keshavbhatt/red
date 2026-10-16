@@ -94,6 +94,9 @@ private:
     void applyChrome();
     void syncModeActions();
     void showWelcome();
+    /// F6 / Shift+F6: keyboard focus to the next (+1) or previous (-1) of the
+    /// page, the rail and the downloads panel (whichever are on screen).
+    void cycleFocus(int step);
     void fitMiniPlayer();
     void placeDownloadsPanel();
     void announceDownload(const QString& title, bool alreadyQueued);
@@ -133,6 +136,7 @@ private:
     OverlayButton* m_miniRestore = nullptr;   ///< back to the full window from the mini player
     QShortcut* m_exitMiniPlayer = nullptr;    ///< Esc in the mini player
     QShortcut* m_closePanelOverlay = nullptr; ///< Esc while the panel floats over the page
+    QShortcut* m_focusPrevious = nullptr;     ///< Shift+F6
     QMenu* m_overflow = nullptr;              ///< the rail's More menu (F10 opens it without the rail)
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;

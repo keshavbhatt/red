@@ -80,6 +80,12 @@ the window is shorter than the buttons. Top to bottom:
 The rail hides in fullscreen, in TV mode and in mini-player mode. Setting "Show side rail"
 keeps everything reachable via shortcuts and the tray.
 
+**Keyboard** (UX audit item 14): F6 / Shift+F6 cycle the page, the rail and the downloads panel
+(those on screen). Rail and panel buttons take focus from the keyboard only (`Qt::TabFocus`), so
+a click never takes it from the page and YouTube's own keys keep working; on the rail Up / Down
+move, Enter / Space press, Esc returns to the page (the panel's Esc too). Focus shows as a dashed
+`muted` ring, never for the mouse.
+
 **Downloads panel** (right, 380 px, `panel` surface, border-left). Cards: hover buttons, a
 right-click / Menu-key menu with every action for the state (+ Copy link, Copy error, Remove),
 Enter = open / retry / resume, Delete = remove a finished card, Space = pause / resume, a dashed

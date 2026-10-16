@@ -38,6 +38,9 @@ public:
 
     void setEngineStatus(const services::EngineManager::Status& status);
     static constexpr int kWidth = 380;
+    /// F6 arrived here: the card list, or "download from a link" when it is empty.
+    void focusFirst();
+    [[nodiscard]] bool hasFocusInside() const;
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
@@ -49,6 +52,8 @@ Q_SIGNALS:
     void changeFolderRequested();
     void engineRequested(); ///< the chip was clicked: set up / update / show settings
     void closeRequested();
+    /// Esc inside the panel: the owner hands focus back to the page.
+    void leaveRequested();
 
 private:
     void setupUi();

@@ -42,6 +42,7 @@ Actions::Actions(QWidget* owner)
     downloadUrl = make(owner, tr("Download from link…"), {QKeySequence(Qt::CTRL | Qt::Key_N)});
     downloads = make(owner, tr("Downloads"), {QKeySequence(Qt::CTRL | Qt::Key_J)});
     copyLink = make(owner, tr("Copy video link"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C)});
+    focusNext = make(owner, tr("Move between page, rail and downloads"), {QKeySequence(Qt::Key_F6)});
     miniPlayer = make(owner, tr("Mini player"), {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M)});
     // Ctrl+1/2/3 pick a mode; Ctrl+T and Ctrl+M stay as on/off toggles (MainWindow).
     youtubeMode = make(owner, tr("YouTube"), {QKeySequence(Qt::CTRL | Qt::Key_1)});
@@ -86,10 +87,10 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {home,     back,       forward,     reload,    download,   downloadUrl, downloads,
-            copyLink, miniPlayer, youtubeMode, musicMode, tvMode,     playPause,   next,
-            previous, zoomIn,     zoomOut,     zoomReset, fullScreen, showHide,    settings,
-            menu,     shortcuts,  onlineGuide, account,   about,      quit};
+    return {home,     back,      forward,    reload,      download,  downloadUrl, downloads,
+            copyLink, focusNext, miniPlayer, youtubeMode, musicMode, tvMode,      playPause,
+            next,     previous,  zoomIn,     zoomOut,     zoomReset, fullScreen,  showHide,
+            settings, menu,      shortcuts,  onlineGuide, account,   about,       quit};
 }
 
 } // namespace red::ui
