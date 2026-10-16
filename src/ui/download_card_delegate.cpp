@@ -24,6 +24,22 @@ constexpr int kThumbHeight = 58;
 constexpr int kButtonSize = 26;
 constexpr int kButtonGap = 4;
 constexpr int kRadius = 10;
+constexpr int kInset = 6;      ///< card to list edge, horizontally
+constexpr int kErrorLines = 4; ///< a failed card shows this much of its reason
+
+/// The card's usual row (thumbnail, title, status, buttons): the whole card,
+/// or its top on a failed card that also shows its reason.
+QRect mainBlock(const QRect& card)
+{
+    return {card.left(), card.top(), card.width(), DownloadCardDelegate::kCardHeight - 6};
+}
+
+QFont smallFont(const QFont& base)
+{
+    QFont small = base;
+    small.setPointSizeF(base.pointSizeF() - 1);
+    return small;
+}
 
 core::DownloadState stateOf(const QModelIndex& index)
 {
@@ -59,9 +75,29 @@ DownloadCardDelegate::DownloadCardDelegate(ThumbnailCache& thumbnails, core::The
     , m_theme(theme)
 {}
 
-QSize DownloadCardDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex&) const
+QString DownloadCardDelegate::errorText(const QModelIndex& index)
 {
-    return {option.rect.width(), kCardHeight};
+    return stateOf(index) == core::DownloadState::Failed
+               ? index.data(core::DownloadQueue::ErrorRole).toString().trimmed()
+               : QString();
+}
+
+int DownloadCardDelegate::errorHeight(const QFont& font, const QString& error, int width) const
+{
+    if (error.isEmpty()) {
+        return 0;
+    }
+    const QFontMetrics fm(smallFont(font));
+    const int wrapped = fm.boundingRect(QRect(0, 0, width, 10000), Qt::TextWordWrap, error).height();
+    return std::min(wrapped, fm.lineSpacing() * kErrorLines);
+}
+
+QSize DownloadCardDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    const QString error = errorText(index);
+    const int textWidth = m_cardWidth - 2 * kInset - 2 * kMargin;
+    const int extra = error.isEmpty() ? 0 : errorHeight(option.font, error, textWidth) + kMargin;
+    return {option.rect.width(), kCardHeight + extra};
 }
 
 QList<DownloadCardDelegate::HitButton>
@@ -96,8 +132,9 @@ DownloadCardDelegate::buttonsFor(const QRect& card, core::DownloadState state, b
         add(Action::Remove, u"trash"_s, tr("Remove from list"));
         break;
     }
-    int x = card.right() - kMargin - kButtonSize;
-    const int y = card.bottom() - kMargin - kButtonSize;
+    const QRect block = mainBlock(card);
+    int x = block.right() - kMargin - kButtonSize;
+    const int y = block.bottom() - kMargin - kButtonSize;
     for (int i = static_cast<int>(buttons.size()) - 1; i >= 0; --i) {
         buttons[i].rect = QRect(x, y, kButtonSize, kButtonSize);
         x -= kButtonSize + kButtonGap;
@@ -111,7 +148,8 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     const Tokens t = Tokens::forScheme(m_theme.isDark());
     const core::DownloadState state = stateOf(index);
     const bool hovered = option.state.testFlag(QStyle::State_MouseOver);
-    const QRect card = option.rect.adjusted(6, 3, -6, -3);
+    const QRect card = option.rect.adjusted(kInset, 3, -kInset, -3);
+    const QRect block = mainBlock(card);
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
@@ -122,6 +160,13 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     painter->fillPath(path, hovered ? t.elevated : t.panel);
     painter->setPen(QPen(t.border, 1));
     painter->drawPath(path);
+    // Keyboard use: a dashed ring on the current card (never for the mouse).
+    if (m_keyboardFocus && option.state.testFlag(QStyle::State_HasFocus)) {
+        QPainterPath ring;
+        ring.addRoundedRect(QRectF(card).adjusted(3, 3, -3, -3), kRadius - 3, kRadius - 3);
+        painter->setPen(QPen(t.muted, 1, Qt::DashLine));
+        painter->drawPath(ring);
+    }
 
     // Thumbnail with the state bar on its left.
     const QRect thumbRect(card.left() + kMargin, card.top() + kMargin, kThumbWidth, kThumbHeight);
@@ -164,11 +209,13 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         painter->fontMetrics().elidedText(title, Qt::ElideRight, titleRect.width() * 2 - 20);
     painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, elidedTitle);
 
-    QFont small = option.font;
-    small.setPointSizeF(option.font.pointSizeF() - 1);
+    const QFont small = smallFont(option.font);
     painter->setFont(small);
     painter->setPen(state == core::DownloadState::Failed ? t.danger : t.muted);
-    QString status = index.data(core::DownloadQueue::StatusLineRole).toString();
+    const QString error = errorText(index);
+    // A failed card spells its reason out below; the status row just says so.
+    QString status =
+        error.isEmpty() ? index.data(core::DownloadQueue::StatusLineRole).toString() : tr("Failed");
     const QString uploader = index.data(core::DownloadQueue::UploaderRole).toString();
     if (!uploader.isEmpty() && state == core::DownloadState::Completed) {
         status = uploader + u" · "_s + status;
@@ -177,9 +224,15 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         buttonsFor(card, state, !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty());
     const int buttonsWidth =
         hovered && !buttons.isEmpty() ? static_cast<int>(buttons.size()) * (kButtonSize + kButtonGap) + 4 : 0;
-    const QRect statusRect(textLeft, card.bottom() - kMargin - 18, textRight - textLeft - buttonsWidth, 18);
+    const QRect statusRect(textLeft, block.bottom() - kMargin - 18, textRight - textLeft - buttonsWidth, 18);
     painter->drawText(statusRect, Qt::AlignLeft | Qt::AlignVCenter,
                       painter->fontMetrics().elidedText(status, Qt::ElideRight, statusRect.width()));
+    if (!error.isEmpty()) {
+        const int width = card.width() - 2 * kMargin;
+        const QRect errorRect(card.left() + kMargin, block.bottom() + 1, width,
+                              errorHeight(option.font, error, width));
+        painter->drawText(errorRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, error);
+    }
 
     // Progress bar under the title while active/paused.
     const double progress = index.data(core::DownloadQueue::ProgressRole).toDouble();
@@ -237,7 +290,7 @@ bool DownloadCardDelegate::editorEvent(QEvent* event, QAbstractItemModel*, const
     if (event->type() != QEvent::MouseButtonRelease || mouse->button() != Qt::LeftButton) {
         return false;
     }
-    const QRect card = option.rect.adjusted(6, 3, -6, -3);
+    const QRect card = option.rect.adjusted(kInset, 3, -kInset, -3);
     const core::DownloadState state = stateOf(index);
     const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
     for (const HitButton& b : buttonsFor(card, state, hasFile)) {
@@ -255,7 +308,7 @@ bool DownloadCardDelegate::helpEvent(QHelpEvent* event, QAbstractItemView* view,
     if (event->type() != QEvent::ToolTip || !index.isValid()) {
         return QStyledItemDelegate::helpEvent(event, view, option, index);
     }
-    const QRect card = option.rect.adjusted(6, 3, -6, -3);
+    const QRect card = option.rect.adjusted(kInset, 3, -kInset, -3);
     const core::DownloadState state = stateOf(index);
     const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
     for (const HitButton& b : buttonsFor(card, state, hasFile)) {

@@ -4,6 +4,7 @@
 #include "ui/download_card_delegate.h"
 
 #include <QFrame>
+#include <QHash>
 
 class QLabel;
 class QListView;
@@ -38,6 +39,9 @@ public:
     void setEngineStatus(const services::EngineManager::Status& status);
     static constexpr int kWidth = 380;
 
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 Q_SIGNALS:
     void newDownloadRequested();
     void cardAction(quint64 jobId, red::ui::DownloadCardDelegate::Action action);
@@ -51,6 +55,11 @@ private:
     void applyIcons();
     void updateEmptyState();
     void updateFooter();
+    /// Every action a card offers, for the right mouse button and the Menu key.
+    void showCardMenu(const QModelIndex& index, const QPoint& globalPos);
+    /// Enter: open a finished file, retry a failed one, resume a paused one.
+    void runPrimaryAction(const QModelIndex& index);
+    void emitAction(const QModelIndex& index, DownloadCardDelegate::Action action);
 
     core::DownloadQueue& m_queue;
     core::Settings& m_settings;
@@ -73,6 +82,8 @@ private:
     QToolButton* m_folderButton = nullptr;
     QToolButton* m_changeButton = nullptr;
     services::EngineManager::Status m_engine;
+    QHash<quint64, bool> m_showsError; ///< which cards are tall (a failed card's reason)
+    bool m_keyboard = false;           ///< the list is being used from the keyboard
 };
 
 } // namespace red::ui

@@ -69,7 +69,7 @@ the window is shorter than the buttons. Top to bottom:
 | Back / Forward | chevrons | Alt+←/→ (disabled when unavailable) |
 | Reload | ↻ | F5 (becomes ✕ "stop" while loading) |
 | — | | |
-| **Download** | ⤓ in a red pill when the page is a video/playlist/channel | Ctrl+D · opens the Download dialog for the current page |
+| **Download** | ⤓, the glyph in `brand` red when the page is a video/playlist/channel (no filled pill) | Ctrl+D · opens the Download dialog for the current page |
 | Downloads | list icon with a badge (active count) | Ctrl+J · toggles the panel |
 | Mini player | picture icon | Ctrl+Shift+M |
 | — spacer — | | |
@@ -80,7 +80,11 @@ the window is shorter than the buttons. Top to bottom:
 The rail hides in fullscreen, in TV mode and in mini-player mode. Setting "Show side rail"
 keeps everything reachable via shortcuts and the tray.
 
-**Downloads panel** (right, 380 px, `panel` surface, border-left). Docked beside the page from
+**Downloads panel** (right, 380 px, `panel` surface, border-left). Cards: hover buttons, a
+right-click / Menu-key menu with every action for the state (+ Copy link, Copy error, Remove),
+Enter = open / retry / resume, Delete = remove a finished card, Space = pause / resume, a dashed
+ring on the current card only while the keyboard is in use; a failed card grows to show its
+reason (up to four lines); screen readers get title + status (`Qt::AccessibleTextRole`). Docked beside the page from
 900 px of window width; narrower, it floats over the page's right side (Esc, Ctrl+J or ✕ close
 it) and is not reopened at start. Where it cannot show (full screen, mini player, TV, or closed in
 a narrow window) a queued download raises a hint: "Download added: <title>" or "Already in your

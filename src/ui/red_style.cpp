@@ -160,7 +160,7 @@ QToolButton:hover { background: {{hover}}; }
 QToolButton:checked { background: {{hover}}; }
 QToolButton::menu-indicator { image: none; }
 
-/* Rail buttons: square, rounded; the Download pill takes the primary colour. */
+/* Rail buttons: square, rounded, flat; the checked ones sit on the hover tone. */
 /* Sizes come from ui::RailButton: 40 px square, or the rail's width with labels. */
 QToolButton[redRailButton="true"] {
     background: transparent; border: none; border-radius: 10px; padding: 0; margin: 0;
@@ -168,8 +168,6 @@ QToolButton[redRailButton="true"] {
 QToolButton[redRailButton="true"]::menu-indicator { image: none; width: 0; }
 QToolButton[redRailButton="true"]:hover { background: {{hover}}; }
 QToolButton[redRailButton="true"]:checked { background: {{hover}}; }
-QToolButton[redRailButton="true"][redAccent="true"] { background: {{primary}}; }
-QToolButton[redRailButton="true"][redAccent="true"]:hover { background: {{primaryHover}}; }
 QToolButton[redRailButton="true"]:disabled { background: transparent; }
 /* The mode switch: three smaller rail buttons in one outlined group. */
 QFrame[redModeSwitch="true"] { border: 1px solid {{border}}; border-radius: 12px; background: transparent; }

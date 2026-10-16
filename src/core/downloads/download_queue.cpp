@@ -60,6 +60,11 @@ QVariant DownloadQueue::data(const QModelIndex& index, int role) const
         return j.isPlaylist();
     case ErrorRole:
         return j.error;
+    // Screen readers: the card is painted, so its words come from here.
+    case Qt::AccessibleTextRole:
+        return QString((j.title.isEmpty() ? j.url : j.title) + u", "_s + j.statusLine());
+    case Qt::AccessibleDescriptionRole:
+        return tr("Enter opens or retries, Delete removes it, the Menu key lists every action.");
     default:
         return {};
     }

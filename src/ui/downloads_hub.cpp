@@ -363,6 +363,12 @@ void DownloadsHub::handleCardAction(quint64 jobId, DownloadCardDelegate::Action 
     case DownloadCardDelegate::Action::Remove:
         m_queue->remove(jobId);
         break;
+    case DownloadCardDelegate::Action::CopyLink:
+        QApplication::clipboard()->setText(job->url);
+        break;
+    case DownloadCardDelegate::Action::CopyError:
+        QApplication::clipboard()->setText(job->error);
+        break;
     case DownloadCardDelegate::Action::None:
         break;
     }

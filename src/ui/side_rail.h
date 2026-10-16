@@ -31,7 +31,7 @@ public:
     /// Icons with labels (true) or icons only.
     void setExpanded(bool expanded);
     [[nodiscard]] bool isExpanded() const { return m_expanded; }
-    /// Highlights the Download button as a red pill when the page is downloadable.
+    /// Turns the Download button's glyph red when the page is downloadable.
     void setDownloadable(bool downloadable);
     /// Active-download count badge on the Downloads button (0 hides it).
     void setActiveDownloads(int count);

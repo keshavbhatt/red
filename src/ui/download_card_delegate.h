@@ -30,6 +30,8 @@ public:
         Open,
         ShowInFolder,
         Remove,
+        CopyLink,  ///< the video's or list's link to the clipboard
+        CopyError, ///< a failed download's full reason to the clipboard
     };
 
     DownloadCardDelegate(ThumbnailCache& thumbnails, core::ThemeService& theme, QObject* parent = nullptr);
@@ -45,6 +47,11 @@ public:
 
     static constexpr int kCardHeight = 92;
 
+    /// The list's viewport width, for the height of a failed card's wrapped error.
+    void setCardWidth(int width) { m_cardWidth = width; }
+    /// A dashed ring on the current card while the list is used from the keyboard.
+    void setKeyboardFocus(bool on) { m_keyboardFocus = on; }
+
 Q_SIGNALS:
     void actionTriggered(quint64 jobId, red::ui::DownloadCardDelegate::Action action);
     void thumbnailNeeded();
@@ -59,11 +66,16 @@ private:
     };
     [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state,
                                               bool hasFile) const;
+    /// A failed card's reason, wrapped under the card's usual row (empty otherwise).
+    [[nodiscard]] static QString errorText(const QModelIndex& index);
+    [[nodiscard]] int errorHeight(const QFont& font, const QString& error, int width) const;
 
     ThumbnailCache& m_thumbnails;
     core::ThemeService& m_theme;
     QPersistentModelIndex m_hoverIndex;
     QPoint m_hoverPos;
+    int m_cardWidth = 368;
+    bool m_keyboardFocus = false;
 };
 
 } // namespace red::ui

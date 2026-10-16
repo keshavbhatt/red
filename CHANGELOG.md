@@ -25,6 +25,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   all; Esc closes it.
 - "Download added" appears where the Downloads panel can't (full screen, the mini player, TV
   mode, a narrow window), and "Already in your downloads" when the same download is queued.
+- Download cards have a right-click menu with every action (Open, Show in folder, Pause, Resume,
+  Retry, Cancel, Copy link, Copy error, Remove), work from the keyboard (Enter, Delete, Space, the
+  Menu key) and are read out by screen readers. A failed download shows its whole reason.
 - Settings confirms Clear cache, Copy diagnostics, Reset site permissions and Reset all settings
   right under the buttons.
 
@@ -36,9 +39,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   channel, *Download from link* elsewhere. The mini player button says why it is unavailable.
 - In a short window the rail scrolls instead of squeezing its buttons together.
 - On-screen hints stay up long enough to read the longer ones.
-- Colours follow YouTube's: red only for small marks such as progress bars and badges, YouTube's
-  light (or dark) pill for main buttons and the rail's Download button, and YouTube blue for
-  check boxes and selections.
+- Colours follow YouTube's: red only for small marks such as progress bars, badges and the rail's
+  Download button when there is something to download, YouTube's light (or dark) pill for main
+  buttons, and YouTube blue for check boxes and selections.
 
 ### Fixed
 - Closing the mini player's window returns to the full window instead of quitting Red.
