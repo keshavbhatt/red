@@ -134,6 +134,16 @@ private Q_SLOTS:
         QCOMPARE(m_settings->startMode(), StartMode::Desktop);
     }
 
+    void firstRunUntilWelcomeOrNotes()
+    {
+        QVERIFY(m_settings->isFirstRun());
+        m_settings->setWelcomeSeen(true);
+        QVERIFY(!m_settings->isFirstRun());
+        m_settings->setWelcomeSeen(false);
+        m_settings->setWhatsNewSeenVersion(u"10.2.0"_s); // an upgrade from a Red 10 with release notes
+        QVERIFY(!m_settings->isFirstRun());
+    }
+
     void startModeMigratesStartInTv()
     {
         const QString path = m_dir->filePath(u"legacy.ini"_s);

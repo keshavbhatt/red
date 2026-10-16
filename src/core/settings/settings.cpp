@@ -939,6 +939,21 @@ void Settings::setVideoDecodeFallbackNotice(bool pending)
     storeBool(keys::kVideoDecodeFallbackNotice, false, pending);
 }
 
+bool Settings::welcomeSeen() const
+{
+    return boolValue(keys::kWelcomeSeen, false);
+}
+
+void Settings::setWelcomeSeen(bool seen)
+{
+    storeBool(keys::kWelcomeSeen, false, seen);
+}
+
+bool Settings::isFirstRun() const
+{
+    return !welcomeSeen() && whatsNewSeenVersion().isEmpty();
+}
+
 QString Settings::whatsNewSeenVersion() const
 {
     return stringValue(keys::kWhatsNewSeenVersion).trimmed();

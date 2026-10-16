@@ -38,8 +38,10 @@ Newest first. One entry per working session.
   `RED_DEBUG_OPEN=downloads|announce` verify it.
 * Owner request: YouTube's colour roles instead of one bright red accent (ADR-017), sampled from
   the live page over CDP; verified in dark and light grabs.
-* Open from the audit: first-run welcome, keyboard and
-  screen-reader access to the rail and panel.
+* Fifth slice: a welcome for new installs instead of release notes (ADR-018), *Show me around*
+  in the More menu, hints that stay up for a reading time. Verified on a fresh profile.
+* Open from the audit: keyboard and screen-reader access to the rail and panel, download card
+  actions (items 10, 14, 15), and items 16, 18, 19.
 
 ## 2026-09-13 — Session 3 (packaging, public repo)
 

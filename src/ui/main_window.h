@@ -93,6 +93,7 @@ private:
     void setDownloadsPanelVisible(bool visible);
     void applyChrome();
     void syncModeActions();
+    void showWelcome();
     void fitMiniPlayer();
     void placeDownloadsPanel();
     void announceDownload(const QString& title, bool alreadyQueued);

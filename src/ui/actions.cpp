@@ -62,6 +62,7 @@ Actions::Actions(QWidget* owner)
     settings = make(owner, tr("Settings…"), {QKeySequence(Qt::CTRL | Qt::Key_Comma)});
     shortcuts = make(owner, tr("Keyboard shortcuts"), {QKeySequence(Qt::Key_F1)});
     menu = make(owner, tr("Menu"), {QKeySequence(Qt::Key_F10)});
+    welcome = make(owner, tr("Show me around"));
     onlineGuide = make(owner, tr("Online guide"));
     openLogFolder = make(owner, tr("Open log folder"));
     about = make(owner, tr("About Red"));

@@ -57,6 +57,8 @@ qt_add_library(red_ui STATIC
     overlay_button.cpp
     overlay_button.h
     tray_controller.h
+    welcome_dialog.cpp
+    welcome_dialog.h
     whats_new_dialog.cpp
     whats_new_dialog.h
 )

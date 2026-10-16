@@ -14,6 +14,7 @@ inline constexpr QLatin1StringView kCloseAction{"window/closeAction"};
 inline constexpr QLatin1StringView kShowRail{"window/showRail"};
 inline constexpr QLatin1StringView kRailLabels{"window/railLabels"};
 inline constexpr QLatin1StringView kWhatsNewSeenVersion{"window/whatsNewSeenVersion"};
+inline constexpr QLatin1StringView kWelcomeSeen{"window/welcomeSeen"};
 inline constexpr QLatin1StringView kFreeDownloadsDay{"licensing/freeDownloadsDay"};
 inline constexpr QLatin1StringView kFreeDownloadsUsed{"licensing/freeDownloadsUsed"};
 inline constexpr QLatin1StringView kLastMode{"window/lastMode"};

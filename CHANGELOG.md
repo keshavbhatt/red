@@ -14,6 +14,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The side rail shows **labels** next to its icons. *Hide labels* at the bottom of the rail (or
   Settings, General) brings back the narrow icons-only rail.
 - F10 opens the rail's menu, also when the rail is hidden.
+- A **welcome** on the first start shows the three modes, downloading, the mini player and
+  blocking; *Show me around* in the rail's menu opens it again.
 - The mini player has a button in its corner (it shows when the mouse moves) and Esc to go back
   to the full window.
 - The mini player works in YouTube Music: a tall window with YouTube Music's own player (art,
@@ -33,6 +35,7 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The rail's Download button says what a click does: *Download this* on a video, playlist or
   channel, *Download from link* elsewhere. The mini player button says why it is unavailable.
 - In a short window the rail scrolls instead of squeezing its buttons together.
+- On-screen hints stay up long enough to read the longer ones.
 - Colours follow YouTube's: red only for small marks such as progress bars and badges, YouTube's
   light (or dark) pill for main buttons and the rail's Download button, and YouTube blue for
   check boxes and selections.

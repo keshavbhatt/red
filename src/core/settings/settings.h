@@ -320,6 +320,12 @@ public:
     [[nodiscard]] bool videoDecodeFallbackNotice() const;
     void setVideoDecodeFallbackNotice(bool pending);
     /// The app version whose release notes were shown ("What's new"); empty = never.
+    /// The welcome sheet was shown (once, on the first start of a new install).
+    [[nodiscard]] bool welcomeSeen() const;
+    void setWelcomeSeen(bool seen);
+    /// Neither the welcome nor any release notes were ever shown: a new install
+    /// (or a Red 9 upgrade, whose settings do not carry over).
+    [[nodiscard]] bool isFirstRun() const;
     [[nodiscard]] QString whatsNewSeenVersion() const;
     void setWhatsNewSeenVersion(const QString& version);
     /// The free tier's download counter (day + count); see services::LicenseService.

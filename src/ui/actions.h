@@ -46,6 +46,7 @@ public:
     QAction* settings = nullptr;
     QAction* menu = nullptr; ///< F10: the rail's More menu, also with the rail hidden
     QAction* shortcuts = nullptr;
+    QAction* welcome = nullptr; ///< "Show me around": the first-run welcome again
     QAction* onlineGuide = nullptr;
     QAction* openLogFolder = nullptr;
     QAction* about = nullptr;

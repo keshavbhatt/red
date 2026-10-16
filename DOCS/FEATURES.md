@@ -22,7 +22,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | S6 | Native notifications (download finished with thumbnail + actions) | none | KEEP | done — `platform::FreedesktopNotifier` |
 | S7 | Crash handler + log file + diagnostics copy | none | KEEP | from whatsie |
 | S8 | GPU auto-fallback, Wayland→XCB retry | none | KEEP | from whatsie (ADR-032 lineage) |
-| S12 | "What's new" once per version on first start, notes from the bundled CHANGELOG.md | intro slides | KEEP | done — `core::changelogSection`, `ui::WhatsNewDialog`, `RED_DEBUG_OPEN=whatsnew` |
+| S12 | "What's new" once per version on first start, notes from the bundled CHANGELOG.md | intro slides | KEEP | done, `core::changelogSection`, `ui::WhatsNewDialog`, `RED_DEBUG_OPEN=whatsnew`; a new install gets `ui::WelcomeDialog` instead (ADR-018) |
 | S13 | Playback position as a progress bar behind the taskbar entry (Unity LauncherEntry signal, Plasma draws it), off by default | none | KEEP | done, `platform::TaskbarProgress`, Settings > Playback |
 | S9 | App lock, licensing, RateApp, intro slides, history tab | yes | DROP | Red stays closed source, but these were never worth their upkeep; YouTube keeps history |
 | S10 | `red <youtube-url>` / `red --tv` / `red --download <url>` CLI | Open URL dialog | KEEP | done — `app::CliOptions` |

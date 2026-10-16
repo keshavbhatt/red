@@ -41,7 +41,8 @@ void FullScreenHint::showHint(const QString& text)
     reposition();
     show();
     raise();
-    m_timer->start();
+    // Long enough to read: the TV and download hints are several phrases.
+    m_timer->start(std::clamp(2000 + 60 * static_cast<int>(text.size()), 3500, 8000));
 }
 
 void FullScreenHint::hideHint()

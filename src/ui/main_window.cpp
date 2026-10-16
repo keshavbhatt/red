@@ -30,6 +30,7 @@
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "ui/welcome_dialog.h"
 #include "ui/whats_new_dialog.h"
 #include "web/bridge.h"
 #include "web/cookie_exporter.h"
@@ -160,6 +161,7 @@ void MainWindow::setupUi()
     overflow->addAction(m_actions->zoomReset);
     overflow->addSeparator();
     overflow->addAction(m_actions->shortcuts);
+    overflow->addAction(m_actions->welcome);
     overflow->addAction(m_actions->onlineGuide);
     overflow->addAction(m_actions->openLogFolder);
     overflow->addAction(m_actions->account);
@@ -271,6 +273,7 @@ void MainWindow::connectActions()
         }
     });
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
+    connect(a.welcome, &QAction::triggered, this, &MainWindow::showWelcome);
     connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
     connect(a.openLogFolder, &QAction::triggered, this,
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
@@ -823,6 +826,8 @@ void MainWindow::debugOpen(const QString& what)
     } else if (what == u"plans"_s) {
         showAccount();
         m_accountDialog->showPlans();
+    } else if (what == u"welcome"_s) {
+        showWelcome();
     } else if (what == u"whatsnew"_s) {
         maybeShowWhatsNew(true);
     } else if (what == u"link"_s) {
@@ -966,10 +971,26 @@ void MainWindow::maybeShowGpuFallbackNotice()
                           "Settings → Advanced."));
 }
 
+void MainWindow::showWelcome()
+{
+    // Marked when shown, like What's new: a crash must not loop it.
+    m_settings.setWelcomeSeen(true);
+    auto* dialog = new WelcomeDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &WelcomeDialog::shortcutsRequested, this, &MainWindow::showShortcuts);
+    dialog->show();
+}
+
 void MainWindow::maybeShowWhatsNew(bool force)
 {
     if (!force &&
         (m_settings.whatsNewSeenVersion() == m_appVersion || QApplication::activeModalWidget() != nullptr)) {
+        return;
+    }
+    // A new install gets the welcome instead: release notes mean nothing yet.
+    if (!force && m_settings.isFirstRun()) {
+        m_settings.setWhatsNewSeenVersion(m_appVersion);
+        showWelcome();
         return;
     }
     const QString notes = WhatsNewDialog::bundledNotes(m_appVersion);

@@ -182,7 +182,10 @@ Quit (menu, tray, Ctrl+Q) still does.
 
 ## 7. Empty / error / first-run states
 
-* First launch: no wizard. The engine is set up lazily on the first download with a
+* First launch: no wizard, one welcome sheet (`ui::WelcomeDialog`, ADR-018): four rows (the
+  modes, downloading, the mini player, blocking) with their shortcuts, *Keyboard shortcuts* and
+  *Get started*; *Show me around* in the More menu reopens it. The engine is set up lazily on the
+  first download with a
   progress sheet ("Setting up the download engine — yt-dlp · JavaScript runtime · ffmpeg").
 * Load failure: branded error page (bg, mark, title, reason, Try again).
 * GPU fallback notice: one-time non-modal banner in the downloads panel header area.

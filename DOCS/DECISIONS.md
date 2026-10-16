@@ -388,3 +388,21 @@ deeper `#CC0000` red everywhere, or `#FF0033` in place of `#FF0000`).
 **Consequences.** Red's chrome reads like YouTube's: mostly neutral, with red where YouTube puts
 it. The brand still shows in the logo, the mode switch and every progress bar.
 
+## ADR-018: a welcome for new installs (2026-10-16)
+
+**Context.** A new user's first screen was the release notes of the running version (ADR-012):
+nothing told them about the rail, the three modes, downloading or the mini player. UX audit
+item 8.
+
+**Decision.** `Settings::isFirstRun()` is true when neither the welcome (`window/welcomeSeen`)
+nor any release notes (`window/whatsNewSeenVersion`) were ever shown: a new install, or a Red 9
+upgrade (its settings do not carry over, ADR-012). Then the startup slot of What's new shows
+`ui::WelcomeDialog` instead and marks this version's notes seen; Red 10 upgraders keep getting
+What's new. The welcome is four rows (modes, downloads, mini player, blocking) naming the
+shortcuts, with *Keyboard shortcuts* and *Get started*; `Actions::welcome` (*Show me around*, More
+menu) reopens it. Marked seen when shown. `RED_DEBUG_OPEN=welcome`. The transient hint
+(`web::FullScreenHint`) now stays for a reading time (2 s + 60 ms per character, 3.5 to 8 s).
+
+**Consequences.** Red 9 upgraders see the welcome rather than the 10.x notes, which suits them:
+Red 10 is a new app to them. `resetToDefaults()` shows the welcome again once.
+
