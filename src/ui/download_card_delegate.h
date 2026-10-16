@@ -2,6 +2,7 @@
 
 #include "core/downloads/download_job.h"
 
+#include <QHash>
 #include <QStyledItemDelegate>
 
 namespace red::core {
@@ -69,6 +70,20 @@ private:
     /// A failed card's reason, wrapped under the card's usual row (empty otherwise).
     [[nodiscard]] static QString errorText(const QModelIndex& index);
     [[nodiscard]] int errorHeight(const QFont& font, const QString& error, int width) const;
+    /// The bar's drawn fraction: glides between the engine's reports (one per
+    /// chunk read, often a second apart) instead of jumping (see the .cpp).
+    [[nodiscard]] double shownProgress(quint64 id, double actual) const;
+
+    struct Glide
+    {
+        double actual = -1;    ///< the last reported fraction
+        qint64 reportedAt = 0; ///< ms, when it arrived
+        double rate = 0;       ///< fraction per ms, smoothed over reports
+        double step = 0;       ///< the last report's increase: how far ahead the bar may run
+        double shown = 0;      ///< what was drawn last
+        qint64 shownAt = 0;
+    };
+    mutable QHash<quint64, Glide> m_glides;
 
     ThumbnailCache& m_thumbnails;
     core::ThemeService& m_theme;

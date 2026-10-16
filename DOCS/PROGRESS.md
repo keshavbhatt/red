@@ -46,6 +46,10 @@ Newest first. One entry per working session.
 * Seventh slice: keyboard access (item 14): F6 / Shift+F6 between page, rail and panel, Tab
   focus on rail and panel buttons without taking focus on click, arrows / Enter / Esc on the rail,
   dashed focus rings. `RED_DEBUG_OPEN=focus|focus-panel`.
+* Owner report: download progress jumped. The engine reports once per chunk read (chunks grow
+  to 1 MB, about one report a second at 800 kB/s); the card now glides between reports at the
+  measured rate (at most one step ahead, never backwards) and repaints at ~30 fps only while a
+  transfer runs. Measured with a throttled download in a test profile.
 * Open from the audit: items 16, 18, 19 (minor).
 
 ## 2026-09-13 — Session 3 (packaging, public repo)

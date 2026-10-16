@@ -81,13 +81,20 @@ DownloadsPanel::DownloadsPanel(core::DownloadQueue& queue, core::Settings& setti
     });
     // Indeterminate bars and speed lines need a repaint while anything runs.
     auto* ticker = new QTimer(this);
-    ticker->setInterval(120);
-    connect(ticker, &QTimer::timeout, this, [this] {
-        if (m_queue.runningCount() > 0 && isVisible()) {
+    ticker->setInterval(33); // ~30 fps: the bars glide between the engine's reports
+    connect(ticker, &QTimer::timeout, this, [this, ticker] {
+        if (m_queue.runningCount() == 0) {
+            ticker->stop(); // idle: no wake-ups
+        } else if (isVisible()) {
             m_list->viewport()->update();
         }
     });
-    ticker->start();
+    // Runs only while something transfers: a job changing state starts it.
+    connect(&m_queue, &QAbstractItemModel::dataChanged, ticker, [this, ticker] {
+        if (m_queue.runningCount() > 0 && !ticker->isActive()) {
+            ticker->start();
+        }
+    });
 }
 
 void DownloadsPanel::setupUi()

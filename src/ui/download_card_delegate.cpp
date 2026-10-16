@@ -7,6 +7,7 @@
 #include "ui/thumbnail_cache.h"
 
 #include <QAbstractItemView>
+#include <QDateTime>
 #include <QHelpEvent>
 #include <QMouseEvent>
 #include <QPainter>
@@ -90,6 +91,42 @@ int DownloadCardDelegate::errorHeight(const QFont& font, const QString& error, i
     const QFontMetrics fm(smallFont(font));
     const int wrapped = fm.boundingRect(QRect(0, 0, width, 10000), Qt::TextWordWrap, error).height();
     return std::min(wrapped, fm.lineSpacing() * kErrorLines);
+}
+
+/// The engine reports progress once per chunk it reads, and the chunks grow
+/// to 1 MB: on a slow line the bar would sit for a second and jump. Between
+/// reports the bar runs on at the measured rate, at most one report's step
+/// ahead (it waits rather than move back if the next one is short), eases onto each report,
+/// and never moves back except when a new item (playlist) restarts it.
+double DownloadCardDelegate::shownProgress(quint64 id, double actual) const
+{
+    if (actual < 0) {
+        m_glides.remove(id);
+        return actual; // indeterminate
+    }
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    Glide& g = m_glides[id];
+    if (g.actual < 0 || actual < g.actual - 0.001) {
+        g = Glide{actual, now, 0, 0, actual, now};
+        return actual;
+    }
+    if (actual > g.actual + 1e-6) {
+        const auto dt = static_cast<double>(now - g.reportedAt);
+        const double step = actual - g.actual;
+        if (dt > 0) {
+            const double rate = step / dt;
+            g.rate = g.rate > 0 ? 0.6 * g.rate + 0.4 * rate : rate;
+        }
+        g.step = step;
+        g.actual = actual;
+        g.reportedAt = now;
+    }
+    const double lead = std::min(g.rate * static_cast<double>(now - g.reportedAt), g.step);
+    const double target = std::min(1.0, g.actual + std::max(0.0, lead));
+    const double blend = std::min(1.0, static_cast<double>(now - g.shownAt) / 150.0);
+    g.shown = std::max(g.shown, g.shown + (target - g.shown) * blend);
+    g.shownAt = now;
+    return g.shown;
 }
 
 QSize DownloadCardDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -235,7 +272,13 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     }
 
     // Progress bar under the title while active/paused.
-    const double progress = index.data(core::DownloadQueue::ProgressRole).toDouble();
+    const double reported = index.data(core::DownloadQueue::ProgressRole).toDouble();
+    const quint64 jobId = index.data(core::DownloadQueue::IdRole).toULongLong();
+    const double progress =
+        state == core::DownloadState::Downloading ? shownProgress(jobId, reported) : reported;
+    if (state != core::DownloadState::Downloading) {
+        m_glides.remove(jobId);
+    }
     if (state == core::DownloadState::Downloading || state == core::DownloadState::Paused ||
         state == core::DownloadState::Processing || state == core::DownloadState::Probing) {
         const QRect track(textLeft, statusRect.top() - 8, textRight - textLeft, 4);

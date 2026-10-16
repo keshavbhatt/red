@@ -48,6 +48,7 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 - Closing the mini player's window returns to the full window instead of quitting Red.
+- Download progress bars move smoothly instead of jumping every second or so.
 
 ## [10.2.0] - 2026-09-15
 
