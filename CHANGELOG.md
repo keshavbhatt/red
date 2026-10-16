@@ -33,6 +33,9 @@ versions follow [Semantic Versioning](https://semver.org/).
   Menu key) and are read out by screen readers. A failed download shows its whole reason.
 - Settings confirms Clear cache, Copy diagnostics, Reset site permissions and Reset all settings
   right under the buttons.
+- **Middle-click scrolling**: Settings, General, *Scroll with the middle mouse button*. Middle-click
+  the page and move the mouse to scroll; click again to stop. Off by default, since middle-click
+  pastes on Linux; takes effect after a restart.
 
 ### Changed
 - Red opens in YouTube unless set otherwise, instead of in whichever mode was open when it
@@ -47,6 +50,10 @@ versions follow [Semantic Versioning](https://semver.org/).
   buttons, and YouTube blue for check boxes and selections.
 
 ### Fixed
+- In YouTube Music, Next and Previous could show as unavailable, so the desktop's media controls,
+  the tray and Bluetooth headsets could not skip tracks.
+- Choices in Settings, General (the start page, the tray icon, download notifications) were
+  forgotten after a restart. Earlier choices are picked up again.
 - Closing the mini player's window returns to the full window instead of quitting Red.
 - Download progress bars move smoothly instead of jumping every second or so.
 - With *Advanced* picked and no stream chosen yet, the download dialog previewed an audio file

@@ -193,6 +193,11 @@ public:
     void setStartMode(StartMode mode);
     /// The mode a launch opens in: startMode() with LastUsed resolved.
     [[nodiscard]] AppMode startupMode() const;
+    /// Middle-click on the page starts scrolling (public issue #17), a
+    /// Chromium switch read at start. Off by default: on Linux middle-click
+    /// pastes.
+    [[nodiscard]] bool middleClickScroll() const;
+    void setMiddleClickScroll(bool enabled);
     [[nodiscard]] StartPage startPage() const;
     void setStartPage(StartPage page);
     [[nodiscard]] bool notifyOnDownloadFinish() const;
@@ -346,6 +351,7 @@ Q_SIGNALS:
     void railLabelsChanged(bool show);
     void startModeChanged(red::core::StartMode mode);
     void startPageChanged(red::core::StartPage page);
+    void middleClickScrollChanged(bool enabled);
     void notifyOnDownloadFinishChanged(bool enabled);
     void trayEnabledChanged(bool enabled);
     void themeChanged(red::core::Theme theme);
@@ -374,6 +380,7 @@ Q_SIGNALS:
 
 private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;
+    void migrateGeneralGroup();
     bool storeBool(QLatin1StringView key, bool def, bool value);
     [[nodiscard]] int intValue(QLatin1StringView key, int def) const;
     bool storeInt(QLatin1StringView key, int def, int value);

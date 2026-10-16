@@ -265,6 +265,13 @@ QWidget* SettingsDialog::buildGeneral()
     v->addWidget(mutedLabel(tr("Without the rail, F10 opens its menu and every other button has a keyboard "
                                "shortcut (F1 lists them)."),
                             integration));
+    m_middleScroll = new QCheckBox(tr("Scroll with the middle mouse button"), integration);
+    connect(m_middleScroll, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setMiddleClickScroll(on); });
+    v->addWidget(m_middleScroll);
+    v->addWidget(mutedLabel(tr("Middle-click the page, then move the mouse up or down; click again to stop. "
+                               "Takes effect after a restart."),
+                            integration));
     m_notify = new QCheckBox(tr("Notify me when a download finishes"), integration);
     connect(m_notify, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setNotifyOnDownloadFinish(on); });
@@ -758,6 +765,7 @@ void SettingsDialog::loadValues()
     m_railLabels->setChecked(m_settings.railLabels());
     m_railLabels->setEnabled(m_settings.showRail());
     m_notify->setChecked(m_settings.notifyOnDownloadFinish());
+    m_middleScroll->setChecked(m_settings.middleClickScroll());
     m_theme_->setCurrentIndex(m_theme_->findData(static_cast<int>(m_settings.theme())));
     m_zoom->setValue(m_settings.zoomFactor() * 100);
     m_scale->setValue(m_settings.interfaceScale() * 100);

@@ -158,8 +158,9 @@ void Application::applyChromiumFlags()
     // Must happen before the first QWebEngineProfile is created.
     evaluateGpuStability();
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
-    QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled(),
-                                           m_settings->hardwareVideoDecode());
+    QStringList ours =
+        core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled(),
+                            m_settings->hardwareVideoDecode(), m_settings->middleClickScroll());
     // In a snap we pass --no-sandbox here (isolation comes from snap
     // confinement, W-ADR-008) and merge the user's value so the expert escape
     // hatch keeps working inside the snap.

@@ -102,6 +102,7 @@ private:
     QCheckBox* m_trayEnabled = nullptr;
     QCheckBox* m_showRail = nullptr;
     QCheckBox* m_railLabels = nullptr;
+    QCheckBox* m_middleScroll = nullptr;
     QCheckBox* m_notify = nullptr;
     // appearance
     QComboBox* m_theme_ = nullptr;

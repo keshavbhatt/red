@@ -50,6 +50,10 @@ Newest first. One entry per working session.
   to 1 MB, about one report a second at 800 kB/s); the card now glides between reports at the
   measured rate (at most one step ahead, never backwards) and repaints at ~30 fps only while a
   transfer runs. Measured with a throttled download in a test profile.
+* Public issues for 10.3.0: #15 (YouTube Music next / previous reported unavailable without
+  ytmusic-player-bar, so media controls and headsets could not skip; verified over MPRIS) and #17
+  (middle-click scrolling, Chromium's Blink feature behind a General setting). Found on the way:
+  Settings, General never survived a restart (ADR-019).
 * Open from the audit: items 16, 18, 19 (minor).
 
 ## 2026-09-13 — Session 3 (packaging, public repo)

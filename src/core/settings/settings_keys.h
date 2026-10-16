@@ -22,11 +22,14 @@ inline constexpr QLatin1StringView kLastUrl{"window/lastUrl"};
 inline constexpr QLatin1StringView kLastMusicUrl{"window/lastMusicUrl"};
 inline constexpr QLatin1StringView kDownloadsPanelOpen{"window/downloadsPanelOpen"};
 
-// general/
-inline constexpr QLatin1StringView kStartMode{"general/startMode"};
-inline constexpr QLatin1StringView kStartPage{"general/startPage"};
-inline constexpr QLatin1StringView kNotifyOnDownloadFinish{"general/notifyOnDownloadFinish"};
-inline constexpr QLatin1StringView kTrayEnabled{"general/trayEnabled"};
+// app/ (Settings, General). Not "general/": QSettings' INI format writes that
+// group as [%General] and reads it back as "General/", so up to 10.2 these
+// were saved but never read after a restart; Settings migrates them.
+inline constexpr QLatin1StringView kStartMode{"app/startMode"};
+inline constexpr QLatin1StringView kStartPage{"app/startPage"};
+inline constexpr QLatin1StringView kMiddleClickScroll{"app/middleClickScroll"};
+inline constexpr QLatin1StringView kNotifyOnDownloadFinish{"app/notifyOnDownloadFinish"};
+inline constexpr QLatin1StringView kTrayEnabled{"app/trayEnabled"};
 
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};

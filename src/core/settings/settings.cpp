@@ -23,6 +23,7 @@ constexpr bool kDefaultRailLabels = true; ///< new users see what each button is
 constexpr AppMode kDefaultMode = AppMode::Desktop;
 constexpr bool kDefaultDownloadsPanelOpen = false;
 constexpr StartMode kDefaultStartMode = StartMode::Desktop;
+constexpr bool kDefaultMiddleClickScroll = false;
 constexpr StartPage kDefaultStartPage = StartPage::Home;
 constexpr bool kDefaultNotifyOnDownloadFinish = true;
 constexpr bool kDefaultTrayEnabled = true;
@@ -94,6 +95,7 @@ Settings::Settings(QObject* parent)
     , m_store(std::make_unique<QSettings>())
 {
     qCDebug(lcSettings) << "settings store:" << m_store->fileName();
+    migrateGeneralGroup();
 }
 
 Settings::Settings(const QString& iniFilePath, QObject* parent)
@@ -101,6 +103,27 @@ Settings::Settings(const QString& iniFilePath, QObject* parent)
     , m_store(std::make_unique<QSettings>(iniFilePath, QSettings::IniFormat))
 {
     qCDebug(lcSettings) << "settings store (ini):" << m_store->fileName();
+    migrateGeneralGroup();
+}
+
+/// Up to 10.2 Settings, General lived under "general/", which QSettings'
+/// INI format writes as [%General] and reads back as "General/": the values
+/// were on disk but never found. Move them to "app/" once, keeping the user's
+/// choices (a value already under "app/" wins).
+void Settings::migrateGeneralGroup()
+{
+    for (const QLatin1StringView key : {keys::kStartMode, keys::kStartPage, keys::kMiddleClickScroll,
+                                        keys::kNotifyOnDownloadFinish, keys::kTrayEnabled}) {
+        const QString name = QString(key).section(u'/', 1);
+        for (const QString& old : QStringList{u"General/"_s + name, u"general/"_s + name}) {
+            if (m_store->contains(old)) {
+                if (!m_store->contains(key)) {
+                    m_store->setValue(key, m_store->value(old));
+                }
+                m_store->remove(old);
+            }
+        }
+    }
 }
 
 Settings::~Settings()
@@ -295,6 +318,18 @@ AppMode Settings::startupMode() const
         break;
     }
     return AppMode::Desktop;
+}
+
+bool Settings::middleClickScroll() const
+{
+    return boolValue(keys::kMiddleClickScroll, kDefaultMiddleClickScroll);
+}
+
+void Settings::setMiddleClickScroll(bool enabled)
+{
+    if (storeBool(keys::kMiddleClickScroll, kDefaultMiddleClickScroll, enabled)) {
+        Q_EMIT middleClickScrollChanged(enabled);
+    }
 }
 
 StartPage Settings::startPage() const
@@ -1022,6 +1057,7 @@ void Settings::resetToDefaults()
     Q_EMIT railLabelsChanged(railLabels());
     Q_EMIT startModeChanged(startMode());
     Q_EMIT startPageChanged(startPage());
+    Q_EMIT middleClickScrollChanged(middleClickScroll());
     Q_EMIT notifyOnDownloadFinishChanged(notifyOnDownloadFinish());
     Q_EMIT trayEnabledChanged(trayEnabled());
     Q_EMIT themeChanged(theme());

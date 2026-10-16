@@ -21,7 +21,8 @@ bool useSoftwareGpu(HardwareAcceleration acceleration, bool autoDisabled)
     return autoDisabled;
 }
 
-QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, bool hardwareVideoDecode)
+QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, bool hardwareVideoDecode,
+                          bool middleClickScroll)
 {
     QStringList flags{
         u"--disable-translate"_s,
@@ -54,6 +55,11 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
     if (!features.isEmpty()) {
         flags << u"--enable-features="_s + features.join(u',');
     }
+    if (middleClickScroll) {
+        // Blink's own autoscroll: the marker, the speed and the stop rules
+        // are Chromium's. Verified in Qt WebEngine 6.11 (2026-10-17).
+        flags << u"--enable-blink-features=MiddleClickAutoscroll"_s;
+    }
     if (useSoftwareGpu(acceleration, gpuAutoDisabled)) {
         // Whole GPU process off: the stable choice for broken drivers. Video
         // then composites in software, which is fine up to 1080p on any
@@ -67,11 +73,13 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
 
 namespace {
 
-// Chromium keeps only the last --enable-features/--disable-features switch,
-// so their comma lists must be merged instead of appended.
+// Chromium keeps only the last --enable-features/--disable-features switch
+// (the Blink feature switches too), so their comma lists must be merged
+// instead of appended.
 bool isFeatureList(const QString& flag, QString* key, QStringList* values)
 {
-    for (const auto& prefix : {u"--enable-features="_s, u"--disable-features="_s}) {
+    for (const auto& prefix : {u"--enable-features="_s, u"--disable-features="_s,
+                               u"--enable-blink-features="_s, u"--disable-blink-features="_s}) {
         if (flag.startsWith(prefix)) {
             *key = prefix;
             *values = flag.mid(prefix.size()).split(u',', Qt::SkipEmptyParts);

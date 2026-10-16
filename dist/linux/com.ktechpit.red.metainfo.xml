@@ -148,6 +148,8 @@
           <li>The Downloads panel opens over the page in narrow windows, and a message confirms each new download</li>
           <li>Full keyboard access: F6 moves between the page, the rail and the Downloads panel; F10 opens the menu</li>
           <li>Colours that follow YouTube's: red only for small marks, YouTube's pill buttons and blue controls</li>
+          <li>Optional middle-click scrolling</li>
+          <li>Fixed: skipping tracks from the desktop's media controls and Bluetooth headsets in YouTube Music, and Settings, General choices being forgotten after a restart</li>
         </ul>
       </description>
     </release>

@@ -95,6 +95,14 @@ private Q_SLOTS:
         QVERIFY(!autoFlags.contains(u"--ignore-gpu-blocklist"_s));
         QVERIFY(autoFlags.contains(u"--disable-extensions"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--ignore-gpu-blocklist"_s));
+        QVERIFY(!chromiumFlags(HardwareAcceleration::Auto).join(u' ').contains(u"MiddleClickAutoscroll"_s));
+        QVERIFY(chromiumFlags(HardwareAcceleration::Auto, false, false, true)
+                    .contains(u"--enable-blink-features=MiddleClickAutoscroll"_s));
+        // A user's own Blink switch is merged, not overridden (Chromium keeps the last one).
+        const QString merged = mergeChromiumFlags(u"--enable-blink-features=Foo"_s,
+                                                  {u"--enable-blink-features=MiddleClickAutoscroll"_s});
+        QCOMPARE(merged.count(u"--enable-blink-features="_s), 1);
+        QVERIFY(merged.contains(u"Foo"_s) && merged.contains(u"MiddleClickAutoscroll"_s));
         // GPU-off fully disables the GPU process (ADR-032) — the only thing that
         // avoids the Wayland screen-capture EGL_BAD_DISPLAY hang.
         const QStringList off = chromiumFlags(HardwareAcceleration::Off);

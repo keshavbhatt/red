@@ -16,8 +16,10 @@ enum class HardwareAcceleration;
 /// value of that variable is kept and ours are merged in.
 ///  * hardwareVideoDecode — FEATURES D5: opt-in VA-API decode (Linux); off
 ///    keeps Chromium's CPU decode, which is the stable default on Linux.
+///  * middleClickScroll: middle-click autoscroll (public issue #17), which
+///    Chromium keeps off on Linux (middle-click pastes there).
 [[nodiscard]] QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled = false,
-                                        bool hardwareVideoDecode = false);
+                                        bool hardwareVideoDecode = false, bool middleClickScroll = false);
 
 /// Merges `userFlags` (existing env var content) with ours, deduplicated.
 [[nodiscard]] QString mergeChromiumFlags(const QString& userFlags, const QStringList& ours);

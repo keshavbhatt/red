@@ -406,3 +406,19 @@ menu) reopens it. Marked seen when shown. `RED_DEBUG_OPEN=welcome`. The transien
 **Consequences.** Red 9 upgraders see the welcome rather than the 10.x notes, which suits them:
 Red 10 is a new app to them. `resetToDefaults()` shows the welcome again once.
 
+## ADR-019: Settings, General under app/, not general/ (2026-10-17)
+
+**Context.** While adding middle-click scrolling (public issue #17) the setting did not reach the
+page after a restart. QSettings' INI format writes a group named `general` as `[%General]` and
+reads that section back as `General/`, so every `general/` key (start page, start mode,
+notifications, tray icon) was written but never found again: the choices reset on each start
+since 10.0. The existing round-trip test passed because QSettings caches a file per process.
+
+**Decision.** The keys move to `app/`. `Settings` migrates `General/` and `general/` values to
+`app/` once at construction (an `app/` value wins). `tst_settings` now reads hand-written files
+and checks the written text, so the in-process cache cannot hide a mismatch again.
+
+**Consequences.** Users get their old General choices back with 10.3.0. Middle-click scrolling
+is Chromium's own `MiddleClickAutoscroll` Blink feature, passed at start (restart to change);
+`mergeChromiumFlags` now merges Blink feature lists with a user's own.
+

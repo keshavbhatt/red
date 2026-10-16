@@ -1,5 +1,6 @@
 #include "core/settings/settings.h"
 
+#include <QFile>
 #include <QSettings>
 #include <QSignalSpy>
 #include <QTemporaryDir>
@@ -54,7 +55,8 @@ private Q_SLOTS:
         QVERIFY(m_settings->tvFullscreen());
         QVERIFY(m_settings->tvGamepad());
         QCOMPARE(m_settings->lastMode(), AppMode::Desktop);
-        QVERIFY(m_settings->railLabels()); // new users see what each rail button is
+        QVERIFY(m_settings->railLabels());         // new users see what each rail button is
+        QVERIFY(!m_settings->middleClickScroll()); // Linux pastes with the middle button
         QSignalSpy labels(m_settings.get(), &Settings::railLabelsChanged);
         m_settings->setRailLabels(false);
         m_settings->setRailLabels(false);
@@ -142,6 +144,55 @@ private Q_SLOTS:
         m_settings->setWelcomeSeen(false);
         m_settings->setWhatsNewSeenVersion(u"10.2.0"_s); // an upgrade from a Red 10 with release notes
         QVERIFY(!m_settings->isFirstRun());
+    }
+
+    void generalGroupSurvivesARestart()
+    {
+        // QSettings' INI format reads a "[general]" section as its special
+        // "[General]" (keys without a group): the general/ keys must still
+        // come back after a restart.
+        m_settings->setStartMode(StartMode::Music);
+        m_settings->setStartPage(StartPage::Subscriptions);
+        m_settings->setMiddleClickScroll(true);
+        m_settings->setNotifyOnDownloadFinish(false);
+        m_settings->sync();
+        Settings again(m_dir->filePath(u"red.ini"_s));
+        QCOMPARE(again.startMode(), StartMode::Music);
+        QCOMPARE(again.startPage(), StartPage::Subscriptions);
+        QVERIFY(again.middleClickScroll());
+        QVERIFY(!again.notifyOnDownloadFinish());
+    }
+
+    void generalGroupReadFromDisk()
+    {
+        // What 10.2 and earlier left on disk for Settings, General: migrated,
+        // so the user's choices come back (a fresh file, no in-process cache).
+        const QString path = m_dir->filePath(u"written-earlier.ini"_s);
+        {
+            QFile f(path);
+            QVERIFY(f.open(QIODevice::WriteOnly));
+            f.write("[%General]\nmiddleClickScroll=true\nstartPage=1\n");
+        }
+        Settings fresh(path);
+        QCOMPARE(fresh.startPage(), StartPage::Subscriptions);
+        QVERIFY(fresh.middleClickScroll());
+    }
+
+    void appGroupReadFromDisk()
+    {
+        // The app/ keys written to disk come back in a fresh store.
+        const QString path = m_dir->filePath(u"written-now.ini"_s);
+        {
+            Settings writer(path);
+            writer.setStartMode(StartMode::Tv);
+            writer.setTrayEnabled(false);
+            writer.sync();
+        }
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::ReadOnly));
+        const QByteArray text = f.readAll();
+        QVERIFY(text.contains("[app]"));
+        QVERIFY(!text.contains("General"));
     }
 
     void startModeMigratesStartInTv()
