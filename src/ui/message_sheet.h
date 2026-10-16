@@ -12,7 +12,7 @@ class QVBoxLayout;
 
 namespace red::ui {
 
-/// Red's replacement for QMessageBox / QInputDialog: accent badge, title,
+/// Red's replacement for QMessageBox / QInputDialog: brand badge, title,
 /// body, optional muted note and text field, pill buttons. Works modally
 /// (`run()`) and asynchronously (`open()` + `finished` → `clickedIndex()`).
 class MessageSheet : public QDialog
@@ -23,16 +23,16 @@ class MessageSheet : public QDialog
 public:
     enum class Tone
     {
-        Info,     ///< brand accent badge
-        Question, ///< brand accent badge
+        Info,     ///< brand badge
+        Question, ///< brand badge
         Warning,  ///< amber badge
         Danger,   ///< red badge, destructive primary
     };
     enum class Role
     {
         Normal,
-        Primary,     ///< accent pill, default button
-        Destructive, ///< accent pill for an action that removes something
+        Primary,     ///< primary pill, default button
+        Destructive, ///< primary pill for an action that removes something
     };
 
     MessageSheet(QWidget* parent, Tone tone, const QString& title, const QString& body);

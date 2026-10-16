@@ -42,8 +42,8 @@ AccountDialog::AccountDialog(services::LicenseService& license, const core::Them
     auto* icon = new QLabel(this);
     icon->setFixedSize(44, 44);
     icon->setAlignment(Qt::AlignCenter);
-    icon->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.accent.name()));
-    icon->setPixmap(icons::pixmap(u"account"_s, t.accentText, 24, devicePixelRatioF()));
+    icon->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.brand.name()));
+    icon->setPixmap(icons::pixmap(u"account"_s, t.brandText, 24, devicePixelRatioF()));
     top->addWidget(icon, 0, Qt::AlignTop);
     auto* text = new QVBoxLayout;
     text->setSpacing(4);

@@ -33,6 +33,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 - The rail's Download button says what a click does: *Download this* on a video, playlist or
   channel, *Download from link* elsewhere. The mini player button says why it is unavailable.
 - In a short window the rail scrolls instead of squeezing its buttons together.
+- Colours follow YouTube's: red only for small marks such as progress bars and badges, YouTube's
+  light (or dark) pill for main buttons and the rail's Download button, and YouTube blue for
+  check boxes and selections.
 
 ### Fixed
 - Closing the mini player's window returns to the full window instead of quitting Red.

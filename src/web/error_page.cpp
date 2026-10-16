@@ -10,9 +10,12 @@ QString errorPageHtml(bool dark, const QString& title, const QString& detail)
     const QString bg = dark ? u"#0f0f0f"_s : u"#ffffff"_s;
     const QString fg = dark ? u"#f1f1f1"_s : u"#0f0f0f"_s;
     const QString muted = dark ? u"#aaaaaa"_s : u"#606060"_s;
-    const QString accent = u"#ff0000"_s;
-    const QString accentHover = dark ? u"#ff3d3d"_s : u"#e60000"_s;
-    const QString ring = dark ? u"rgba(255,0,0,0.16)"_s : u"rgba(255,0,0,0.12)"_s;
+    // YouTube's roles (ADR-017): red for the mark, the inverted pill for the button.
+    const QString brand = u"#ff0033"_s;
+    const QString ring = dark ? u"rgba(255,0,51,0.16)"_s : u"rgba(255,0,51,0.12)"_s;
+    const QString primary = dark ? u"#f1f1f1"_s : u"#0f0f0f"_s;
+    const QString primaryHover = dark ? u"#d9d9d9"_s : u"#272727"_s;
+    const QString primaryText = dark ? u"#0f0f0f"_s : u"#ffffff"_s;
 
     QString html = uR"HTML(<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -26,16 +29,16 @@ QString errorPageHtml(bool dark, const QString& title, const QString& detail)
     -webkit-user-select:none;user-select:none}
   .wrap{max-width:420px;padding:32px 24px}
   .mark{width:96px;height:96px;border-radius:24px;margin:0 auto 26px;
-    background:{{ACCENT}};box-shadow:0 0 0 12px {{RING}};
+    background:{{BRAND}};box-shadow:0 0 0 12px {{RING}};
     display:flex;align-items:center;justify-content:center}
   .mark svg{width:52px;height:52px;fill:none;stroke:#fff;stroke-width:6;
     stroke-linecap:round;stroke-linejoin:round}
   h1{font-size:22px;font-weight:600;margin:0 0 10px}
   p{font-size:15px;line-height:1.5;color:{{MUTED}};margin:0 0 26px}
   button{appearance:none;border:0;cursor:pointer;
-    background:{{ACCENT}};color:#fff;font-size:15px;font-weight:600;
+    background:{{PRIMARY}};color:{{PRIMARYTEXT}};font-size:15px;font-weight:600;
     padding:12px 30px;border-radius:24px;transition:background .15s ease}
-  button:hover{background:{{ACCENTHOVER}}}
+  button:hover{background:{{PRIMARYHOVER}}}
   button:active{transform:translateY(1px)}
 </style></head>
 <body>
@@ -55,8 +58,10 @@ QString errorPageHtml(bool dark, const QString& title, const QString& detail)
     html.replace(u"{{BG}}"_s, bg);
     html.replace(u"{{FG}}"_s, fg);
     html.replace(u"{{MUTED}}"_s, muted);
-    html.replace(u"{{ACCENT}}"_s, accent);
-    html.replace(u"{{ACCENTHOVER}}"_s, accentHover);
+    html.replace(u"{{BRAND}}"_s, brand);
+    html.replace(u"{{PRIMARY}}"_s, primary);
+    html.replace(u"{{PRIMARYHOVER}}"_s, primaryHover);
+    html.replace(u"{{PRIMARYTEXT}}"_s, primaryText);
     html.replace(u"{{RING}}"_s, ring);
     html.replace(u"{{TITLE}}"_s, title.toHtmlEscaped());
     html.replace(u"{{DETAIL}}"_s, detail.toHtmlEscaped());

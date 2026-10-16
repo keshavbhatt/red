@@ -36,6 +36,8 @@ Newest first. One entry per working session.
   silently; a "Download added" / "Already in your downloads" hint where it cannot show; a
   duplicate no longer spends a free download; Settings confirms its silent actions inline.
   `RED_DEBUG_OPEN=downloads|announce` verify it.
+* Owner request: YouTube's colour roles instead of one bright red accent (ADR-017), sampled from
+  the live page over CDP; verified in dark and light grabs.
 * Open from the audit: first-run welcome, keyboard and
   screen-reader access to the rail and panel.
 

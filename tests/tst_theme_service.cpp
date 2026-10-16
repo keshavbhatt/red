@@ -53,10 +53,10 @@ private Q_SLOTS:
     {
         QVERIFY(ThemeService::lightPalette().color(QPalette::Window) !=
                 ThemeService::darkPalette().color(QPalette::Window));
-        // Both accents are YouTube's brand red (DESIGN.md §1).
-        for (const QColor accent : {ThemeService::darkPalette().color(QPalette::Highlight),
-                                    ThemeService::lightPalette().color(QPalette::Highlight)}) {
-            QVERIFY(accent.red() > accent.green() && accent.red() > accent.blue());
+        // Selection is YouTube's blue, not the brand red (ADR-017).
+        for (const QColor selection : {ThemeService::darkPalette().color(QPalette::Highlight),
+                                       ThemeService::lightPalette().color(QPalette::Highlight)}) {
+            QVERIFY(selection.blue() > selection.red() && selection.blue() > selection.green());
         }
     }
 };

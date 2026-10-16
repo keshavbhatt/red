@@ -10,9 +10,15 @@ namespace red::ui {
 /// download cards and the dialogs all read from here.
 struct Tokens
 {
-    QColor accent;
-    QColor accentHover;
-    QColor accentText;
+    // YouTube's colour roles: red only for small brand marks, the inverted
+    // pill for primary actions, blue for controls and selection (ADR-017).
+    QColor brand;     ///< YouTube red: progress, badges, the active mode glyph
+    QColor brandText; ///< glyphs on a brand badge
+    QColor primary;   ///< primary buttons and the rail's Download pill
+    QColor primaryHover;
+    QColor primaryText;
+    QColor control;     ///< ticked check boxes, radios, selection, the picked card
+    QColor controlText; ///< the tick and selected text on `control`
     QColor bg;
     QColor rail;
     QColor panel;

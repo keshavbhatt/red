@@ -54,8 +54,8 @@ PlansDialog::PlansDialog(const services::LicenseService& license, const core::Th
     auto* icon = new QLabel(this);
     icon->setFixedSize(44, 44);
     icon->setAlignment(Qt::AlignCenter);
-    icon->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.accent.name()));
-    icon->setPixmap(icons::pixmap(u"bolt"_s, t.accentText, 24, devicePixelRatioF()));
+    icon->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.brand.name()));
+    icon->setPixmap(icons::pixmap(u"bolt"_s, t.brandText, 24, devicePixelRatioF()));
     top->addWidget(icon, 0, Qt::AlignTop);
     auto* text = new QVBoxLayout;
     text->setSpacing(4);
@@ -92,7 +92,7 @@ PlansDialog::PlansDialog(const services::LicenseService& license, const core::Th
         auto* name = new QLabel(plans[c].name, head);
         name->setAlignment(Qt::AlignCenter);
         name->setStyleSheet(
-            u"font-weight:600;color:%1;"_s.arg(plans[c].tier == Tier::Pro ? t.accent.name() : t.text.name()));
+            u"font-weight:600;color:%1;"_s.arg(plans[c].tier == Tier::Pro ? t.brand.name() : t.text.name()));
         col->addWidget(name);
         auto* mark = new QLabel(plans[c].tier == current ? tr("your plan") : QString(), head);
         mark->setAlignment(Qt::AlignCenter);

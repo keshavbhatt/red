@@ -50,9 +50,9 @@ MessageSheet::MessageSheet(QWidget* parent, Tone tone, const QString& title, con
     auto* badge = new QLabel(this);
     badge->setFixedSize(44, 44);
     badge->setAlignment(Qt::AlignCenter);
-    const QColor badgeColor = tone == Tone::Warning ? t.warning : t.accent;
+    const QColor badgeColor = tone == Tone::Warning ? t.warning : t.brand;
     badge->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(badgeColor.name()));
-    badge->setPixmap(icons::pixmap(iconFor(tone), t.accentText, 24, devicePixelRatioF()));
+    badge->setPixmap(icons::pixmap(iconFor(tone), t.brandText, 24, devicePixelRatioF()));
     top->addWidget(badge, 0, Qt::AlignTop);
     m_text = new QVBoxLayout;
     m_text->setSpacing(6);

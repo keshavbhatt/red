@@ -12,9 +12,13 @@ Tokens Tokens::forScheme(bool dark)
 {
     Tokens t;
     if (dark) {
-        t.accent = QColor(0xFF, 0x00, 0x00);
-        t.accentHover = QColor(0xFF, 0x3D, 0x3D);
-        t.accentText = QColor(0xFF, 0xFF, 0xFF);
+        t.brand = QColor(0xFF, 0x00, 0x33);
+        t.brandText = QColor(0xFF, 0xFF, 0xFF);
+        t.primary = QColor(0xF1, 0xF1, 0xF1);
+        t.primaryHover = QColor(0xD9, 0xD9, 0xD9);
+        t.primaryText = QColor(0x0F, 0x0F, 0x0F);
+        t.control = QColor(0x3E, 0xA6, 0xFF);
+        t.controlText = QColor(0x0F, 0x0F, 0x0F);
         t.bg = QColor(0x0F, 0x0F, 0x0F);
         t.rail = QColor(0x0F, 0x0F, 0x0F);
         t.panel = QColor(0x1F, 0x1F, 0x1F);
@@ -30,9 +34,13 @@ Tokens Tokens::forScheme(bool dark)
         t.danger = QColor(0xFF, 0x4E, 0x45);
         return t;
     }
-    t.accent = QColor(0xFF, 0x00, 0x00);
-    t.accentHover = QColor(0xE6, 0x00, 0x00);
-    t.accentText = QColor(0xFF, 0xFF, 0xFF);
+    t.brand = QColor(0xFF, 0x00, 0x33);
+    t.brandText = QColor(0xFF, 0xFF, 0xFF);
+    t.primary = QColor(0x0F, 0x0F, 0x0F);
+    t.primaryHover = QColor(0x27, 0x27, 0x27);
+    t.primaryText = QColor(0xFF, 0xFF, 0xFF);
+    t.control = QColor(0x06, 0x5F, 0xD4);
+    t.controlText = QColor(0xFF, 0xFF, 0xFF);
     t.bg = QColor(0xFF, 0xFF, 0xFF);
     t.rail = QColor(0xFF, 0xFF, 0xFF);
     t.panel = QColor(0xF9, 0xF9, 0xF9);
@@ -104,7 +112,7 @@ QLineEdit, QComboBox, QAbstractSpinBox, QPlainTextEdit, QTextEdit {
     background: {{input}}; color: {{text}};
     border: 1px solid {{border}}; border-radius: 8px;
     padding: 6px 10px; min-height: 22px;
-    selection-background-color: {{accent}}; selection-color: #ffffff;
+    selection-background-color: {{control}}; selection-color: {{controlText}};
 }
 QLineEdit:hover, QComboBox:hover, QAbstractSpinBox:hover { border: 1px solid {{muted}}; }
 QLineEdit:focus, QComboBox:focus, QAbstractSpinBox:focus { border: 1px solid {{text}}; }
@@ -128,7 +136,7 @@ QAbstractSpinBox::up-button, QAbstractSpinBox::down-button { width: 18px; border
 QAbstractSpinBox::up-arrow { image: url({{chevronUp}}); width: 10px; height: 10px; }
 QAbstractSpinBox::down-arrow { image: url({{chevronDown}}); width: 10px; height: 10px; }
 
-/* Buttons: neutral pills; redPrimary turns one brand red; redFlat is icon-only. */
+/* Buttons: neutral pills; redPrimary is YouTube's inverted pill (Subscribe); redFlat is icon-only. */
 QPushButton {
     background: {{elevated}}; color: {{text}};
     border: 1px solid {{border}}; border-radius: 18px;
@@ -137,8 +145,8 @@ QPushButton {
 QPushButton:hover { background: {{hover}}; }
 QPushButton:pressed { background: {{border}}; }
 QPushButton:disabled { color: {{muted}}; background: transparent; }
-QPushButton[redPrimary="true"] { background: {{accent}}; color: {{accentText}}; border: 1px solid {{accent}}; }
-QPushButton[redPrimary="true"]:hover { background: {{accentHover}}; border-color: {{accentHover}}; }
+QPushButton[redPrimary="true"] { background: {{primary}}; color: {{primaryText}}; border: 1px solid {{primary}}; }
+QPushButton[redPrimary="true"]:hover { background: {{primaryHover}}; border-color: {{primaryHover}}; }
 QPushButton[redPrimary="true"]:disabled { background: {{hover}}; color: {{muted}}; border-color: transparent; }
 QPushButton[redFlat="true"], QToolButton[redFlat="true"] {
     background: transparent; border: none; border-radius: 8px; padding: 6px 10px; min-height: 22px;
@@ -152,7 +160,7 @@ QToolButton:hover { background: {{hover}}; }
 QToolButton:checked { background: {{hover}}; }
 QToolButton::menu-indicator { image: none; }
 
-/* Rail buttons: square, rounded, the active one carries the accent bar. */
+/* Rail buttons: square, rounded; the Download pill takes the primary colour. */
 /* Sizes come from ui::RailButton: 40 px square, or the rail's width with labels. */
 QToolButton[redRailButton="true"] {
     background: transparent; border: none; border-radius: 10px; padding: 0; margin: 0;
@@ -160,8 +168,8 @@ QToolButton[redRailButton="true"] {
 QToolButton[redRailButton="true"]::menu-indicator { image: none; width: 0; }
 QToolButton[redRailButton="true"]:hover { background: {{hover}}; }
 QToolButton[redRailButton="true"]:checked { background: {{hover}}; }
-QToolButton[redRailButton="true"][redAccent="true"] { background: {{accent}}; }
-QToolButton[redRailButton="true"][redAccent="true"]:hover { background: {{accentHover}}; }
+QToolButton[redRailButton="true"][redAccent="true"] { background: {{primary}}; }
+QToolButton[redRailButton="true"][redAccent="true"]:hover { background: {{primaryHover}}; }
 QToolButton[redRailButton="true"]:disabled { background: transparent; }
 /* The mode switch: three smaller rail buttons in one outlined group. */
 QFrame[redModeSwitch="true"] { border: 1px solid {{border}}; border-radius: 12px; background: transparent; }
@@ -174,7 +182,7 @@ QCheckBox::indicator {
     border: 2px solid {{muted}}; border-radius: 4px; background: transparent;
 }
 QCheckBox::indicator:hover { border-color: {{text}}; }
-QCheckBox::indicator:checked { background: {{accent}}; border-color: {{accent}}; image: url({{checkWhite}}); }
+QCheckBox::indicator:checked { background: {{control}}; border-color: {{control}}; image: url({{checkOnControl}}); }
 QCheckBox::indicator:disabled { border-color: {{border}}; }
 QCheckBox::indicator:checked:disabled { background: {{hover}}; border-color: {{hover}}; }
 /* Both radio states add up to 18px: QSS sizes the indicator per state and a
@@ -185,10 +193,10 @@ QListView::indicator, QTreeView::indicator, QTableView::indicator {
 }
 QListView::indicator:hover, QTreeView::indicator:hover { border-color: {{text}}; }
 QListView::indicator:checked, QTreeView::indicator:checked, QTableView::indicator:checked {
-    background: {{accent}}; border-color: {{accent}}; image: url({{checkWhite}});
+    background: {{control}}; border-color: {{control}}; image: url({{checkOnControl}});
 }
 QRadioButton::indicator:hover { border-color: {{text}}; }
-QRadioButton::indicator:checked { border: 6px solid {{accent}}; background: {{accentText}}; width: 6px; height: 6px; }
+QRadioButton::indicator:checked { border: 6px solid {{control}}; background: {{controlText}}; width: 6px; height: 6px; }
 
 /* Menus. */
 QMenu {
@@ -235,11 +243,11 @@ QListWidget[redNav="true"]::item:selected { background: {{hover}}; font-weight: 
 QProgressBar {
     background: {{hover}}; border: none; border-radius: 3px; min-height: 6px; max-height: 6px; text-align: center;
 }
-QProgressBar::chunk { background: {{accent}}; border-radius: 3px; }
+QProgressBar::chunk { background: {{brand}}; border-radius: 3px; }
 
 /* Sliders. */
 QSlider::groove:horizontal { height: 4px; background: {{hover}}; border-radius: 2px; }
-QSlider::sub-page:horizontal { background: {{accent}}; border-radius: 2px; }
+QSlider::sub-page:horizontal { background: {{brand}}; border-radius: 2px; }
 QSlider::handle:horizontal { width: 14px; height: 14px; margin: -5px 0; background: {{text}}; border-radius: 7px; }
 
 /* Splitter handle between the page and the downloads panel. */
@@ -254,9 +262,12 @@ QMessageBox QLabel { min-width: 320px; }
 QHash<QString, QString> tokenMap(const Tokens& t)
 {
     return {
-        {u"accent"_s, t.accent.name()},
-        {u"accentHover"_s, t.accentHover.name()},
-        {u"accentText"_s, t.accentText.name()},
+        {u"brand"_s, t.brand.name()},
+        {u"primary"_s, t.primary.name()},
+        {u"primaryHover"_s, t.primaryHover.name()},
+        {u"primaryText"_s, t.primaryText.name()},
+        {u"control"_s, t.control.name()},
+        {u"controlText"_s, t.controlText.name()},
         {u"bg"_s, t.bg.name()},
         {u"rail"_s, t.rail.name()},
         {u"panel"_s, t.panel.name()},
@@ -284,7 +295,7 @@ QString redStyleSheet(bool dark)
     // to the cache directory once per colour.
     map.insert(u"chevronDown"_s, icons::tintedFile(u"chevron-down"_s, t.muted));
     map.insert(u"chevronUp"_s, icons::tintedFile(u"chevron-up"_s, t.muted));
-    map.insert(u"checkWhite"_s, icons::tintedFile(u"check"_s, t.accentText));
+    map.insert(u"checkOnControl"_s, icons::tintedFile(u"check"_s, t.controlText));
     map.insert(u"checkText"_s, icons::tintedFile(u"check"_s, t.text));
     for (auto it = map.cbegin(); it != map.cend(); ++it) {
         sheet.replace(u"{{"_s + it.key() + u"}}"_s, it.value());

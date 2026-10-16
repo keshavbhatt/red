@@ -10,13 +10,19 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
 * Mark: a rounded-square tile in brand red with a white play glyph whose right edge
   carries a downward "tray" notch — play + download in one shape (`src/resources/icons/red.svg`).
   Symbolic variant: white glyph with a thin dark halo (tray/panel safe).
-* Colour tokens (sampled from YouTube's 2026 design; the accent is YouTube red):
+* Colour tokens (sampled from YouTube's live page, 2026-10-16). YouTube's roles, not one red
+  accent (ADR-017): red only for small brand marks, the inverted pill for primary actions, blue
+  for controls and selection.
 
 | Token | Dark | Light | Used for |
 |---|---|---|---|
-| `accent` | `#FF0000` | `#FF0000` | primary buttons, active rail item, progress |
-| `accentHover` | `#FF3D3D` | `#E60000` | hover on primary |
-| `accentText` | `#FFFFFF` | `#FFFFFF` | text on accent |
+| `brand` | `#FF0033` | `#FF0033` | YouTube red: progress, badges, active mode glyph, dialog badges |
+| `brandText` | `#FFFFFF` | `#FFFFFF` | glyph on a brand badge |
+| `primary` | `#F1F1F1` | `#0F0F0F` | primary buttons, the rail's Download pill (YouTube's Subscribe) |
+| `primaryHover` | `#D9D9D9` | `#272727` | hover on primary |
+| `primaryText` | `#0F0F0F` | `#FFFFFF` | text on primary |
+| `control` | `#3EA6FF` | `#065FD4` | ticked check boxes, radios, selection, the picked kind card |
+| `controlText` | `#0F0F0F` | `#FFFFFF` | tick and selected text on control |
 | `bg` | `#0F0F0F` | `#FFFFFF` | window, page background |
 | `rail` | `#0F0F0F` | `#FFFFFF` | side rail (same as bg, 1px border) |
 | `panel` | `#1F1F1F` | `#F9F9F9` | dialogs, downloads panel cards |
@@ -59,7 +65,7 @@ the window is shorter than the buttons. Top to bottom:
 | Item | Icon | Action / shortcut |
 |---|---|---|
 | Red mark | logo | click → Home (`https://www.youtube.com/`) · Ctrl+H |
-| **Mode switch** | YouTube / music / tv in one outlined group, active glyph in `accent` | Ctrl+1 / Ctrl+2 / Ctrl+3 select; Ctrl+M and Ctrl+T toggle Music and TV (ADR-014) |
+| **Mode switch** | YouTube / music / tv in one outlined group, active glyph in `brand` | Ctrl+1 / Ctrl+2 / Ctrl+3 select; Ctrl+M and Ctrl+T toggle Music and TV (ADR-014) |
 | Back / Forward | chevrons | Alt+←/→ (disabled when unavailable) |
 | Reload | ↻ | F5 (becomes ✕ "stop" while loading) |
 | — | | |
@@ -82,7 +88,7 @@ downloads: <title>".
 * Header: "Downloads" · engine chip (● yt-dlp 2026.08.19 / "Setting up…" / "Update available")
   · `+ New` (paste-URL dialog) · ⋮ (Pause all, Resume all, Clear finished, Open folder, Engine…).
 * Cards (88 px): 96×54 thumbnail with a state-coloured 3 px left bar, title (2 lines),
-  channel · quality/format line, progress bar (accent) with "12.4 MB of 118 MB · 3.2 MB/s · 00:32"
+  channel · quality/format line, progress bar (brand) with "12.4 MB of 118 MB · 3.2 MB/s · 00:32"
   or "Merging…" / "Finished · 118 MB" / "Failed · reason". Hover actions: pause/resume, cancel,
   open, show in folder, retry, remove. Double-click opens the file.
 * Footer: "Save to  ~/Downloads/Red  [Change]".
@@ -99,8 +105,8 @@ sudo pacman -S ffmpeg"), the advanced "use an engine already installed on this s
 ## 2c. Message sheets
 
 Every question or notice Red asks is a `ui::MessageSheet` (never QMessageBox / QInputDialog /
-the engine's stock JavaScript boxes): 44 px accent badge (amber for warnings), title, body,
-optional muted note and text field, pill buttons with one accent primary. Used for the
+the engine's stock JavaScript boxes): 44 px brand badge (amber for warnings), title, body,
+optional muted note and text field, pill buttons with one primary. Used for the
 permission prompt, "Download from link", clear session, reset settings, the GPU notice, the
 crash notice, and the page's alert / confirm / prompt (`WebPage::setScriptDialogs`); Chromium's
 "leave this page?" guard becomes "Leave this page?" with Stay / Leave.
@@ -115,7 +121,7 @@ Modal, 640 px wide, `panel` surface, 12 px radius.
    flat) and a card under the hero offers "Just this video" / "Whole playlist (N videos)" with
    the playlist title; switching is instant from the cached reads, and a playlist that cannot be
    read leaves the option disabled with the reason and Retry. Mix ids (`RD…`) are not playlists.
-2. Kind chooser (`ui::KindCard` ×3, icon + title + hint, accent border on the pick):
+2. Kind chooser (`ui::KindCard` ×3, icon + title + hint, control-blue border on the pick):
    **Video** "Picture and sound" · **Audio only** "Just the sound, for music" · **Advanced**
    "Pick the exact streams". Opens on the kind of the last download (`downloads/lastKind`);
    the page context menu also offers "Download audio only…" which opens straight on Audio.
@@ -131,7 +137,7 @@ Modal, 640 px wide, `panel` surface, 12 px radius.
 3. Playlist/channel: an entry list with checkboxes (thumbnail, title, duration), "Select all",
    range "from … to …", live count "24 of 120 selected". Options apply to all entries.
 4. Footer: Save to folder (path + Change) · filename preview ("Title [id].mp4") ·
-   `Cancel` · **`Download`** (accent pill).
+   `Cancel` · **`Download`** (primary pill).
 
 ## 4. Settings
 

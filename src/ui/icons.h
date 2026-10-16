@@ -7,7 +7,7 @@
 
 // Themed monochrome icons (DESIGN.md): the SVGs under :/icons/ui are drawn in
 // #000000 and tinted at runtime, so one asset serves both schemes and the
-// accent/muted variants. Rendered pixmaps are cached per (name, colour, size, dpr).
+// brand/muted variants. Rendered pixmaps are cached per (name, colour, size, dpr).
 namespace red::ui::icons {
 
 /// A QIcon whose normal/disabled modes are tinted `color` / `disabledColor`.

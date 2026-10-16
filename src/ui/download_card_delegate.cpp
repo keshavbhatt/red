@@ -47,7 +47,7 @@ QColor stateColor(const Tokens& t, core::DownloadState state)
     case core::DownloadState::Processing:
         break;
     }
-    return t.accent;
+    return t.brand;
 }
 
 } // namespace

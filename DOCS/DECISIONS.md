@@ -369,3 +369,22 @@ menu is top right). Window minimum in the mini player: 200×180.
 still work for the owner. If it rolls out, `media-session.js` must read Next / Previous from
 `ytmusic-miniplayer` instead of `ytmusic-player-bar`.
 
+## ADR-017: YouTube's colour roles instead of one red accent (2026-10-16)
+
+**Context.** Every emphasis in Red's chrome was `#FF0000`: primary buttons, the rail's Download
+pill, ticked check boxes, radios, selection, progress, badges. The owner found it too bright and
+asked to match YouTube. Sampled from the live page (dark): the logo, scrubber and progress start
+are `#FF0033` (the progress bar fades to `#FF2791`); Subscribe is `#F1F1F1` with `#0F0F0F` text;
+Sign in and other calls to action are `#3EA6FF` (light: `#065FD4`). YouTube's red is as bright as
+Red's was; YouTube keeps it calm by using it only for small marks.
+
+**Decision.** The `accent` token is replaced by YouTube's roles: `brand` (`#FF0033`: progress,
+the downloads badge, the active mode glyph, dialog badges, the error page's mark), `primary`
+(the inverted pill, `#F1F1F1` / `#0F0F0F`: primary buttons, the rail's Download pill, the error
+page's button) and `control` (YouTube blue: check boxes, radios, text and list selection, the
+palette's Highlight, the picked kind card). Owner choice among three options (also offered: a
+deeper `#CC0000` red everywhere, or `#FF0033` in place of `#FF0000`).
+
+**Consequences.** Red's chrome reads like YouTube's: mostly neutral, with red where YouTube puts
+it. The brand still shows in the logo, the mode switch and every progress bar.
+

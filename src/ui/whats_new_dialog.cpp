@@ -52,8 +52,8 @@ WhatsNewDialog::WhatsNewDialog(const QString& version, const QString& notesMarkd
     auto* badge = new QLabel(this);
     badge->setFixedSize(44, 44);
     badge->setAlignment(Qt::AlignCenter);
-    badge->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.accent.name()));
-    badge->setPixmap(icons::pixmap(u"bolt"_s, t.accentText, 24, devicePixelRatioF()));
+    badge->setStyleSheet(u"background:%1;border-radius:22px;"_s.arg(t.brand.name()));
+    badge->setPixmap(icons::pixmap(u"bolt"_s, t.brandText, 24, devicePixelRatioF()));
     top->addWidget(badge, 0, Qt::AlignTop);
     auto* text = new QVBoxLayout;
     text->setSpacing(4);

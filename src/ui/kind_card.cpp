@@ -56,11 +56,11 @@ void KindCard::paintEvent(QPaintEvent* /*event*/)
     path.addRoundedRect(r, kRadius, kRadius);
     const bool on = isChecked();
     p.fillPath(path, on ? t.hover : (m_hover ? t.elevated : t.panel));
-    p.setPen(QPen(on ? t.accent : (hasFocus() ? t.link : t.border), on ? 2 : 1));
+    p.setPen(QPen(on ? t.control : (hasFocus() ? t.link : t.border), on ? 2 : 1));
     p.drawPath(path);
 
     const QColor fg = isEnabled() ? t.text : t.muted;
-    const QPixmap icon = icons::pixmap(m_icon, on ? t.accent : fg, kIcon, devicePixelRatioF());
+    const QPixmap icon = icons::pixmap(m_icon, on ? t.control : fg, kIcon, devicePixelRatioF());
     const int iconY = (height() - kIcon) / 2;
     p.drawPixmap(kPad, iconY, icon);
 

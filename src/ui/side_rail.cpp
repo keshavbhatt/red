@@ -239,7 +239,7 @@ void SideRail::applyIcons()
         QIcon icon = icons::themed(b->property("redIcon").toString(), t.text, t.muted);
         for (const int size : {16, 20, 24, 32}) {
             for (const qreal dpr : {1.0, 2.0}) {
-                icon.addPixmap(icons::pixmap(b->property("redIcon").toString(), t.accent, size, dpr),
+                icon.addPixmap(icons::pixmap(b->property("redIcon").toString(), t.brand, size, dpr),
                                QIcon::Normal, QIcon::On);
             }
         }
@@ -248,14 +248,14 @@ void SideRail::applyIcons()
     }
     setIcon(m_logo, icons::brand());
     setIcon(m_reload, icons::themed(m_loading ? u"stop"_s : u"reload"_s, t.text, t.muted));
-    setIcon(m_download, icons::themed(u"download"_s, m_downloadable ? t.accentText : t.text, t.muted));
-    m_download->setColors(m_downloadable ? t.accentText : t.text, t.muted);
+    setIcon(m_download, icons::themed(u"download"_s, m_downloadable ? t.primaryText : t.text, t.muted));
+    m_download->setColors(m_downloadable ? t.primaryText : t.text, t.muted);
     m_download->setProperty("redAccent", m_downloadable);
     m_download->style()->unpolish(m_download);
     m_download->style()->polish(m_download);
     m_badge->setStyleSheet(
         u"background:%1;color:%2;border-radius:8px;font-size:10px;font-weight:700;padding:0 4px;"_s.arg(
-            t.accent.name(), t.accentText.name()));
+            t.brand.name(), t.brandText.name()));
 }
 
 /// The button says what a click does: download this page, or (nothing to
