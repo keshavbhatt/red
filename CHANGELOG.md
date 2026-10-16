@@ -3,7 +3,7 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
-## [10.3.0] - unreleased
+## [10.3.0] - 2026-10-17
 
 ### Added
 - A **mode switch** at the top of the rail: YouTube, YouTube Music and TV, with the current one
@@ -49,6 +49,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 ### Fixed
 - Closing the mini player's window returns to the full window instead of quitting Red.
 - Download progress bars move smoothly instead of jumping every second or so.
+- With *Advanced* picked and no stream chosen yet, the download dialog previewed an audio file
+  name; it shows the video file now.
 
 ## [10.2.0] - 2026-09-15
 

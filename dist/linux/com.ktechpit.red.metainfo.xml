@@ -135,6 +135,22 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.3.0" date="2026-10-17" type="stable">
+      <description>
+        <p>Easier to find your way around: a mode switch, a rail with labels, a welcome, and a mini player for Shorts and YouTube Music.</p>
+        <ul>
+          <li>A mode switch at the top of the rail for YouTube, YouTube Music and TV mode (Ctrl+1, Ctrl+2, Ctrl+3), and a Back to YouTube button in TV mode</li>
+          <li>Choose the mode Red opens in; it opens in YouTube by default</li>
+          <li>The side rail shows labels next to its icons, with a switch back to icons only</li>
+          <li>A welcome on the first start, and Show me around in the menu</li>
+          <li>The mini player fits Shorts in a tall window, works in YouTube Music, and has a button and Esc to go back; closing it no longer quits Red</li>
+          <li>Download cards with a right-click menu, keyboard actions and the full reason when a download fails; smooth progress bars</li>
+          <li>The Downloads panel opens over the page in narrow windows, and a message confirms each new download</li>
+          <li>Full keyboard access: F6 moves between the page, the rail and the Downloads panel; F10 opens the menu</li>
+          <li>Colours that follow YouTube's: red only for small marks, YouTube's pill buttons and blue controls</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.2.0" date="2026-09-15" type="stable">
       <description>
         <p>Organised downloads and YouTube Music's Download entry.</p>
