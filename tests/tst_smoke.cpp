@@ -3,9 +3,13 @@
 
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
+#include "ui/about_dialog.h"
 #include "ui/main_window.h"
+#include "ui/whats_new_dialog.h"
 
 #include <QApplication>
+#include <QPointer>
+#include <QPushButton>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
@@ -41,6 +45,36 @@ private Q_SLOTS:
         QTest::qWait(100);
         window.setMode(red::core::AppMode::Desktop);
         QTest::qWait(100);
+        window.close();
+    }
+
+    // About's "What's new" link closes About and shows the release notes on demand.
+    void aboutOpensWhatsNew()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        red::core::Settings settings(dir.filePath(u"about.ini"_s));
+        settings.setWelcomeSeen(true);
+        settings.setWhatsNewSeenVersion(u"10.3.1"_s); // no automatic notes in the way
+        red::core::ThemeService theme(settings);
+        red::ui::MainWindow window(settings, theme, u"10.3.1"_s);
+        window.start(std::nullopt);
+        QVERIFY(QTest::qWaitForWindowExposed(&window));
+
+        window.showAbout();
+        QPointer<red::ui::AboutDialog> about = window.findChild<red::ui::AboutDialog*>();
+        QVERIFY(about);
+        QPushButton* link = nullptr;
+        for (QPushButton* b : about->findChildren<QPushButton*>()) {
+            if (b->text() == u"What's new"_s) {
+                link = b;
+            }
+        }
+        QVERIFY(link != nullptr);
+        QVERIFY(!link->autoDefault()); // Enter in About must not open it
+        link->click();
+        QTRY_VERIFY(window.findChild<red::ui::WhatsNewDialog*>() != nullptr);
+        QTRY_VERIFY(about.isNull() || !about->isVisible());
         window.close();
     }
 };

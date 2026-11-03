@@ -974,6 +974,10 @@ void MainWindow::showAbout()
 {
     auto* dialog = new AboutDialog(m_settings, m_theme, m_webView->userAgent(), engineSummary(), this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &AboutDialog::whatsNewRequested, this, [this, dialog] {
+        dialog->close(); // dialogs never stack
+        maybeShowWhatsNew(true);
+    });
     dialog->show();
 }
 

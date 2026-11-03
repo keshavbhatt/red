@@ -61,9 +61,19 @@ void AboutDialog::setupUi()
     identity->addWidget(name);
     auto* tagline = new QLabel(tr("YouTube, in a real desktop app."), this);
     identity->addWidget(tagline);
+    auto* versionRow = new QHBoxLayout;
+    versionRow->setSpacing(6);
     auto* version = new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), this);
     version->setProperty("redMuted", true);
-    identity->addWidget(version);
+    versionRow->addWidget(version);
+    auto* whatsNew = new QPushButton(tr("What's new"), this);
+    whatsNew->setProperty("redLink", true);
+    whatsNew->setCursor(Qt::PointingHandCursor);
+    whatsNew->setAutoDefault(false); // a link: Enter must not open it
+    connect(whatsNew, &QPushButton::clicked, this, &AboutDialog::whatsNewRequested);
+    versionRow->addWidget(whatsNew);
+    versionRow->addStretch(1);
+    identity->addLayout(versionRow);
     identity->addSpacing(6);
     auto* author = new QLabel(
         tr("Designed and developed by Keshav Bhatt · <a href=\"%1\">ktechpit.com</a>").arg(kWebsiteUrl),

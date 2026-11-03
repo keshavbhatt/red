@@ -153,6 +153,9 @@ QPushButton:disabled { color: {{muted}}; background: transparent; }
 QPushButton[redPrimary="true"] { background: {{primary}}; color: {{primaryText}}; border: 1px solid {{primary}}; }
 QPushButton[redPrimary="true"]:hover { background: {{primaryHover}}; border-color: {{primaryHover}}; }
 QPushButton[redPrimary="true"]:disabled { background: {{hover}}; color: {{muted}}; border-color: transparent; }
+/* A button that reads as a link (About's "What's new"). */
+QPushButton[redLink="true"] { background: transparent; border: none; color: {{link}}; padding: 0 2px; min-height: 0; }
+QPushButton[redLink="true"]:hover { text-decoration: underline; }
 QPushButton[redFlat="true"], QToolButton[redFlat="true"] {
     background: transparent; border: none; border-radius: 8px; padding: 6px 10px; min-height: 22px;
 }

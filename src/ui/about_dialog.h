@@ -22,6 +22,11 @@ public:
                 const QString& engineSummary, QWidget* parent = nullptr);
     ~AboutDialog() override = default;
 
+Q_SIGNALS:
+    /// The "What's new" link next to the version: the window shows the release notes (About
+    /// closes first, so the two do not stack).
+    void whatsNewRequested();
+
 private:
     void setupUi();
     void copyDiagnostics();
