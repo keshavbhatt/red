@@ -484,5 +484,5 @@ TV mode, the mini player and full-screen video. Mouse wheels (no phase) never co
 
 **Consequences.** It needs scroll phases, which Wayland sessions report (KDE, GNOME); on X11 the
 setting does nothing. Verified with synthetic gestures (`RED_DEBUG_SWIPE`) and an injected
-sideways scroller; a real touchpad and natural scrolling still need the owner's hands.
+sideways scroller, then confirmed by the owner on a real touchpad (2026-11-04).
 
