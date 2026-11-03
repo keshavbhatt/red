@@ -489,18 +489,19 @@ setting does nothing. Verified with synthetic gestures (`RED_DEBUG_SWIPE`) and a
 sideways scroller, then on the owner's touchpad (2026-11-04), where the first version (Back =
 fingers to the right, from `inverted()`) felt the wrong way round next to Chrome.
 
-## ADR-023: red check boxes, a softer focus border (2026-11-04)
+## ADR-023: Red's red for controls and selection, a softer focus border (2026-11-04)
 
-**Context.** ADR-017 gave check boxes and radios YouTube's blue. With Settings full of them the
-owner wanted Red's own red there instead, and found the near-white border of a focused field
-too bright.
+**Context.** ADR-017 gave check boxes, radios, selection and the download dialog's picked card
+YouTube's blue. The owner: red is Red's colour and must be the one used; the near-white border
+of a focused field was too bright; the current Settings page's icon had a blue tint (Qt tints a
+selected icon with the palette's highlight when the icon has no selected image).
 
-**Decision.** New tokens: `tick` / `tickText` (`#FF0033` with a white tick) for ticked check
-boxes, radios and list check marks everywhere; `focusBorder` (`#8A8A8A` dark, `#909090` light)
-for focused fields instead of the text colour, and `hoverBorder` (`#5A5A5A` / `#C4C4C4`) below
-it so hover and focus still differ. `control` keeps YouTube blue for text and list selection
-and the picked kind card.
+**Decision.** `control` becomes `#FF0033` with white on it in both schemes: ticked check boxes,
+radios, list check marks, text and list selection, the picked kind card, and the palette's
+Highlight. Links stay YouTube blue (`link`), as on YouTube and the rest of the desktop.
+`focusBorder` (`#8A8A8A` dark, `#909090` light) outlines a focused field instead of the text
+colour, with `hoverBorder` (`#5A5A5A` / `#C4C4C4`) a step below. `icons::themed` always adds a
+selected image (its normal colour unless told otherwise), so no icon is tinted by surprise; the
+Settings pane's current page shows its icon in a light red (`#FF6B81` dark, `#FF0033` light).
 
-**Consequences.** ADR-017's "blue for controls" now means selection only; red stays in small
-marks, which a tick is.
-
+**Consequences.** Supersedes ADR-017's blue `control`; red is no longer only for small marks.

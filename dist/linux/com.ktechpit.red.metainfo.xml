@@ -143,7 +143,7 @@
           <li>In TV mode, D and A change the playback speed in steps of 0.05, with Shift in steps of 0.25</li>
           <li>The Autoplay option is now called Start videos without a click, with a note on where YouTube's own autoplay is</li>
           <li>Leaving full screen brings back a maximized window instead of a smaller one</li>
-          <li>Check boxes and radio buttons in Red's red, and a softer border on the focused field</li>
+          <li>Check boxes, radio buttons, selection and the download dialog's choice in Red's red, and a softer border on the focused field</li>
         </ul>
       </description>
     </release>

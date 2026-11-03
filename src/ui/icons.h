@@ -11,7 +11,10 @@
 namespace red::ui::icons {
 
 /// A QIcon whose normal/disabled modes are tinted `color` / `disabledColor`.
-[[nodiscard]] QIcon themed(const QString& name, const QColor& color, const QColor& disabledColor = {});
+/// `selectedColor` paints the icon of a selected item (a list's current row); by default it is
+/// `color`, so Qt never tints a selected icon with the palette's highlight on its own.
+[[nodiscard]] QIcon themed(const QString& name, const QColor& color, const QColor& disabledColor = {},
+                           const QColor& selectedColor = {});
 /// A single pixmap at `size` logical px for the given device pixel ratio.
 [[nodiscard]] QPixmap pixmap(const QString& name, const QColor& color, int size,
                              qreal devicePixelRatio = 1.0);

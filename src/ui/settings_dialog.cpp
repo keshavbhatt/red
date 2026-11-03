@@ -158,8 +158,10 @@ void SettingsDialog::applyNavIcons()
     const Tokens t = Tokens::forScheme(m_theme.isDark());
     const QStringList names{u"general"_s,   u"palette"_s, u"play"_s,    u"shield"_s,
                             u"downloads"_s, u"tv"_s,      u"advanced"_s};
+    // The current page's icon in a light red (ADR-023): Red's red, lifted on dark.
+    const QColor current = m_theme.isDark() ? QColor(0xFF, 0x6B, 0x81) : t.control;
     for (int i = 0; i < m_nav->count() && i < names.size(); ++i) {
-        m_nav->item(i)->setIcon(icons::themed(names.at(i), t.text));
+        m_nav->item(i)->setIcon(icons::themed(names.at(i), t.text, {}, current));
     }
 }
 

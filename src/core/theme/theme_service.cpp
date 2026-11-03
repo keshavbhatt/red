@@ -86,7 +86,7 @@ QPalette ThemeService::lightPalette()
     p.setColor(QPalette::ButtonText, QColor(0x0F, 0x0F, 0x0F));
     p.setColor(QPalette::BrightText, Qt::white);
     p.setColor(QPalette::Link, QColor(0x06, 0x5F, 0xD4));
-    p.setColor(QPalette::Highlight, QColor(0x06, 0x5F, 0xD4)); // YouTube blue: selection is not red
+    p.setColor(QPalette::Highlight, QColor(0xFF, 0x00, 0x33)); // Red's red (ADR-023)
     p.setColor(QPalette::HighlightedText, Qt::white);
     p.setColor(QPalette::PlaceholderText, QColor(0x60, 0x60, 0x60));
     p.setColor(QPalette::Disabled, QPalette::Text, QColor(0x90, 0x90, 0x90));
@@ -110,8 +110,8 @@ QPalette ThemeService::darkPalette()
     p.setColor(QPalette::ButtonText, QColor(0xF1, 0xF1, 0xF1));
     p.setColor(QPalette::BrightText, Qt::white);
     p.setColor(QPalette::Link, QColor(0x3E, 0xA6, 0xFF));
-    p.setColor(QPalette::Highlight, QColor(0x3E, 0xA6, 0xFF));
-    p.setColor(QPalette::HighlightedText, QColor(0x0F, 0x0F, 0x0F));
+    p.setColor(QPalette::Highlight, QColor(0xFF, 0x00, 0x33)); // Red's red (ADR-023)
+    p.setColor(QPalette::HighlightedText, Qt::white);
     p.setColor(QPalette::PlaceholderText, QColor(0xAA, 0xAA, 0xAA));
     p.setColor(QPalette::Disabled, QPalette::Text, QColor(0x71, 0x71, 0x71));
     p.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(0x71, 0x71, 0x71));

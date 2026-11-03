@@ -60,15 +60,18 @@ QPixmap pixmap(const QString& name, const QColor& color, int size, qreal deviceP
     return pm;
 }
 
-QIcon themed(const QString& name, const QColor& color, const QColor& disabledColor)
+QIcon themed(const QString& name, const QColor& color, const QColor& disabledColor,
+             const QColor& selectedColor)
 {
     QIcon icon;
     const QColor disabled =
         disabledColor.isValid() ? disabledColor : QColor(color.red(), color.green(), color.blue(), 90);
+    const QColor selected = selectedColor.isValid() ? selectedColor : color;
     for (const int size : {16, 20, 24, 32, 48}) {
         for (const qreal dpr : {1.0, 2.0}) {
             icon.addPixmap(pixmap(name, color, size, dpr), QIcon::Normal);
             icon.addPixmap(pixmap(name, disabled, size, dpr), QIcon::Disabled);
+            icon.addPixmap(pixmap(name, selected, size, dpr), QIcon::Selected);
         }
     }
     return icon;

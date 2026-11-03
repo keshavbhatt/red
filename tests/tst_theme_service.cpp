@@ -53,10 +53,10 @@ private Q_SLOTS:
     {
         QVERIFY(ThemeService::lightPalette().color(QPalette::Window) !=
                 ThemeService::darkPalette().color(QPalette::Window));
-        // Selection is YouTube's blue, not the brand red (ADR-017).
-        for (const QColor selection : {ThemeService::darkPalette().color(QPalette::Highlight),
-                                       ThemeService::lightPalette().color(QPalette::Highlight)}) {
-            QVERIFY(selection.blue() > selection.red() && selection.blue() > selection.green());
+        // Selection is Red's red (ADR-023), with white text on it.
+        for (const QPalette& palette : {ThemeService::darkPalette(), ThemeService::lightPalette()}) {
+            QCOMPARE(palette.color(QPalette::Highlight), QColor(0xFF, 0x00, 0x33));
+            QCOMPARE(palette.color(QPalette::HighlightedText), QColor(Qt::white));
         }
     }
 };
