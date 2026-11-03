@@ -8,6 +8,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 ### Changed
 - **Finer playback speeds in TV mode**: D and A now change the speed in steps of 0.05, so
   1.1x and 1.15x are a few presses away; with Shift they step by 0.25 as before.
+- **Settings, Playback**: the *Autoplay* option is now *Start videos without a click*, which is
+  what it always did, with a note that the next video playing by itself is YouTube's own
+  Autoplay setting.
 
 ## [10.3.0] - 2026-10-17
 

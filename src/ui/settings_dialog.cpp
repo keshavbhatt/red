@@ -319,9 +319,15 @@ QWidget* SettingsDialog::buildPlayback()
 {
     auto* player = new QWidget(this);
     auto* f = form(player);
-    m_autoplay = new QCheckBox(tr("Start playing without a click"), player);
+    // Only the first video after a page loads: once you click or press a key the page may play
+    // on its own. What plays next is YouTube's own autoplay setting (issue #22).
+    m_autoplay = new QCheckBox(tr("Start videos without a click"), player);
     connect(m_autoplay, &QCheckBox::toggled, this, [this](bool on) { m_settings.setAutoplay(on); });
-    f->addRow(tr("Autoplay"), m_autoplay);
+    f->addRow(tr("Opening a video"), m_autoplay);
+    f->addRow(QString(),
+              mutedLabel(tr("Whether the next video plays by itself is YouTube's setting: the Autoplay "
+                            "switch in the player, or Settings, Auto-play next video in TV mode."),
+                         player));
     m_codec = new QComboBox(player);
     m_codec->addItem(tr("Let YouTube decide"), static_cast<int>(core::CodecPreference::Auto));
     m_codec->addItem(tr("H.264 — lowest CPU use"), static_cast<int>(core::CodecPreference::H264));

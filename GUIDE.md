@@ -283,9 +283,10 @@ Press **Ctrl+,** or the rail's gear.
   closing the window does, tray icon, side rail and its labels, middle-click scrolling, download
   notifications.
 - **Appearance**: theme, page zoom, interface scale.
-- **Playback**: autoplay, preferred codec, hardware decoding, screen and background playback,
-  a playback progress bar behind Red's taskbar entry (off by default; Plasma and Unity-style
-  docks draw it), mini player size.
+- **Playback**: whether a video you open starts without a click (the next video playing by
+  itself is YouTube's own Autoplay setting, in the player or in TV mode's Settings), preferred
+  codec, hardware decoding, screen and background playback, a playback progress bar behind
+  Red's taskbar entry (off by default; Plasma and Unity-style docks draw it), mini player size.
 - **Blocking**: see [Blocking](#blocking).
 - **Downloads**: see [Downloads](#downloads).
 - **TV mode**: see [TV mode](#tv-mode).
