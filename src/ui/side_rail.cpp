@@ -27,6 +27,8 @@ constexpr int kButtonSide = 40;
 constexpr int kModeButtonSide = 36;
 constexpr int kIconSize = 22;
 constexpr int kModeIconSize = 20;
+constexpr int kModeInset = 4; // inside the mode switch's outline
+constexpr int kModeGap = 3;   // between its buttons
 constexpr int kSeparatorWidth = 24;
 
 QString withShortcut(const QString& text, const QAction* action)
@@ -82,8 +84,8 @@ QWidget* SideRail::makeModeSwitch()
     m_modeSwitch = new QFrame(this);
     m_modeSwitch->setProperty("redModeSwitch", true);
     auto* layout = new QVBoxLayout(m_modeSwitch);
-    layout->setContentsMargins(1, 1, 1, 1);
-    layout->setSpacing(1);
+    layout->setContentsMargins(1, kModeInset, 1, kModeInset); // sides: applyWidths()
+    layout->setSpacing(kModeGap);
     const auto add = [this, layout](QAction* action, const QString& icon) {
         RailButton* button = makeButton(action, icon, kModeButtonSide);
         button->setParent(m_modeSwitch);
@@ -270,8 +272,13 @@ void SideRail::applyWidths()
         b->setExpanded(m_expanded, inner);
     }
     m_modeSwitch->setFixedWidth(m_expanded ? inner : kButtonSide);
+    // With labels the buttons sit kModeInset inside the outline all round; icons only, the
+    // 40 px group has room for the inset above and below only.
+    const int side = m_expanded ? kModeInset : 1;
+    const QMargins m = m_modeSwitch->layout()->contentsMargins();
+    m_modeSwitch->layout()->setContentsMargins(side, m.top(), side, m.bottom());
     for (RailButton* b : {m_youtube, m_music, m_tv}) {
-        b->setExpanded(m_expanded, inner - 4); // inside the group's border and margin
+        b->setExpanded(m_expanded, inner - 2 * kModeInset - 2); // inside the inset and the border
     }
     for (QFrame* line : m_separators) {
         line->setFixedWidth(m_expanded ? inner - 16 : kSeparatorWidth);
