@@ -135,6 +135,17 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.3.1" date="2026-11-04" type="stable">
+      <description>
+        <p>Swipe to go back, finer TV speeds and a full-screen fix.</p>
+        <ul>
+          <li>Swipe two fingers on a touchpad to go back or forward in YouTube and YouTube Music; rows that scroll sideways keep the swipe</li>
+          <li>In TV mode, D and A change the playback speed in steps of 0.05, with Shift in steps of 0.25</li>
+          <li>The Autoplay option is now called Start videos without a click, with a note on where YouTube's own autoplay is</li>
+          <li>Leaving full screen brings back a maximized window instead of a smaller one</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.3.0" date="2026-10-17" type="stable">
       <description>
         <p>Easier to find your way around: a mode switch, a rail with labels, a welcome, and a mini player for Shorts and YouTube Music.</p>

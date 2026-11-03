@@ -3,7 +3,7 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
-## [10.3.1] - unreleased
+## [10.3.1] - 2026-11-04
 
 ### Added
 - **Swipe to go back**: swipe two fingers on a touchpad to go back or forward in YouTube and
