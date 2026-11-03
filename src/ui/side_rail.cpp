@@ -27,8 +27,10 @@ constexpr int kButtonSide = 40;
 constexpr int kModeButtonSide = 36;
 constexpr int kIconSize = 22;
 constexpr int kModeIconSize = 20;
-constexpr int kModeInset = 4; // inside the mode switch's outline
-constexpr int kModeGap = 3;   // between its buttons
+constexpr int kModeInset = 4;       // inside the mode switch's outline, with labels
+constexpr int kModeInsetNarrow = 3; // icons only: the group stays as wide as a rail button
+constexpr int kModeButtonNarrow = kButtonSide - 2 * kModeInsetNarrow - 2; // 32 inside the border
+constexpr int kModeGap = 3;                                               // between its buttons
 constexpr int kSeparatorWidth = 24;
 
 QString withShortcut(const QString& text, const QAction* action)
@@ -84,7 +86,7 @@ QWidget* SideRail::makeModeSwitch()
     m_modeSwitch = new QFrame(this);
     m_modeSwitch->setProperty("redModeSwitch", true);
     auto* layout = new QVBoxLayout(m_modeSwitch);
-    layout->setContentsMargins(1, kModeInset, 1, kModeInset); // sides: applyWidths()
+    layout->setContentsMargins(kModeInset, kModeInset, kModeInset, kModeInset); // applyWidths()
     layout->setSpacing(kModeGap);
     const auto add = [this, layout](QAction* action, const QString& icon) {
         RailButton* button = makeButton(action, icon, kModeButtonSide);
@@ -272,12 +274,12 @@ void SideRail::applyWidths()
         b->setExpanded(m_expanded, inner);
     }
     m_modeSwitch->setFixedWidth(m_expanded ? inner : kButtonSide);
-    // With labels the buttons sit kModeInset inside the outline all round; icons only, the
-    // 40 px group has room for the inset above and below only.
-    const int side = m_expanded ? kModeInset : 1;
-    const QMargins m = m_modeSwitch->layout()->contentsMargins();
-    m_modeSwitch->layout()->setContentsMargins(side, m.top(), side, m.bottom());
+    // Inset all round inside the outline. Icons only, the group keeps a rail button's 40 px
+    // width, so its buttons shrink to 32 px squares to leave the inset at the sides too.
+    const int inset = m_expanded ? kModeInset : kModeInsetNarrow;
+    m_modeSwitch->layout()->setContentsMargins(inset, inset, inset, inset);
     for (RailButton* b : {m_youtube, m_music, m_tv}) {
+        b->setSide(m_expanded ? kModeButtonSide : kModeButtonNarrow);
         b->setExpanded(m_expanded, inner - 2 * kModeInset - 2); // inside the inset and the border
     }
     for (QFrame* line : m_separators) {

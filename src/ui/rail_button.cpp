@@ -28,6 +28,12 @@ void RailButton::setExpanded(bool expanded, int width)
     update();
 }
 
+void RailButton::setSide(int side)
+{
+    m_side = side;
+    setFixedSize(m_expanded ? width() : m_side, m_side);
+}
+
 void RailButton::setLabel(const QString& label)
 {
     m_label = label;

@@ -22,6 +22,8 @@ public:
 
     /// Label beside the icon, `width` px wide; collapsed: the square button.
     void setExpanded(bool expanded, int width);
+    /// The button's height, and its width without labels.
+    void setSide(int side);
     /// Overrides the default label (the action's text without "…").
     void setLabel(const QString& label);
     /// A second, muted line under the label while expanded; empty hides it.
