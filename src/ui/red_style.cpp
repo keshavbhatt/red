@@ -232,7 +232,11 @@ QListView, QTreeView, QTableView, QListWidget, QTreeWidget, QTableWidget {
     selection-background-color: {{hover}}; selection-color: {{text}};
     alternate-background-color: transparent;
 }
-QListView::item, QTreeView::item { padding: 4px; border-radius: 6px; }
+QListView::item { padding: 4px; border-radius: 6px; }
+/* Tree rows span several columns: square cells, so a selected or hovered row is one band
+   rather than a pill per cell; the branch area to its left joins in. */
+QTreeView::item { padding: 4px; border-radius: 0; }
+QTreeView::branch:selected, QTreeView::branch:hover { background: {{hover}}; }
 QListView::item:selected, QTreeView::item:selected, QTableView::item:selected { background: {{hover}}; color: {{text}}; }
 QListView::item:hover, QTreeView::item:hover { background: {{hover}}; }
 QHeaderView::section {
