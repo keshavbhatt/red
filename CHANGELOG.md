@@ -12,6 +12,10 @@ versions follow [Semantic Versioning](https://semver.org/).
   what it always did, with a note that the next video playing by itself is YouTube's own
   Autoplay setting.
 
+### Fixed
+- **Leaving full screen** brings back a maximized window instead of a smaller one (seen on KDE
+  Plasma Wayland).
+
 ## [10.3.0] - 2026-10-17
 
 ### Added

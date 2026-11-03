@@ -647,10 +647,15 @@ void MainWindow::setFullScreenMode(bool on)
         }
     } else {
         m_exitFullScreen->setEnabled(false);
+        // Wayland (KWin): one request from full screen straight to maximized ends as a normal
+        // window (issue #19). Leave full screen first, maximize on the next turn.
+        showNormal();
         if (m_stateBeforeFullScreen & Qt::WindowMaximized) {
-            showMaximized();
-        } else {
-            showNormal();
+            QTimer::singleShot(0, this, [this] {
+                if (!isFullScreen() && !m_miniPlayer) {
+                    showMaximized();
+                }
+            });
         }
         m_webView->exitPageFullScreen();
     }
@@ -728,11 +733,14 @@ void MainWindow::setMiniPlayer(bool on)
     }
     m_miniPlayer = on;
     if (on) {
-        if (isFullScreen()) {
+        const bool wasFullScreen = isFullScreen();
+        if (wasFullScreen) {
             m_actions->fullScreen->setChecked(false);
         }
-        m_geometryBeforeMini = saveGeometry();
-        m_stateBeforeMini = windowState();
+        // Leaving full screen maximizes again only on the next turn (setFullScreenMode), so
+        // remember the window as it was before full screen.
+        m_geometryBeforeMini = wasFullScreen ? m_geometryBeforeFullScreen : saveGeometry();
+        m_stateBeforeMini = wasFullScreen ? m_stateBeforeFullScreen : windowState();
         applyChrome();
         m_webView->setMiniPlayer(true);
         setWindowFlag(Qt::WindowStaysOnTopHint, true);
