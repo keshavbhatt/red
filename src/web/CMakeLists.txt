@@ -28,6 +28,8 @@ qt_add_library(red_web STATIC
     web_page.h
     web_profile.cpp
     web_profile.h
+    swipe_indicator.cpp
+    swipe_indicator.h
     web_view.cpp
     web_view.h
 )

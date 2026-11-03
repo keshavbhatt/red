@@ -109,6 +109,11 @@ medium or large.
 further from where you clicked, the faster it scrolls. Click again to stop. It is off by default
 because on Linux the middle button pastes.
 
+**Swipe to go back**: on a touchpad, swipe two fingers to the right to go back and to the left
+to go forward, as in a browser. An arrow slides in from the edge; let go once it fills in. A row
+that scrolls sideways keeps the swipe for itself. It works in YouTube and YouTube Music on a
+Wayland session, not in TV mode; turn it off in *Settings → General*.
+
 **Screen** stays awake while a video plays, and playback keeps going while the window is hidden
 or minimised. Both are switches in *Settings → Playback*.
 
@@ -280,7 +285,7 @@ Press **Ctrl+,** or the rail's gear.
 
 - **General**: the mode Red opens in (YouTube by default, YouTube Music, TV mode, or the mode
   you used last), the YouTube start page (Home, Subscriptions, or where you left off), what
-  closing the window does, tray icon, side rail and its labels, middle-click scrolling, download
+  closing the window does, tray icon, side rail and its labels, middle-click scrolling, swiping to go back, download
   notifications.
 - **Appearance**: theme, page zoom, interface scale.
 - **Playback**: whether a video you open starts without a click (the next video playing by

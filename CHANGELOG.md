@@ -5,6 +5,11 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [10.3.1] - unreleased
 
+### Added
+- **Swipe to go back**: swipe two fingers on a touchpad to go back or forward in YouTube and
+  YouTube Music, with an arrow that shows when letting go will navigate. Rows that scroll
+  sideways keep the swipe. On by default; *Settings → General* turns it off.
+
 ### Changed
 - **Finer playback speeds in TV mode**: D and A now change the speed in steps of 0.05, so
   1.1x and 1.15x are a few presses away; with Shift they step by 0.25 as before.

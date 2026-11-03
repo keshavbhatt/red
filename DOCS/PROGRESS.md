@@ -14,6 +14,14 @@ Newest first. One entry per working session.
 | M5 Settings & polish | wip |
 | M6 Packaging | recipes + workflows ready (snap, Flatpak, tests); first run needs the repo pushed |
 
+## 2026-11-04: public issues
+
+* #16: TV speed keys step by 0.05 (Shift: 0.25). #22: Autoplay renamed "Start videos without a
+  click" (checked live: it wins over `--autoplay-policy`). #19: leaving full screen restores a
+  maximized window on KWin Wayland (reproduced with a KWin script, fixed by maximizing on the
+  next turn). #18: two-finger swipe for back / forward (ADR-022), verified with synthetic
+  gestures: back, forward, a sideways scroller keeps the swipe, short swipe ignored, TV ignored.
+
 ## 2026-11-03: open source
 
 * Snap channels as in omnidict (owner, ADR-021): pushes to `master` reach edge as

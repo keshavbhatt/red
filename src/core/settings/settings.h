@@ -198,6 +198,10 @@ public:
     /// pastes.
     [[nodiscard]] bool middleClickScroll() const;
     void setMiddleClickScroll(bool enabled);
+    /// A two-finger touchpad swipe goes back and forward (public issue #18, ADR-022).
+    /// On by default; never in TV mode.
+    [[nodiscard]] bool swipeNavigation() const;
+    void setSwipeNavigation(bool enabled);
     [[nodiscard]] StartPage startPage() const;
     void setStartPage(StartPage page);
     [[nodiscard]] bool notifyOnDownloadFinish() const;
@@ -352,6 +356,7 @@ Q_SIGNALS:
     void startModeChanged(red::core::StartMode mode);
     void startPageChanged(red::core::StartPage page);
     void middleClickScrollChanged(bool enabled);
+    void swipeNavigationChanged(bool enabled);
     void notifyOnDownloadFinishChanged(bool enabled);
     void trayEnabledChanged(bool enabled);
     void themeChanged(red::core::Theme theme);

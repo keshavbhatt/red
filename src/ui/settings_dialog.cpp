@@ -272,6 +272,12 @@ QWidget* SettingsDialog::buildGeneral()
     v->addWidget(mutedLabel(tr("Middle-click the page, then move the mouse up or down; click again to stop. "
                                "Takes effect after a restart."),
                             integration));
+    m_swipe = new QCheckBox(tr("Swipe with two fingers to go back and forward"), integration);
+    connect(m_swipe, &QCheckBox::toggled, this, [this](bool on) { m_settings.setSwipeNavigation(on); });
+    v->addWidget(m_swipe);
+    v->addWidget(mutedLabel(tr("On a touchpad, in YouTube and YouTube Music; not in TV mode. Needs a Wayland "
+                               "session."),
+                            integration));
     m_notify = new QCheckBox(tr("Notify me when a download finishes"), integration);
     connect(m_notify, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setNotifyOnDownloadFinish(on); });
@@ -772,6 +778,7 @@ void SettingsDialog::loadValues()
     m_railLabels->setEnabled(m_settings.showRail());
     m_notify->setChecked(m_settings.notifyOnDownloadFinish());
     m_middleScroll->setChecked(m_settings.middleClickScroll());
+    m_swipe->setChecked(m_settings.swipeNavigation());
     m_theme_->setCurrentIndex(m_theme_->findData(static_cast<int>(m_settings.theme())));
     m_zoom->setValue(m_settings.zoomFactor() * 100);
     m_scale->setValue(m_settings.interfaceScale() * 100);

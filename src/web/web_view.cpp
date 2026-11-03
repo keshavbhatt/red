@@ -10,6 +10,7 @@
 #include "web/logging.h"
 #include "web/permission_controller.h"
 #include "web/popup_window.h"
+#include "web/swipe_indicator.h"
 #include "web/user_agent.h"
 #include "web/web_page.h"
 #include "web/web_profile.h"
@@ -17,11 +18,13 @@
 #include <QAction>
 #include <QChildEvent>
 #include <QContextMenuEvent>
+#include <QCoreApplication>
 #include <QMenu>
 #include <QTimer>
 #include <QWebChannel>
 #include <QWebEngineContextMenuRequest>
 #include <QWebEngineFullScreenRequest>
+#include <QWebEngineHistory>
 #include <QWebEngineLoadingInfo>
 #include <QWebEngineScript>
 #include <QWheelEvent>
@@ -50,6 +53,19 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
     m_page->setHostWidget(this);
     setPage(m_page);
     applyZoom();
+
+    m_swipeIndicator = new SwipeIndicator(this);
+    m_swipeFinish = new QTimer(this);
+    m_swipeFinish->setSingleShot(true);
+    m_swipeFinish->setInterval(120);
+    connect(m_swipeFinish, &QTimer::timeout, this, &WebView::finishSwipe);
+    scheduleDebugSwipes();
+    connect(&m_settings, &core::Settings::swipeNavigationChanged, this, [this](bool on) {
+        if (!on) {
+            m_swipe.cancel();
+            m_swipeIndicator->setProgress(0);
+        }
+    });
 
     // One channel per page exposing the profile's bridge object (ADR-006).
     auto* channel = new QWebChannel(m_page);
@@ -88,6 +104,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, const QStr
     });
     connect(m_page, &QWebEnginePage::fullScreenRequested, this, [this](QWebEngineFullScreenRequest request) {
         request.accept();
+        m_pageFullScreen = request.toggleOn();
         Q_EMIT fullScreenRequested(request.toggleOn());
     });
 
@@ -325,6 +342,7 @@ void WebView::mediaCommand(const QString& command, double argument)
 
 void WebView::setMiniPlayer(bool on)
 {
+    m_miniPlayer = on;
     m_profile->setMiniPlayer(on);
 }
 
@@ -435,8 +453,110 @@ bool WebView::eventFilter(QObject* watched, QEvent* event)
             }
             return true;
         }
+        trackSwipe(*wheel);
     }
     return QWebEngineView::eventFilter(watched, event);
+}
+
+// ---- two-finger swipe (ADR-022) ----------------------------------------------
+//
+// The touchpad gesture reaches the page through the filter above, with its phases; the
+// scroll the page did not use comes back to wheelEvent() without them. Only that unused
+// part moves the arrow, so anything that can still scroll sideways keeps the swipe.
+
+bool WebView::swipeAllowed() const
+{
+    return m_settings.swipeNavigation() && m_profile->mode() != core::AppMode::Tv && !m_miniPlayer &&
+           !m_pageFullScreen;
+}
+
+void WebView::trackSwipe(const QWheelEvent& event)
+{
+    switch (event.phase()) {
+    case Qt::ScrollBegin:
+        if (m_swipeFinish->isActive()) {
+            m_swipeFinish->stop();
+            finishSwipe(); // a new gesture before the last one was decided
+        }
+        if (swipeAllowed()) {
+            m_swipe.begin(event.inverted());
+        }
+        break;
+    case Qt::ScrollUpdate:
+        m_swipe.update(event.pixelDelta());
+        break;
+    case Qt::ScrollEnd:
+        if (m_swipe.active()) {
+            m_swipe.end();
+            m_swipeFinish->start(); // the page's last answers are still on their way
+        }
+        break;
+    default: // no phase (a mouse wheel) or momentum: never a swipe
+        break;
+    }
+}
+
+void WebView::wheelEvent(QWheelEvent* event)
+{
+    if (m_swipe.active()) {
+        m_swipe.unused(event->pixelDelta());
+        showSwipeProgress();
+        event->accept();
+        return;
+    }
+    QWebEngineView::wheelEvent(event);
+}
+
+// RED_DEBUG_SWIPE=<seconds>:<dx>:<steps>[:<hold ms>][;…] (ADR-010): plays touchpad swipes into
+// the page at those times after start, `steps` movements of `dx` px (classic scrolling:
+// negative = fingers right = Back), holding before the fingers lift when asked (for a grab).
+void WebView::scheduleDebugSwipes()
+{
+    const QString spec = qEnvironmentVariable("RED_DEBUG_SWIPE");
+    for (const QString& one : spec.split(u';', Qt::SkipEmptyParts)) {
+        const QStringList f = one.split(u':');
+        const int at = f.value(0).toInt();
+        const int dx = f.value(1).toInt();
+        const int steps = f.value(2, u"12"_s).toInt();
+        const int hold = f.value(3, u"0"_s).toInt();
+        QTimer::singleShot(at * 1000, this, [this, dx, steps, hold] {
+            QWidget* target = focusProxy() != nullptr ? focusProxy() : this;
+            const QPointF pos(target->width() / 2.0, target->height() / 2.0);
+            const QPointF global = target->mapToGlobal(pos);
+            const auto send = [target, pos, global](Qt::ScrollPhase phase, QPoint delta) {
+                QWheelEvent ev(pos, global, delta, delta * 2, Qt::NoButton, Qt::NoModifier, phase, false);
+                QCoreApplication::sendEvent(target, &ev);
+            };
+            qCInfo(lcWeb) << "debug swipe" << dx << "x" << steps;
+            send(Qt::ScrollBegin, {});
+            for (int i = 1; i <= steps; ++i) {
+                QTimer::singleShot(16 * i, target, [send, dx] { send(Qt::ScrollUpdate, QPoint(dx, 0)); });
+            }
+            QTimer::singleShot(16 * (steps + 1) + hold, target, [send] { send(Qt::ScrollEnd, {}); });
+        });
+    }
+}
+
+void WebView::showSwipeProgress()
+{
+    double progress = m_swipe.progress(width());
+    if ((progress > 0 && !history()->canGoBack()) || (progress < 0 && !history()->canGoForward())) {
+        progress = 0; // nowhere to go: no arrow, as in a browser
+    }
+    m_swipeIndicator->setProgress(progress);
+}
+
+void WebView::finishSwipe()
+{
+    const core::SwipeAction action = m_swipe.finish(width());
+    m_swipeIndicator->setProgress(0);
+    if (action == core::SwipeAction::Back && history()->canGoBack()) {
+        qCInfo(lcWeb) << "swipe: back";
+        back();
+    } else if (action == core::SwipeAction::Forward && history()->canGoForward()) {
+        qCInfo(lcWeb) << "swipe: forward";
+        forward();
+    }
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent* event)

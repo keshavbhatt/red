@@ -218,7 +218,9 @@ window, every visible dialog and any open popup (menus, combo lists) on a timer,
 `RED_DEBUG_AUTODOWNLOAD=video|audio|advanced[-playlist][:from-to]` fills the download dialog once
 the probe finishes and accepts it (`advanced`, unbounded playlists and `video-subtitles`, which
 drops the subtitle picker open, stay open for a grab); `RED_DEBUG_SETTINGS_PAGE=<n>` opens
-Settings on a page and `RED_DEBUG_OPEN=<dialog>` opens one of the app's dialogs. Together with `scripts/cdp-eval.mjs` (remote debugging on port 9422) they let a headless
+Settings on a page and `RED_DEBUG_OPEN=<dialog>` opens one of the app's dialogs;
+`RED_DEBUG_SWIPE=<seconds>:<dx>:<steps>[:<hold ms>][;…]` plays touchpad swipes into the page
+(ADR-022). Together with `scripts/cdp-eval.mjs` (remote debugging on port 9422) they let a headless
 session exercise the real UI end to end. They read environment variables only, cost nothing when
 unset, and ship (they are harmless and useful for bug reports).
 
@@ -462,4 +464,25 @@ Publishing stays gated by `PUBLISH_TO_STORE` and `SNAPCRAFT_STORE_CREDENTIALS`.
 
 **Consequences.** Tagging is the decision to ship to every snap user; edge is where a build is
 checked first. Candidate and beta stay unused. Flathub still follows the published snap by hand.
+
+## ADR-022: two-finger swipe for back and forward, from the scroll the page leaves unused (2026-11-04)
+
+**Context.** Public issue #18 asked for the browser's two-finger swipe back. A touchpad swipe
+is horizontal scrolling, so it must not steal sideways scrolling from rows that use it, and TV
+mode has no browser history (its Back leaves the screen, and stops a playing video).
+
+**Decision.** `WebView` watches the touchpad gesture on its way into the page (its begin,
+update and end phases) and counts only the sideways scroll the page hands back unused: Qt
+WebEngine returns unconsumed wheel events to the view, without their phase. Chromium latches a
+gesture to the scroller it started on and reports nothing once that scroller reaches its end,
+so a row scrolled to its end never turns into Back mid-gesture, while a swipe that starts
+where nothing can scroll sideways navigates. `core::SwipeTracker` holds the arithmetic (finger
+direction from `inverted()`, a mostly-sideways test, a threshold of a quarter of the width up
+to 220 px) and decides 120 ms after the fingers lift, when the page's last answers are in.
+`web::SwipeIndicator` is the arrow at the edge. Setting `app/swipeNavigation`, default on; off in
+TV mode, the mini player and full-screen video. Mouse wheels (no phase) never count.
+
+**Consequences.** It needs scroll phases, which Wayland sessions report (KDE, GNOME); on X11 the
+setting does nothing. Verified with synthetic gestures (`RED_DEBUG_SWIPE`) and an injected
+sideways scroller; a real touchpad and natural scrolling still need the owner's hands.
 

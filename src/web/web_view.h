@@ -3,6 +3,7 @@
 #include "core/media_state.h"
 #include "core/render_crash_policy.h"
 #include "core/settings/settings.h"
+#include "core/swipe_navigation.h"
 
 #include <QElapsedTimer>
 #include <QUrl>
@@ -11,7 +12,9 @@
 
 #include <optional>
 
+class QTimer;
 class QWebEngineLoadingInfo;
+class QWheelEvent;
 
 namespace red::core {
 class ThemeService;
@@ -20,6 +23,7 @@ class ThemeService;
 namespace red::web {
 
 class PermissionController;
+class SwipeIndicator;
 class WebPage;
 class WebProfile;
 
@@ -88,6 +92,8 @@ protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
     void childEvent(QChildEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
+    /// Scroll the page did not use comes back here (two-finger swipe, ADR-022).
+    void wheelEvent(QWheelEvent* event) override;
 
 private:
     void applyZoom();
@@ -99,6 +105,11 @@ private:
     void updateDownloadable();
     void recoverFromSignInRejection(const QUrl& url);
     [[nodiscard]] QUrl startUrl() const;
+    [[nodiscard]] bool swipeAllowed() const;
+    void trackSwipe(const QWheelEvent& event);
+    void showSwipeProgress();
+    void finishSwipe();
+    void scheduleDebugSwipes();
 
     core::Settings& m_settings;
     core::ThemeService& m_theme;
@@ -112,6 +123,11 @@ private:
     bool m_showingError = false;
     bool m_downloadable = false;
     bool m_signInRecoveryTried = false;
+    bool m_miniPlayer = false;
+    bool m_pageFullScreen = false;
+    core::SwipeTracker m_swipe;
+    SwipeIndicator* m_swipeIndicator = nullptr;
+    QTimer* m_swipeFinish = nullptr;
     QString m_errorTitle;
     QString m_errorDetail;
 };

@@ -47,6 +47,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | D13 | Custom error page with retry | yes | KEEP | done — `web::error_page` (from whatsie) |
 | D14 | Return YouTube Dislike counts (setting, default on) | none | KEEP | done — `services::DislikesClient`, `dislikes.js` |
 | D15 | DeArrow titles/thumbnails | none | LATER | CSP img-src on desktop |
+| D16 | Two-finger touchpad swipe for back / forward (setting, default on; YouTube and YouTube Music, never TV mode; public issue #18) | n/a | KEEP | done, `core::SwipeTracker`, `web::SwipeIndicator`, ADR-022 |
 
 ## C. TV mode (Leanback)
 

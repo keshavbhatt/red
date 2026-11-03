@@ -57,6 +57,7 @@ private Q_SLOTS:
         QCOMPARE(m_settings->lastMode(), AppMode::Desktop);
         QVERIFY(m_settings->railLabels());         // new users see what each rail button is
         QVERIFY(!m_settings->middleClickScroll()); // Linux pastes with the middle button
+        QVERIFY(m_settings->swipeNavigation());    // as in a browser
         QSignalSpy labels(m_settings.get(), &Settings::railLabelsChanged);
         m_settings->setRailLabels(false);
         m_settings->setRailLabels(false);
@@ -154,12 +155,14 @@ private Q_SLOTS:
         m_settings->setStartMode(StartMode::Music);
         m_settings->setStartPage(StartPage::Subscriptions);
         m_settings->setMiddleClickScroll(true);
+        m_settings->setSwipeNavigation(false);
         m_settings->setNotifyOnDownloadFinish(false);
         m_settings->sync();
         Settings again(m_dir->filePath(u"red.ini"_s));
         QCOMPARE(again.startMode(), StartMode::Music);
         QCOMPARE(again.startPage(), StartPage::Subscriptions);
         QVERIFY(again.middleClickScroll());
+        QVERIFY(!again.swipeNavigation());
         QVERIFY(!again.notifyOnDownloadFinish());
     }
 

@@ -57,6 +57,8 @@ qt_add_library(red_core STATIC
     youtube_url.h
     mini_player_policy.cpp
     mini_player_policy.h
+    swipe_navigation.cpp
+    swipe_navigation.h
     zoom_policy.cpp
     zoom_policy.h
 )
