@@ -141,6 +141,7 @@
         <ul>
           <li>Swipe two fingers on a touchpad to go back or forward in YouTube and YouTube Music; rows that scroll sideways keep the swipe</li>
           <li>The download dialog's stream list sums up what you picked and its size, and warns when a video has no sound</li>
+          <li>What's new opens from About at any time and browses the notes of earlier releases</li>
           <li>In TV mode, D and A change the playback speed in steps of 0.05, with Shift in steps of 0.25</li>
           <li>The Autoplay option is now called Start videos without a click, with a note on where YouTube's own autoplay is</li>
           <li>Leaving full screen brings back a maximized window instead of a smaller one</li>

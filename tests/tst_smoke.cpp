@@ -75,6 +75,13 @@ private Q_SLOTS:
         link->click();
         QTRY_VERIFY(window.findChild<red::ui::WhatsNewDialog*>() != nullptr);
         QTRY_VERIFY(about.isNull() || !about->isVisible());
+        // It opens on the running version and browses older ones.
+        auto* notes = window.findChild<red::ui::WhatsNewDialog*>();
+        QCOMPARE(notes->shownVersion(), u"10.3.1"_s);
+        notes->showVersion(u"10.0.0"_s);
+        QCOMPARE(notes->shownVersion(), u"10.0.0"_s);
+        notes->showVersion(u"9.9.9"_s); // not in the changelog: ignored
+        QCOMPARE(notes->shownVersion(), u"10.0.0"_s);
         window.close();
     }
 };

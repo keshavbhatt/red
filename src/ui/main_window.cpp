@@ -1062,7 +1062,7 @@ void MainWindow::maybeShowWhatsNew(bool force)
     }
     // Marked when shown, not when closed: a crash must not loop the dialog.
     m_settings.setWhatsNewSeenVersion(m_appVersion);
-    auto* dialog = new WhatsNewDialog(m_appVersion, notes, this);
+    auto* dialog = new WhatsNewDialog(m_appVersion, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

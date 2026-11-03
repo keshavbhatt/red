@@ -1,8 +1,20 @@
 #pragma once
 
+#include <QList>
 #include <QString>
 
 namespace red::core {
+
+/// One `## [<version>]` heading of a Keep-a-Changelog document.
+struct ChangelogRelease
+{
+    QString version; ///< without a `v` prefix
+    QString date;    ///< the `YYYY-MM-DD` after the heading; empty while unreleased
+};
+
+/// Every release heading in document order (newest first in a Keep-a-Changelog file), so the
+/// What's new dialog can offer older versions too. Pure, tested.
+[[nodiscard]] QList<ChangelogRelease> changelogReleases(const QString& markdown);
 
 /// The body of the `## [<version>]` section of a Keep-a-Changelog document:
 /// everything after that heading up to the next `## ` heading, trimmed.

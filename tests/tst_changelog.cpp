@@ -42,6 +42,33 @@ private Q_SLOTS:
         QVERIFY(changelogSection(QString(), u"10.0.0"_s).isEmpty());
     }
 
+    void releasesInDocumentOrderWithDates()
+    {
+        const QList<ChangelogRelease> releases = changelogReleases(kDoc);
+        QCOMPARE(releases.size(), 2);
+        QCOMPARE(releases.at(0).version, u"10.1.0"_s);
+        QVERIFY(releases.at(0).date.isEmpty()); // unreleased
+        QCOMPARE(releases.at(1).version, u"10.0.0"_s);
+        QCOMPARE(releases.at(1).date, u"2026-09-20"_s);
+        // A v prefix, CRLF, and link-reference lines that are not headings.
+        const QList<ChangelogRelease> other =
+            changelogReleases(u"## [v2.0.0] - 2026-01-02\r\n[2.0.0]: x\r\n"_s);
+        QCOMPARE(other.size(), 1);
+        QCOMPARE(other.at(0).version, u"2.0.0"_s);
+        QCOMPARE(other.at(0).date, u"2026-01-02"_s);
+        QVERIFY(changelogReleases(QString()).isEmpty());
+    }
+
+    void realChangelogListsEveryRelease()
+    {
+        QFile file(QString::fromLatin1(RED_CHANGELOG_PATH));
+        QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QList<ChangelogRelease> releases = changelogReleases(QString::fromUtf8(file.readAll()));
+        QVERIFY(releases.size() >= 5);
+        QCOMPARE(releases.first().version, QString::fromLatin1(RED_VERSION)); // newest first
+        QCOMPARE(releases.last().version, u"10.0.0"_s);
+    }
+
     void realChangelogHasNotesForThisVersion()
     {
         QFile file(QString::fromLatin1(RED_CHANGELOG_PATH));

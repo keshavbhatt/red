@@ -12,7 +12,7 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **What you picked, in words**: under the download dialog's stream list, a line sums up the
   picked streams and their size, and warns when a video stream has no sound picked with it.
 - **What's new, any time**: a *What's new* link next to the version in *About Red* shows the
-  release notes again.
+  release notes again, and a version picker in it browses the notes of every earlier release.
 
 ### Changed
 - **Finer playback speeds in TV mode**: D and A now change the speed in steps of 0.05, so
