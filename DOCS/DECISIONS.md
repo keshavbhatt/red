@@ -480,7 +480,8 @@ where nothing can scroll sideways navigates. `core::SwipeTracker` holds the arit
 in Chrome: scrolling past the left edge is Back, whatever natural scrolling does to the
 fingers; a mostly-sideways test, a threshold of a quarter of the width up
 to 220 px) and decides 120 ms after the fingers lift, when the page's last answers are in.
-`web::SwipeIndicator` is the arrow at the edge. Setting `app/swipeNavigation`, default on; off in
+`web::SwipeIndicator` is the arrow at the edge, as in Chrome: a bubble with a ring that grows with
+the swipe, red once letting go would navigate, held red and faded when it fires. Setting `app/swipeNavigation`, default on; off in
 TV mode, the mini player and full-screen video. Mouse wheels (no phase) never count.
 
 **Consequences.** It needs scroll phases, which Wayland sessions report (KDE, GNOME); on X11 the

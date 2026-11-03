@@ -543,19 +543,23 @@ void WebView::showSwipeProgress()
     if ((progress > 0 && !history()->canGoBack()) || (progress < 0 && !history()->canGoForward())) {
         progress = 0; // nowhere to go: no arrow, as in a browser
     }
+    m_swipeIndicator->setDark(m_theme.isDark());
     m_swipeIndicator->setProgress(progress);
 }
 
 void WebView::finishSwipe()
 {
     const core::SwipeAction action = m_swipe.finish(width());
-    m_swipeIndicator->setProgress(0);
     if (action == core::SwipeAction::Back && history()->canGoBack()) {
         qCInfo(lcWeb) << "swipe: back";
+        m_swipeIndicator->confirm();
         back();
     } else if (action == core::SwipeAction::Forward && history()->canGoForward()) {
         qCInfo(lcWeb) << "swipe: forward";
+        m_swipeIndicator->confirm();
         forward();
+    } else {
+        m_swipeIndicator->setProgress(0);
     }
 }
 
