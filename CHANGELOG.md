@@ -9,6 +9,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **Swipe to go back**: swipe two fingers on a touchpad to go back or forward in YouTube and
   YouTube Music, with an arrow that shows when letting go will navigate. Rows that scroll
   sideways keep the swipe. On by default; *Settings → General* turns it off.
+- **What you picked, in words**: under the download dialog's stream list, a line sums up the
+  picked streams and their size, and warns when a video stream has no sound picked with it.
 
 ### Changed
 - **Finer playback speeds in TV mode**: D and A now change the speed in steps of 0.05, so

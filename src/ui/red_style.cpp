@@ -77,6 +77,7 @@ QToolTip {
 }
 QStatusBar { background: {{bg}}; border-top: 1px solid {{border}}; }
 QLabel[redMuted="true"] { color: {{muted}}; }
+QLabel[redWarning="true"] { color: {{warning}}; }
 QLabel[redTitle="true"] { font-size: 16px; font-weight: 600; }
 QLabel[redHeading="true"] { font-size: 20px; font-weight: 600; }
 QLabel[redSection="true"] { font-size: 12px; font-weight: 600; color: {{muted}}; text-transform: uppercase; letter-spacing: 1px; }

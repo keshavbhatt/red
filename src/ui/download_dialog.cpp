@@ -411,6 +411,7 @@ QWidget* DownloadDialog::buildAdvancedTab()
     connect(m_formats, &QTreeWidget::itemChanged, this, [this](QTreeWidgetItem* item, int column) {
         if (column != 0 || item->checkState(0) != Qt::Checked) {
             updatePreview();
+            updateStreamSummary();
             return;
         }
         // Exclusive within a kind: a video pick clears other video picks (and
@@ -431,8 +432,15 @@ QWidget* DownloadDialog::buildAdvancedTab()
             }
         }
         updatePreview();
+        updateStreamSummary();
     });
     layout->addWidget(m_formats, 1);
+    m_streamSummary = new QLabel(tab);
+    m_streamSummary->setProperty("redMuted", true);
+    m_streamSummary->setWordWrap(true);
+    m_streamSummary->setTextFormat(Qt::PlainText);
+    layout->addWidget(m_streamSummary);
+    updateStreamSummary();
     return tab;
 }
 
@@ -603,6 +611,7 @@ void DownloadDialog::presentScope()
     m_status->setStyleSheet({});
     m_retry->setVisible(false);
     m_formats->clear();
+    updateStreamSummary();
     m_entries->clear();
     m_playlistSection->setVisible(false);
     if (!state.info) {
@@ -771,6 +780,7 @@ void DownloadDialog::populateFromInfo()
     }
     m_removeSponsors->setEnabled(!m_isPlaylist || true);
     populateFormats();
+    updateStreamSummary();
     if (m_isPlaylist) {
         populateEntries();
     }
@@ -927,6 +937,91 @@ void DownloadDialog::updatePreview()
         m_download->setEnabled(picked && !m_probing);
     } else {
         m_download->setEnabled(!m_probing && !(state.info && state.info->isLive));
+    }
+}
+
+void DownloadDialog::updateStreamSummary()
+{
+    // The picked streams, looked up in the probe by id.
+    const core::MediaFormat* video = nullptr;
+    const core::MediaFormat* audio = nullptr;
+    const core::MediaFormat* both = nullptr;
+    for (int i = 0; i < m_formats->topLevelItemCount(); ++i) {
+        QTreeWidgetItem* group = m_formats->topLevelItem(i);
+        for (int j = 0; j < group->childCount(); ++j) {
+            QTreeWidgetItem* item = group->child(j);
+            if (item->checkState(0) != Qt::Checked) {
+                continue;
+            }
+            const QString id = item->data(0, kFormatIdRole).toString();
+            const auto it = std::find_if(m_info.formats.cbegin(), m_info.formats.cend(),
+                                         [&id](const core::MediaFormat& f) { return f.id == id; });
+            if (it == m_info.formats.cend()) {
+                continue;
+            }
+            const int kind = item->data(0, kFormatKindRole).toInt();
+            (kind == 0 ? video : (kind == 1 ? audio : both)) = &*it;
+        }
+    }
+    // "MP4 1080p (1920×1080, AVC)", "M4A medium (129 kbps, AAC)".
+    const auto describe = [](const core::MediaFormat& f) {
+        QString name = f.ext.toUpper();
+        if (!f.note.isEmpty()) {
+            name += u' ' + f.note;
+        }
+        QStringList details;
+        if (f.hasVideo()) {
+            details << u"%1×%2"_s.arg(f.width).arg(f.height);
+        } else if (f.abr > 0 || f.tbr > 0) {
+            details << tr("%1 kbps").arg(static_cast<int>(f.abr > 0 ? f.abr : f.tbr));
+        }
+        if (!f.codecLabel().isEmpty()) {
+            details << f.codecLabel();
+        }
+        return details.isEmpty() ? name : u"%1 (%2)"_s.arg(name, details.join(u", "_s));
+    };
+    const auto size = [](std::initializer_list<const core::MediaFormat*> parts) {
+        qint64 total = 0;
+        for (const core::MediaFormat* f : parts) {
+            if (f == nullptr || f->filesize <= 0) {
+                return QString(); // one part unknown: no total rather than a wrong one
+            }
+            total += f->filesize;
+        }
+        return core::formatBytes(total);
+    };
+
+    QString text;
+    bool warn = false;
+    if (both != nullptr) {
+        const QString s = size({both});
+        text = tr("You get: %1, video and sound in one").arg(describe(*both));
+        if (!s.isEmpty()) {
+            text += tr(", about %1").arg(s);
+        }
+    } else if (video != nullptr && audio != nullptr) {
+        const QString s = size({video, audio});
+        text = tr("You get: %1 + %2").arg(describe(*video), describe(*audio));
+        if (!s.isEmpty()) {
+            text += tr(", about %1").arg(s);
+        }
+    } else if (video != nullptr) {
+        text = tr("You get: %1 with no sound. Pick an audio stream too for sound.").arg(describe(*video));
+        warn = true;
+    } else if (audio != nullptr) {
+        const QString s = size({audio});
+        text = tr("You get: %1, sound only").arg(describe(*audio));
+        if (!s.isEmpty()) {
+            text += tr(", about %1").arg(s);
+        }
+    } else {
+        text = tr("Nothing picked yet.");
+    }
+    m_streamSummary->setText(text);
+    if (m_streamSummary->property("redWarning").toBool() != warn) {
+        m_streamSummary->setProperty("redWarning", warn);
+        m_streamSummary->style()->unpolish(m_streamSummary);
+        m_streamSummary->style()->polish(m_streamSummary);
     }
 }
 

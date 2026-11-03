@@ -109,6 +109,8 @@ private:
     void populateEntries();
     void updateHero();
     void updatePreview();
+    /// The advanced tab's line under the stream table: what is picked and what it adds up to.
+    void updateStreamSummary();
     void updateEntryCount();
     void chooseFolder();
     [[nodiscard]] core::DownloadOptions options() const;
@@ -157,6 +159,7 @@ private:
     QCheckBox* m_audioEmbedMeta = nullptr;
     QTreeWidget* m_formats = nullptr;
     QLabel* m_formatsHint = nullptr;
+    QLabel* m_streamSummary = nullptr;
     QWidget* m_playlistSection = nullptr;
     QListWidget* m_entries = nullptr;
     QLabel* m_entryCount = nullptr;
