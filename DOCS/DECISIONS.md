@@ -445,3 +445,21 @@ the private repository stays as a frozen mirror. The snap workflow builds on `ma
 **Consequences.** Contributions to the GPL part are welcome; forks must leave the module out.
 The public repository needs the `SNAPCRAFT_STORE_CREDENTIALS` secret and `PUBLISH_TO_STORE`
 variable. The Flathub manifest still repackages the snap; building it from a tag is a follow-up.
+
+## ADR-021: snap tags go straight to stable; edge builds name the commit (2026-11-03)
+
+**Context.** Since 10.0 the snap workflow published every push to edge with the version of the
+release it led to, and stable was promoted by hand in the store. The repository had no tags and
+no GitHub releases. The owner asked for omnidict's flow (its ADR-021).
+
+**Decision.** `.github/workflows/snap.yml`: a push to `master` publishes to edge with the version
+`X.Y.Z+git<hash>` (set in `snap/snapcraft.yaml` when the build is not exactly the version's
+tag); a `vX.Y.Z` tag publishes `X.Y.Z` straight to stable, after checking the tag against
+`project(VERSION)`. A newer push to a branch cancels its older build, never a tag's.
+`.github/workflows/release.yml` turns the same tag into a GitHub release whose notes are the
+dated `CHANGELOG.md` section, and fails when the section is undated or the version differs.
+Publishing stays gated by `PUBLISH_TO_STORE` and `SNAPCRAFT_STORE_CREDENTIALS`.
+
+**Consequences.** Tagging is the decision to ship to every snap user; edge is where a build is
+checked first. Candidate and beta stay unused. Flathub still follows the published snap by hand.
+

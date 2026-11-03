@@ -16,6 +16,10 @@ Newest first. One entry per working session.
 
 ## 2026-11-03: open source
 
+* Snap channels as in omnidict (owner, ADR-021): pushes to `master` reach edge as
+  `X.Y.Z+git<hash>`, a `vX.Y.Z` tag publishes to stable and `release.yml` makes the GitHub
+  release from the changelog section.
+
 * Owner decision: Red goes open source at github.com/keshavbhatt/red like Playlist Downloader
   (ADR-020): GPL-3.0-or-later, the licensing module source-available. LICENSE, LICENSES/,
   LICENSING.md, REUSE.toml, SPDX headers on the module, metainfo and snap licence fields, the

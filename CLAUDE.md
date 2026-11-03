@@ -20,5 +20,7 @@ in LICENSING.md and REUSE.toml: GPL-3.0-or-later, licensing module under its own
   Diagnostics.
 - ffmpeg is never downloaded; it comes from the system or the snap/Flatpak runtime.
 - The snap is built by GitHub Actions only, never locally.
-- Release checklist: replace `— unreleased` in the `## [x.y.z]` changelog heading with the date,
-  keep the metainfo `<release>` in sync, bump `project(VERSION)`.
+- Release checklist: replace the unreleased marker in the `## [x.y.z]` changelog heading with
+  ` - YYYY-MM-DD`, keep the metainfo `<release>` in sync, bump `project(VERSION)`, then push the
+  tag `vX.Y.Z`. The tag publishes the snap to stable and creates the GitHub release with the
+  changelog section as notes (ADR-021); pushes to `master` only reach edge.

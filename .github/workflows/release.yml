@@ -1,0 +1,42 @@
+# A version tag (v10.3.1) becomes a GitHub release whose notes are that version's section of
+# CHANGELOG.md. The tag must match project(VERSION) in CMakeLists.txt and the section must be
+# dated (the release checklist in CLAUDE.md); otherwise the job fails and nothing is
+# released. The snap for the tag is built and published by snap.yml; the Flatpak by Flathub.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check the version and write the notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#v}"
+          project=$(awk '/^project\(red/ {on = 1} on && $1 == "VERSION" {print $2; exit}' CMakeLists.txt)
+          if [ "$version" != "$project" ]; then
+            echo "tag $TAG does not match project(VERSION) $project" >&2
+            exit 1
+          fi
+          heading=$(grep -m1 "^## \[$version\]" CHANGELOG.md || true)
+          if ! grep -qE ' - [0-9]{4}-[0-9]{2}-[0-9]{2}$' <<<"$heading"; then
+            echo "CHANGELOG.md has no dated section for $version: '$heading'" >&2
+            exit 1
+          fi
+          awk -v h="$heading" '$0 == h {on = 1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notes.md
+          cat notes.md
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" --title "Red ${TAG#v}" --notes-file notes.md --verify-tag --latest

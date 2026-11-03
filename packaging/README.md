@@ -21,9 +21,11 @@ developer machines (owner decision, 2026-09-07: the KDE SDK images are multi-GB)
 - **Plugs** each have a reason: `joystick` (gamepads in TV mode), `screen-inhibit-control`,
   `audio-record` (voice search), `removable-media` (downloads to external drives),
   `browser-support` and the network plugs (WebEngine).
-- **CI**: `.github/workflows/snap.yml` builds amd64 and arm64 on every push to `main`;
-  with the repo variable `PUBLISH_TO_STORE=true` and the `SNAPCRAFT_STORE_CREDENTIALS`
-  secret it releases to **edge**. Nothing is stored as a workflow artifact.
+- **CI** (ADR-021): `.github/workflows/snap.yml` builds amd64 and arm64. A push to `master`
+  publishes to **edge** as `X.Y.Z+git<hash>`; a `vX.Y.Z` tag publishes `X.Y.Z` to **stable**
+  after checking it against `project(VERSION)`. Publishing needs the repo variable
+  `PUBLISH_TO_STORE=true` and the `SNAPCRAFT_STORE_CREDENTIALS` secret. A newer push cancels
+  an older branch build, never a tag's. Nothing is stored as a workflow artifact.
 
 ### Store listing text
 
@@ -69,10 +71,13 @@ short video of the Flatpak build attached. Flathub builds it in their CI; never 
 
 ## Before tagging a release
 
-- `CHANGELOG.md`: replace `— unreleased` in the `## [x.y.z]` heading with the date; no
+- `CHANGELOG.md`: replace the unreleased marker in the `## [x.y.z]` heading with
+  ` - YYYY-MM-DD` (`release.yml` refuses an undated section); no
   accounts/licensing text (CLAUDE.md; `tst_changelog` enforces it). The dialog shows this section.
 - `dist/linux/com.ktechpit.red.metainfo.xml`: matching `<release version date>` notes.
 - `CMakeLists.txt`: `project(VERSION)` bumped.
+- Check the edge build of that commit, then `git tag vX.Y.Z && git push origin vX.Y.Z`: the
+  snap goes to stable and `release.yml` creates the GitHub release from the changelog section.
 
 ## Validation without building
 

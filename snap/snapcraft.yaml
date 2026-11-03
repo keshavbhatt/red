@@ -141,8 +141,13 @@ parts:
       - -DRED_BUILD_TESTS=OFF
     override-build: |
       craftctl default
-      # version from the CMake project
-      VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2)
+      # The version comes from the CMake project, the one source of truth. A build that is
+      # not exactly a version tag (the edge channel) carries the commit: 10.3.1+git1a2b3c4.
+      VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2 | tr -d '[:space:]')
+      if ! git -c safe.directory="*" -C "${CRAFT_PART_SRC}" describe --exact-match --tags --match "v${VER}" >/dev/null 2>&1; then
+        HASH=$(git -c safe.directory="*" -C "${CRAFT_PART_SRC}" rev-parse --short=7 HEAD 2>/dev/null || true)
+        [ -n "${HASH}" ] && VER="${VER}+git${HASH}"
+      fi
       craftctl set version="${VER}"
       # store icon
       mkdir -p "${CRAFT_PART_INSTALL}/meta/gui"
