@@ -1,0 +1,28 @@
+version = 1
+SPDX-PackageName = "Red"
+SPDX-PackageSupplier = "Keshav Bhatt <connect@ktechpit.com>"
+SPDX-PackageDownloadLocation = "https://github.com/keshavbhatt/red"
+
+# Everything is GPL-3.0-or-later except the licensing module below.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# The licensing module: account, licence, evaluation and allowance code.
+[[annotations]]
+path = [
+    "src/modules/AccountAndLicense/**",
+    "src/core/licensing/**",
+    "src/services/licensing/**",
+    "src/ui/account_dialog.cpp",
+    "src/ui/account_dialog.h",
+    "src/ui/plans_dialog.cpp",
+    "src/ui/plans_dialog.h",
+    "tests/tst_daily_allowance.cpp",
+    "tests/tst_legacy_account.cpp"
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "LicenseRef-Ktechpit-Licensing-Module"

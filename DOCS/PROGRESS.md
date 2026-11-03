@@ -14,6 +14,15 @@ Newest first. One entry per working session.
 | M5 Settings & polish | wip |
 | M6 Packaging | recipes + workflows ready (snap, Flatpak, tests); first run needs the repo pushed |
 
+## 2026-11-03: open source
+
+* Owner decision: Red goes open source at github.com/keshavbhatt/red like Playlist Downloader
+  (ADR-020): GPL-3.0-or-later, the licensing module source-available. LICENSE, LICENSES/,
+  LICENSING.md, REUSE.toml, SPDX headers on the module, metainfo and snap licence fields, the
+  About legal notice and Licences link. The public README and guide moved to the root;
+  `scripts/publish-public.sh` and the tracked `Testing/` logs removed.
+* The snap workflow builds on `master`, the public default branch.
+
 ## 2026-10-16: UX audit, mode switch
 
 * UX audit of reaching the main features (19 items, P0 to P2); the first slice landed: a mode

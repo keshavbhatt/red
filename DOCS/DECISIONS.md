@@ -422,3 +422,26 @@ and checks the written text, so the in-process cache cannot hide a mismatch agai
 is Chromium's own `MiddleClickAutoscroll` Blink feature, passed at start (restart to change);
 `mergeChromiumFlags` now merges Blink feature lists with a user's own.
 
+
+## ADR-020: open source, two licences by path (2026-11-03)
+
+**Context.** Red 10 was proprietary (2026-09-13): the source lived in the private
+github.com/keshavbhatt/new-red and the public github.com/keshavbhatt/red held only the README,
+guide, changelog and screenshots. The owner decided to open the source the way Playlist
+Downloader did (its ADR-008).
+
+**Decision.** The code goes public at github.com/keshavbhatt/red on `master`, the branch the
+shipped metainfo, snap and guide links already point at; the public materials that were on
+`master` since 2020 stay on `archive-2020`. The program is GPL-3.0-or-later. The licensing module
+(`src/modules/AccountAndLicense/`, `src/core/licensing/`, `src/services/licensing/`,
+`src/ui/account_dialog.*`, `src/ui/plans_dialog.*`, `tst_daily_allowance`, `tst_legacy_account`)
+is source-available under the Ktechpit Licensing Module License, with the same GPLv3 section 7
+additional permission for official builds. `LICENSING.md`, `REUSE.toml` and SPDX headers record
+it; the metainfo declares `GPL-3.0-or-later AND LicenseRef-proprietary=...`, the snap
+GPL-3.0-or-later; About carries the GPL's legal notice and a Licences link. The public README
+and guide move to the root and `scripts/publish-public.sh` goes. The history is published whole;
+the private repository stays as a frozen mirror. The snap workflow builds on `master`.
+
+**Consequences.** Contributions to the GPL part are welcome; forks must leave the module out.
+The public repository needs the `SNAPCRAFT_STORE_CREDENTIALS` secret and `PUBLISH_TO_STORE`
+variable. The Flathub manifest still repackages the snap; building it from a tag is a follow-up.

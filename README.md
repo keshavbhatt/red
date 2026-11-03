@@ -1,24 +1,28 @@
 <p align="center">
-  <img src="screenshots/banner.png" alt="Red — YouTube, in a real desktop app" width="100%">
+  <img src="screenshots/banner.png" alt="Red: YouTube, in a real desktop app" width="100%">
 </p>
 
 <p align="center">
   A living-room TV mode, ad and tracker blocking, SponsorBlock, media keys, a mini player and a
-  real download manager — lightweight and native, built with Qt&nbsp;6.
+  real download manager, lightweight and native, built with Qt&nbsp;6.
 </p>
 
 <p align="center">
-  <img src="screenshots/00-hero.png" alt="Red in desktop mode: a video playing, dislike count and SponsorBlock markers" width="100%">
+  <a href="https://snapcraft.io/red-app"><img src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" alt="Get it from the Snap Store" height="56"></a>
+  &nbsp;
+  <a href="https://flathub.org/apps/com.ktechpit.red"><img src="https://flathub.org/api/badge?locale=en" alt="Get it on Flathub" height="56"></a>
 </p>
 
----
+<p align="center">
+  <img src="screenshots/00-hero.png" alt="Red in desktop mode" width="100%">
+</p>
 
 ## Install
 
 **Snap** (amd64 and arm64):
 
 ```sh
-sudo snap install red-app --edge
+sudo snap install red-app
 ```
 
 **Flatpak** (x86_64 and aarch64), from [Flathub](https://flathub.org/apps/com.ktechpit.red):
@@ -26,14 +30,6 @@ sudo snap install red-app --edge
 ```sh
 flatpak install flathub com.ktechpit.red
 ```
-
-## Why Red
-
-YouTube is great, but a browser tab is a poor home for it. Red gives it a real window with the
-things a browser cannot do: it blocks ads before the player sees them, skips sponsor segments,
-answers your media keys, shrinks into a mini player, becomes a TV, and downloads anything on
-YouTube — video, audio, playlists, channels — with subtitles, thumbnails and chapters embedded.
-It is a thin native shell, **no Electron**, so it starts fast and stays light.
 
 ## Features
 
@@ -48,20 +44,20 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
 - Ads stripped from player and feed responses before YouTube renders them, plus a tiny
   network-level list for ad and analytics networks. Playback hosts are never touched.
 - SponsorBlock: skip or mark eight segment categories, with progress-bar markers.
-- Hide Shorts.
+- Return YouTube Dislike, Hide Shorts.
 
-**Downloads (yt-dlp)**
-- yt-dlp and its JavaScript runtime set themselves up on first use and keep themselves
-  updated; ffmpeg comes from your system (the snap and Flatpak runtimes ship it).
-- Quality presets, MP4 / MKV / WebM, audio-only in MP3 / M4A / Opus / FLAC / WAV, subtitles,
-  embedded thumbnail, metadata and chapters, sponsor-segment removal, playlist and channel
-  entry picking, an advanced per-stream table.
+**Downloads**
+- Any video, playlist or channel: video, audio only (MP3 / M4A / Opus / FLAC / WAV) or the
+  exact streams you pick, with subtitles, thumbnail, metadata and chapters embedded and
+  sponsor segments cut out on request.
+- Playlists are detected from any link; entries can be picked one by one.
 - A queue with pause / resume / retry, notifications with *Show in folder*, and your YouTube
   sign-in reused for age-restricted or rate-limited videos.
+- The download engine sets itself up on first use and keeps itself updated.
 
 **Desktop integration**
-- Media keys and desktop media controls (MPRIS), tray icon with playback controls,
-  keeps the screen awake while playing, mini player (Ctrl+Shift+M), single instance with
+- Media keys and desktop media controls (MPRIS), tray icon with playback controls, keeps the
+  screen awake while playing, mini player (Ctrl+Shift+M), single instance with
   `red <youtube-link>` and `red --download <link>`.
 
 ## Screenshots
@@ -76,42 +72,53 @@ It is a thin native shell, **no Electron**, so it starts fast and stays light.
     <td width="50%"><img src="screenshots/04-blocking.png" alt="Blocking settings"></td>
   </tr>
 </table>
+## Building
 
-Regenerate the set from raw window grabs with `scripts/screenshots.py <raw-dir>`.
-
-## Build from source
-
-Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub KDE
-runtime), CMake ≥ 3.21, and a C++20 compiler.
+Red is a Qt 6 (6.11), C++20, CMake application. On any distribution, against the KDE snap
+SDK:
 
 ```sh
-# Development build against the KDE Qt 6.11 snap SDK (works on any distro)
-sudo snap install kde-qt6-core24-sdk kf6-core24
-scripts/dev-build.sh --tests    # configure + build + run the test suite
+sudo snap install kde-qt6-core24-sdk kf6-core24   # once
+scripts/dev-build.sh --tests    # configure, build and run the tests
 scripts/dev-run.sh              # launch (-- --tv for TV mode, -- --music for YouTube Music)
+```
 
-# …or with a system Qt >= 6.11
+Or with a system Qt 6.11 or newer:
+
+```sh
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-## Project layout
-
 ```
-src/core      pure logic (settings, URL rules, block list, download queue) — Qt Core only, unit-tested
-src/services  network/process services: engine provisioning, yt-dlp probing, SponsorBlock
-src/web       WebEngine profile/page/view, the request interceptor, injected scripts, the JS↔C++ bridge
+src/core      pure logic (settings, URL rules, block list, download queue), Qt Core only, unit-tested
+src/services  network and process services: engine provisioning, media probing, SponsorBlock
+src/web       WebEngine profile, page and view, the request interceptor, injected scripts, the bridge
 src/platform  OS backends behind interfaces (notifications, MPRIS, screen inhibit, file manager)
 src/ui        QtWidgets: main window, rail, downloads panel, dialogs, tray
 src/app       Application object, CLI, single instance
-tests/        Qt Test suites (unit + offscreen smoke)
+tests/        Qt Test suites (unit and offscreen smoke)
 ```
 
-## License
+`DOCS/` holds the feature contract, the design, the decisions and the progress log; start
+with `DOCS/README.md`. The public materials published before Red 10 are on the
+`archive-2020` branch.
 
-Red is proprietary software. Copyright © 2026 Keshav Bhatt, all rights reserved; see
-[LICENSE](LICENSE).
+## Licence
+
+Open source: GPL-3.0-or-later for the program, with the licensing module (account,
+licence, evaluation and allowance code) under the Ktechpit Licensing Module License, which
+allows reading and building it but not changing, bypassing or redistributing it. The
+details, the paths and what this means for forks are in [LICENSING.md](LICENSING.md).
+
+## Help
+
+The [user guide](GUIDE.md) covers the window, TV mode, blocking, downloads, every setting,
+the shortcuts and common problems. Bugs and requests go to the
+[issues](https://github.com/keshavbhatt/red/issues), or by email to
+[connect@ktechpit.com](mailto:connect@ktechpit.com); please attach the diagnostics from
+*About Red, Copy* when reporting a problem.
 
 <sub>YouTube is a trademark of Google LLC. Red is an independent client and is not affiliated
 with, endorsed by, or sponsored by YouTube or Google.</sub>

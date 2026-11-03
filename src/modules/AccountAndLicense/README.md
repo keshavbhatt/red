@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Keshav Bhatt (Ktechpit)
+SPDX-License-Identifier: LicenseRef-Ktechpit-Licensing-Module
+-->
+
 # AccountAndLicense Module
 
 A self-contained Qt6 CMake static library that handles **serial-ID management**

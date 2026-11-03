@@ -1,0 +1,52 @@
+Ktechpit Licensing Module License, version 1.0
+
+Copyright (c) 2026 Keshav Bhatt (Ktechpit). All rights reserved.
+
+This licence covers the files it is applied to (the "Module"): the account, licence,
+evaluation-period and download-allowance code of Red, listed in
+LICENSING.md and REUSE.toml in the same repository. The rest of Red is
+licensed under the GNU General Public License, version 3 or later, as described in
+LICENSING.md; this Module is not part of that GPL-licensed work.
+
+1. What you may do
+
+   a. Read the Module and study how it works.
+   b. Build the Module, unmodified, as part of Red from this repository
+      for your own personal use, including to develop and test contributions.
+   c. Send changes to the Module to its author for inclusion; the author decides.
+
+2. What you may not do
+
+   a. Modify, adapt, translate or create derivative works of the Module.
+   b. Remove, disable, bypass, weaken or otherwise interfere with any check, limit,
+      evaluation period, activation, verification or anomaly detection the Module
+      implements, in the Module or in any program that uses it.
+   c. Distribute the Module, or any work containing it, in source or binary form,
+      modified or unmodified. The one exception: unmodified official builds published by
+      Ktechpit may be redistributed as they are, for example by a software store.
+   d. Use the Module, its file formats, its protocol or its network endpoints in any
+      other software, or contact those endpoints other than through an unmodified official
+      build published by Ktechpit.
+
+3. Combination with the GPL-licensed program
+
+   Ktechpit grants an additional permission under section 7 of the GNU General Public
+   License, version 3, for Red to be combined with this Module and the
+   combination to be conveyed, provided the Module is unmodified and the combination is
+   an official build published by Ktechpit. Anyone else who conveys a work under the GPL
+   derived from Red must leave the Module out (see LICENSING.md).
+
+4. No other rights
+
+   No trademark, patent or other rights are granted. "Red" and
+   "Ktechpit" are names of Ktechpit.
+
+5. Warranty and liability
+
+   THE MODULE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
+   ARISING FROM THE MODULE OR ITS USE.
+
+6. Termination
+
+   Any breach of this licence ends your rights under it at once.

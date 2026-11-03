@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Keshav Bhatt (Ktechpit)
+# SPDX-License-Identifier: LicenseRef-Ktechpit-Licensing-Module
+
 cmake_minimum_required(VERSION 3.21)
 
 # Find Qt6 if not already found by a parent project.

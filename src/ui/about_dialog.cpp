@@ -80,6 +80,20 @@ void AboutDialog::setupUi()
     disclaimer->setProperty("redMuted", true);
     disclaimer->setWordWrap(true);
     identity->addWidget(disclaimer);
+    // The GPL's "Appropriate Legal Notices" (v3, section 5d), in one line and a link.
+    auto* legal = new QLabel(tr("Copyright 2026 Keshav Bhatt. Free software under the GNU GPL v3 or later, "
+                                "with no warranty; the account and licence module has its own terms. "
+                                "<a href=\"%1\">Licences</a>")
+                                 .arg(links::kLicences),
+                             this);
+    legal->setObjectName(u"legalNotice"_s);
+    legal->setProperty("redMuted", true);
+    legal->setTextFormat(Qt::RichText);
+    legal->setWordWrap(true);
+    legal->setOpenExternalLinks(false);
+    legal->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    connect(legal, &QLabel::linkActivated, this, [](const QString& link) { platform::openUrl(link); });
+    identity->addWidget(legal);
     hero->addLayout(identity, 1);
     root->addLayout(hero);
 

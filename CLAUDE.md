@@ -1,8 +1,11 @@
 # Red — project instructions
 
-Red is a proprietary YouTube desktop client (Qt 6.11, C++20, CMake). Read `DOCS/` for the
+Red is an open-source YouTube desktop client (Qt 6.11, C++20, CMake). Read `DOCS/` for the
 feature contract (FEATURES), design (DESIGN), decisions (DECISIONS, ADRs) and progress log.
-The repository is private; `DOCS/` is committed.
+The public repository github.com/keshavbhatt/red is the only remote (`master`: Red 10,
+`archive-2020`: the public materials from before); `DOCS/` is committed. The licence split is
+in LICENSING.md and REUSE.toml: GPL-3.0-or-later, licensing module under its own licence
+(ADR-020).
 
 ## Standing rules
 

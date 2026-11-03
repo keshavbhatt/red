@@ -56,7 +56,7 @@ description: |
   affiliated with YouTube or Google.
 website: https://github.com/keshavbhatt/red
 issues: https://github.com/keshavbhatt/red/issues
-license: Proprietary
+license: GPL-3.0-or-later # the licensing module has its own licence: LICENSING.md
 icon: snap/gui/icon.svg
 
 platforms:

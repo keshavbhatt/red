@@ -51,7 +51,8 @@ Limits: title 40 characters, summary 79, description 4096; syntax is `**bold**`,
 
 ### Submitting to Flathub
 
-Red is closed source, so the Flathub manifest cannot build from a git tag. The submission lives
+The Flathub manifest repackages the published snap (it predates the public source; building
+from a git tag is a possible follow-up). The submission lives
 in the fork clone at `/home/commander/DCode/other/flathub-repositories/flathub`, branch
 `add-red` (from upstream `new-pr`): `com.ktechpit.red.yaml` plus the `shared-modules`
 submodule, following ultimate-media-downloader. A `simple` module downloads the published snap
@@ -62,8 +63,9 @@ are filled in by hand (the store info endpoint lists them:
 `curl -H 'Snap-Device-Series: 16' 'https://api.snapcraft.io/v2/snaps/info/red-app?fields=download,revision'`).
 Lint without building: `flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.ktechpit.red.yaml`.
 The PR targets `flathub/flathub` branch `new-pr`, title `Add com.ktechpit.red`, and needs a
-short video of the Flatpak build attached. Flathub builds it in their CI; never build locally. The metainfo's licence must be
-`LicenseRef-proprietary=<URL of the public LICENSE>`; Flathub rejects the bare identifier.
+short video of the Flatpak build attached. Flathub builds it in their CI; never build locally. The metainfo's licence is
+`GPL-3.0-or-later AND LicenseRef-proprietary=<URL of the module licence>`; Flathub rejects a bare
+`LicenseRef-proprietary`.
 
 ## Before tagging a release
 

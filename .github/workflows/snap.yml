@@ -1,11 +1,11 @@
 # Builds the snap on GitHub's CI for both architectures. Publishing to the
 # store is opt-in: set the repo variable PUBLISH_TO_STORE=true and the
-# SNAPCRAFT_STORE_CREDENTIALS secret to release pushes on main to edge.
+# SNAPCRAFT_STORE_CREDENTIALS secret to release pushes on master to edge.
 name: snap
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'src/**'
       - 'cmake/**'
@@ -36,7 +36,7 @@ jobs:
       - name: Publish to the Snap Store (edge)
         if: >-
           vars.PUBLISH_TO_STORE == 'true' &&
-          github.ref == 'refs/heads/main' &&
+          github.ref == 'refs/heads/master' &&
           github.event_name == 'push'
         uses: snapcore/action-publish@v1
         env:
