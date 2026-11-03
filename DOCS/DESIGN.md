@@ -11,8 +11,8 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
   carries a downward "tray" notch — play + download in one shape (`src/resources/icons/red.svg`).
   Symbolic variant: white glyph with a thin dark halo (tray/panel safe).
 * Colour tokens (sampled from YouTube's live page, 2026-10-16). YouTube's roles, not one red
-  accent (ADR-017): red only for small brand marks, the inverted pill for primary actions, blue
-  for controls and selection.
+  accent (ADR-017): red for small brand marks and ticked check boxes and radios (ADR-023), the
+  inverted pill for primary actions, blue for selection.
 
 | Token | Dark | Light | Used for |
 |---|---|---|---|
@@ -21,8 +21,12 @@ YouTube's own header/guide; it sits in a distinct brand surface and stays out of
 | `primary` | `#F1F1F1` | `#0F0F0F` | primary buttons, the rail's Download pill (YouTube's Subscribe) |
 | `primaryHover` | `#D9D9D9` | `#272727` | hover on primary |
 | `primaryText` | `#0F0F0F` | `#FFFFFF` | text on primary |
-| `control` | `#3EA6FF` | `#065FD4` | ticked check boxes, radios, selection, the picked kind card |
-| `controlText` | `#0F0F0F` | `#FFFFFF` | tick and selected text on control |
+| `control` | `#3EA6FF` | `#065FD4` | text and list selection, the picked kind card |
+| `controlText` | `#0F0F0F` | `#FFFFFF` | selected text on control |
+| `tick` | `#FF0033` | `#FF0033` | ticked check boxes and radios (ADR-023) |
+| `tickText` | `#FFFFFF` | `#FFFFFF` | the tick on `tick` |
+| `hoverBorder` | `#5A5A5A` | `#C4C4C4` | an input's border under the mouse |
+| `focusBorder` | `#8A8A8A` | `#909090` | an input's border with keyboard focus (visible, not glaring) |
 | `bg` | `#0F0F0F` | `#FFFFFF` | window, page background |
 | `rail` | `#0F0F0F` | `#FFFFFF` | side rail (same as bg, 1px border) |
 | `panel` | `#1F1F1F` | `#F9F9F9` | dialogs, downloads panel cards |

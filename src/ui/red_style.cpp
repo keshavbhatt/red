@@ -19,6 +19,10 @@ Tokens Tokens::forScheme(bool dark)
         t.primaryText = QColor(0x0F, 0x0F, 0x0F);
         t.control = QColor(0x3E, 0xA6, 0xFF);
         t.controlText = QColor(0x0F, 0x0F, 0x0F);
+        t.tick = QColor(0xFF, 0x00, 0x33);
+        t.tickText = QColor(0xFF, 0xFF, 0xFF);
+        t.hoverBorder = QColor(0x5A, 0x5A, 0x5A);
+        t.focusBorder = QColor(0x8A, 0x8A, 0x8A);
         t.bg = QColor(0x0F, 0x0F, 0x0F);
         t.rail = QColor(0x0F, 0x0F, 0x0F);
         t.panel = QColor(0x1F, 0x1F, 0x1F);
@@ -41,6 +45,10 @@ Tokens Tokens::forScheme(bool dark)
     t.primaryText = QColor(0xFF, 0xFF, 0xFF);
     t.control = QColor(0x06, 0x5F, 0xD4);
     t.controlText = QColor(0xFF, 0xFF, 0xFF);
+    t.tick = QColor(0xFF, 0x00, 0x33);
+    t.tickText = QColor(0xFF, 0xFF, 0xFF);
+    t.hoverBorder = QColor(0xC4, 0xC4, 0xC4);
+    t.focusBorder = QColor(0x90, 0x90, 0x90);
     t.bg = QColor(0xFF, 0xFF, 0xFF);
     t.rail = QColor(0xFF, 0xFF, 0xFF);
     t.panel = QColor(0xF9, 0xF9, 0xF9);
@@ -114,8 +122,8 @@ QLineEdit, QComboBox, QAbstractSpinBox, QPlainTextEdit, QTextEdit {
     padding: 6px 10px; min-height: 22px;
     selection-background-color: {{control}}; selection-color: {{controlText}};
 }
-QLineEdit:hover, QComboBox:hover, QAbstractSpinBox:hover { border: 1px solid {{muted}}; }
-QLineEdit:focus, QComboBox:focus, QAbstractSpinBox:focus { border: 1px solid {{text}}; }
+QLineEdit:hover, QComboBox:hover, QAbstractSpinBox:hover { border: 1px solid {{hoverBorder}}; }
+QLineEdit:focus, QComboBox:focus, QAbstractSpinBox:focus { border: 1px solid {{focusBorder}}; }
 QLineEdit:read-only { color: {{muted}}; }
 QLineEdit:disabled, QComboBox:disabled, QAbstractSpinBox:disabled { color: {{muted}}; border-color: {{border}}; }
 QComboBox::drop-down, QComboBox::drop-down:editable {
@@ -182,7 +190,7 @@ QCheckBox::indicator {
     border: 2px solid {{muted}}; border-radius: 4px; background: transparent;
 }
 QCheckBox::indicator:hover { border-color: {{text}}; }
-QCheckBox::indicator:checked { background: {{control}}; border-color: {{control}}; image: url({{checkOnControl}}); }
+QCheckBox::indicator:checked { background: {{tick}}; border-color: {{tick}}; image: url({{checkOnTick}}); }
 QCheckBox::indicator:disabled { border-color: {{border}}; }
 QCheckBox::indicator:checked:disabled { background: {{hover}}; border-color: {{hover}}; }
 /* Both radio states add up to 18px: QSS sizes the indicator per state and a
@@ -193,10 +201,10 @@ QListView::indicator, QTreeView::indicator, QTableView::indicator {
 }
 QListView::indicator:hover, QTreeView::indicator:hover { border-color: {{text}}; }
 QListView::indicator:checked, QTreeView::indicator:checked, QTableView::indicator:checked {
-    background: {{control}}; border-color: {{control}}; image: url({{checkOnControl}});
+    background: {{tick}}; border-color: {{tick}}; image: url({{checkOnTick}});
 }
 QRadioButton::indicator:hover { border-color: {{text}}; }
-QRadioButton::indicator:checked { border: 6px solid {{control}}; background: {{controlText}}; width: 6px; height: 6px; }
+QRadioButton::indicator:checked { border: 6px solid {{tick}}; background: {{tickText}}; width: 6px; height: 6px; }
 
 /* Menus. */
 QMenu {
@@ -268,6 +276,10 @@ QHash<QString, QString> tokenMap(const Tokens& t)
         {u"primaryText"_s, t.primaryText.name()},
         {u"control"_s, t.control.name()},
         {u"controlText"_s, t.controlText.name()},
+        {u"tick"_s, t.tick.name()},
+        {u"tickText"_s, t.tickText.name()},
+        {u"hoverBorder"_s, t.hoverBorder.name()},
+        {u"focusBorder"_s, t.focusBorder.name()},
         {u"bg"_s, t.bg.name()},
         {u"rail"_s, t.rail.name()},
         {u"panel"_s, t.panel.name()},
@@ -295,7 +307,7 @@ QString redStyleSheet(bool dark)
     // to the cache directory once per colour.
     map.insert(u"chevronDown"_s, icons::tintedFile(u"chevron-down"_s, t.muted));
     map.insert(u"chevronUp"_s, icons::tintedFile(u"chevron-up"_s, t.muted));
-    map.insert(u"checkOnControl"_s, icons::tintedFile(u"check"_s, t.controlText));
+    map.insert(u"checkOnTick"_s, icons::tintedFile(u"check"_s, t.tickText));
     map.insert(u"checkText"_s, icons::tintedFile(u"check"_s, t.text));
     for (auto it = map.cbegin(); it != map.cend(); ++it) {
         sheet.replace(u"{{"_s + it.key() + u"}}"_s, it.value());

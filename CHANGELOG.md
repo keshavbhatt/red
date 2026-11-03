@@ -16,6 +16,8 @@ versions follow [Semantic Versioning](https://semver.org/).
 - **Settings, Playback**: the *Autoplay* option is now *Start videos without a click*, which is
   what it always did, with a note that the next video playing by itself is YouTube's own
   Autoplay setting.
+- **Red check boxes**: ticked check boxes and radio buttons use Red's red instead of blue, and a
+  focused field has a softer border.
 
 ### Fixed
 - **Leaving full screen** brings back a maximized window instead of a smaller one (seen on KDE

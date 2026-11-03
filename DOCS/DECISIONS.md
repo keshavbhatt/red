@@ -488,3 +488,18 @@ setting does nothing. Verified with synthetic gestures (`RED_DEBUG_SWIPE`) and a
 sideways scroller, then on the owner's touchpad (2026-11-04), where the first version (Back =
 fingers to the right, from `inverted()`) felt the wrong way round next to Chrome.
 
+## ADR-023: red check boxes, a softer focus border (2026-11-04)
+
+**Context.** ADR-017 gave check boxes and radios YouTube's blue. With Settings full of them the
+owner wanted Red's own red there instead, and found the near-white border of a focused field
+too bright.
+
+**Decision.** New tokens: `tick` / `tickText` (`#FF0033` with a white tick) for ticked check
+boxes, radios and list check marks everywhere; `focusBorder` (`#8A8A8A` dark, `#909090` light)
+for focused fields instead of the text colour, and `hoverBorder` (`#5A5A5A` / `#C4C4C4`) below
+it so hover and focus still differ. `control` keeps YouTube blue for text and list selection
+and the picked kind card.
+
+**Consequences.** ADR-017's "blue for controls" now means selection only; red stays in small
+marks, which a tick is.
+

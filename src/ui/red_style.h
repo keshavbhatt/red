@@ -18,7 +18,11 @@ struct Tokens
     QColor primaryHover;
     QColor primaryText;
     QColor control;     ///< ticked check boxes, radios, selection, the picked card
-    QColor controlText; ///< the tick and selected text on `control`
+    QColor controlText; ///< selected text on `control`
+    QColor tick;        ///< ticked check boxes and radios: Red's red
+    QColor tickText;    ///< the tick on `tick`
+    QColor hoverBorder; ///< an input's border under the mouse
+    QColor focusBorder; ///< an input's border with keyboard focus: visible, not glaring
     QColor bg;
     QColor rail;
     QColor panel;
