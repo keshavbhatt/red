@@ -135,7 +135,7 @@ from YouTube it opens TV mode, in TV mode it goes back.
 | Ctrl+T, or the Back to YouTube button | Back to YouTube |
 | Ctrl+D | Download the current video |
 | + / −, M | Volume, mute |
-| A / D, S | Playback speed down / up, reset |
+| A / D, S | Playback speed down / up by 0.05 (with Shift by 0.25), reset |
 | F11 | Leave full screen |
 
 A **gamepad** works as on a console: the left stick or D-pad moves, **A** selects, **B** goes

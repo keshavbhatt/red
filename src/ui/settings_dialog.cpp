@@ -607,7 +607,7 @@ QWidget* SettingsDialog::buildTv()
         {tr("Ctrl+T, or the Back to YouTube button"), tr("Back to YouTube")},
         {tr("Ctrl+D"), tr("Download the current video")},
         {tr("+ / −, M"), tr("Volume, mute")},
-        {tr("A / D, S"), tr("Playback speed down / up, reset")},
+        {tr("A / D, S"), tr("Playback speed down / up by 0.05 (with Shift by 0.25), reset")},
         {tr("Gamepad A / B"), tr("Select / back")},
         {tr("Gamepad LT / RT"), tr("Seek back / forward")},
     };

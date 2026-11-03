@@ -3,6 +3,12 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
+## [10.3.1] - unreleased
+
+### Changed
+- **Finer playback speeds in TV mode**: D and A now change the speed in steps of 0.05, so
+  1.1x and 1.15x are a few presses away; with Shift they step by 0.25 as before.
+
 ## [10.3.0] - 2026-10-17
 
 ### Added

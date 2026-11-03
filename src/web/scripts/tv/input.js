@@ -2,7 +2,7 @@
 // purpose:  mouse & keyboard conveniences for Leanback (FEATURES T4):
 //           right click = back, wheel swallowed, cursor hidden when idle,
 //           Ctrl+D downloads the current video, +/- volume, M mute, C captions,
-//           D/A speed — all only when the page has focus.
+//           D/A speed (Shift for larger steps), all only when the page has focus.
 // depends:  Leanback reading keyCode on document keydown events; the
 //           .html5-video-player API (setVolume/getVolume/setPlaybackRate)
 // verified: 2026-09-06
@@ -25,6 +25,22 @@
     }
     red.tv = red.tv || {};
     red.tv.sendKey = sendKey;
+
+    // Speed keys: D / A step by 0.05 (issue #16: 1.1x, 1.15x), with Shift by 0.25, within
+    // Leanback's own range. Through the player API, so Leanback's state stays in step.
+    var SPEED_STEP = 0.05;
+    var SPEED_STEP_LARGE = 0.25;
+    var SPEED_MIN = 0.25;
+    var SPEED_MAX = 2;
+    function stepSpeed(p, delta) {
+        if (!p.setPlaybackRate || !p.getPlaybackRate) {
+            return;
+        }
+        var rate = Math.round((p.getPlaybackRate() + delta) * 100) / 100;
+        rate = Math.min(SPEED_MAX, Math.max(SPEED_MIN, rate));
+        p.setPlaybackRate(rate);
+        indicator(p.getPlaybackRate() + '×');
+    }
 
     function currentVideoUrl() {
         try {
@@ -118,10 +134,10 @@
             if (p.isMuted && p.mute && p.unMute) { if (p.isMuted()) { p.unMute(); indicator('Unmuted'); } else { p.mute(); indicator('Muted'); } }
             break;
         case 'd': case 'D':
-            if (p.setPlaybackRate && p.getPlaybackRate) { var r1 = Math.min(2, p.getPlaybackRate() + 0.25); p.setPlaybackRate(r1); indicator(r1 + '×'); }
+            stepSpeed(p, e.shiftKey ? SPEED_STEP_LARGE : SPEED_STEP);
             break;
         case 'a': case 'A':
-            if (p.setPlaybackRate && p.getPlaybackRate) { var r2 = Math.max(0.25, p.getPlaybackRate() - 0.25); p.setPlaybackRate(r2); indicator(r2 + '×'); }
+            stepSpeed(p, -(e.shiftKey ? SPEED_STEP_LARGE : SPEED_STEP));
             break;
         case 's': case 'S':
             if (p.setPlaybackRate) { p.setPlaybackRate(1); indicator('1×'); }
