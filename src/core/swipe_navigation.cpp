@@ -5,13 +5,12 @@
 
 namespace red::core {
 
-void SwipeTracker::begin(bool inverted)
+void SwipeTracker::begin()
 {
     m_active = true;
-    m_inverted = inverted;
     m_sumX = 0;
     m_sumY = 0;
-    m_fingerX = 0;
+    m_towardsStart = 0;
 }
 
 void SwipeTracker::update(QPoint pixelDelta)
@@ -28,10 +27,8 @@ void SwipeTracker::unused(QPoint pixelDelta)
     if (!m_active) {
         return;
     }
-    // A wheel delta is positive towards the left. With classic scrolling the content moves
-    // against the fingers, so fingers going right give a negative delta; natural scrolling
-    // (inverted) flips that. Back is always fingers to the right.
-    m_fingerX += m_inverted ? pixelDelta.x() : -pixelDelta.x();
+    // A wheel delta is positive when it scrolls towards the left edge.
+    m_towardsStart += pixelDelta.x();
 }
 
 void SwipeTracker::end()
@@ -50,7 +47,7 @@ double SwipeTracker::progress(int viewWidth) const
         return 0.0;
     }
     const double needed = std::min(static_cast<double>(kMaxCommitPx), viewWidth * kCommitShare);
-    return std::clamp(m_fingerX / needed, -1.0, 1.0);
+    return std::clamp(m_towardsStart / needed, -1.0, 1.0);
 }
 
 SwipeAction SwipeTracker::finish(int viewWidth)
@@ -71,7 +68,7 @@ void SwipeTracker::cancel()
     m_active = false;
     m_sumX = 0;
     m_sumY = 0;
-    m_fingerX = 0;
+    m_towardsStart = 0;
 }
 
 } // namespace red::core

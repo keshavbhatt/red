@@ -476,13 +476,15 @@ update and end phases) and counts only the sideways scroll the page hands back u
 WebEngine returns unconsumed wheel events to the view, without their phase. Chromium latches a
 gesture to the scroller it started on and reports nothing once that scroller reaches its end,
 so a row scrolled to its end never turns into Back mid-gesture, while a swipe that starts
-where nothing can scroll sideways navigates. `core::SwipeTracker` holds the arithmetic (finger
-direction from `inverted()`, a mostly-sideways test, a threshold of a quarter of the width up
+where nothing can scroll sideways navigates. `core::SwipeTracker` holds the arithmetic (direction as
+in Chrome: scrolling past the left edge is Back, whatever natural scrolling does to the
+fingers; a mostly-sideways test, a threshold of a quarter of the width up
 to 220 px) and decides 120 ms after the fingers lift, when the page's last answers are in.
 `web::SwipeIndicator` is the arrow at the edge. Setting `app/swipeNavigation`, default on; off in
 TV mode, the mini player and full-screen video. Mouse wheels (no phase) never count.
 
 **Consequences.** It needs scroll phases, which Wayland sessions report (KDE, GNOME); on X11 the
 setting does nothing. Verified with synthetic gestures (`RED_DEBUG_SWIPE`) and an injected
-sideways scroller, then confirmed by the owner on a real touchpad (2026-11-04).
+sideways scroller, then on the owner's touchpad (2026-11-04), where the first version (Back =
+fingers to the right, from `inverted()`) felt the wrong way round next to Chrome.
 

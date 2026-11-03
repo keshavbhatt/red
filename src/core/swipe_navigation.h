@@ -26,9 +26,8 @@ public:
     static constexpr double kCommitShare = 0.25;
     static constexpr int kMaxCommitPx = 220;
 
-    /// Fingers down. `inverted`: the platform reports natural scrolling (deltas follow the
-    /// content rather than the wheel), as QWheelEvent::inverted().
-    void begin(bool inverted);
+    /// Fingers down.
+    void begin();
     /// A movement of the gesture as it reached the page (before the page saw it).
     void update(QPoint pixelDelta);
     /// Scroll from this gesture that the page did not use.
@@ -48,10 +47,11 @@ private:
     [[nodiscard]] bool mostlySideways() const;
 
     bool m_active = false;
-    bool m_inverted = false;
     int m_sumX = 0; // absolute movement of the whole gesture, to tell sideways from vertical
     int m_sumY = 0;
-    int m_fingerX = 0; // unused sideways scroll in finger direction: positive = fingers right
+    // Unused sideways scroll, positive towards the left edge. As in Chrome, Back is scrolling
+    // past the left edge, whichever way the fingers move for that (natural scrolling or not).
+    int m_towardsStart = 0;
 };
 
 } // namespace red::core

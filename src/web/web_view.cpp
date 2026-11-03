@@ -479,7 +479,7 @@ void WebView::trackSwipe(const QWheelEvent& event)
             finishSwipe(); // a new gesture before the last one was decided
         }
         if (swipeAllowed()) {
-            m_swipe.begin(event.inverted());
+            m_swipe.begin();
         }
         break;
     case Qt::ScrollUpdate:
@@ -509,7 +509,7 @@ void WebView::wheelEvent(QWheelEvent* event)
 
 // RED_DEBUG_SWIPE=<seconds>:<dx>:<steps>[:<hold ms>][;…] (ADR-010): plays touchpad swipes into
 // the page at those times after start, `steps` movements of `dx` px (classic scrolling:
-// negative = fingers right = Back), holding before the fingers lift when asked (for a grab).
+// positive = towards the left edge = Back), holding before the fingers lift when asked (for a grab).
 void WebView::scheduleDebugSwipes()
 {
     const QString spec = qEnvironmentVariable("RED_DEBUG_SWIPE");
