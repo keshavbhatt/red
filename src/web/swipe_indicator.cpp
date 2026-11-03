@@ -12,7 +12,7 @@ namespace red::web {
 namespace {
 constexpr int kBubble = 40;  // the arrow's circle
 constexpr int kRingMax = 92; // the ring behind it at the end of the swipe
-constexpr int kMargin = 24;  // from the edge to the bubble once fully in
+constexpr int kMargin = 56;  // from the edge to the bubble once fully in: the whole ring shows
 constexpr int kBox = kRingMax + 4;
 const QColor kAccent(0xFF, 0x00, 0x33); // Red's brand red (DESIGN.md `brand`)
 } // namespace
