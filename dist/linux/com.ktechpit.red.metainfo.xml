@@ -135,6 +135,16 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.4.0" date="2026-11-04" type="stable">
+      <description>
+        <p>Other apps by the same developer, in About.</p>
+        <ul>
+          <li>About Red shows two other apps by Red's developer, different each time, and See all lists every one, with search and a Refresh button</li>
+          <li>Get opens your software centre; apps you already have are marked Installed</li>
+          <li>Settings, General turns it off; the list is fetched about once a week and nothing about you is sent</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.3.2" date="2026-11-04" type="stable">
       <description>
         <p>The video menu with a gamepad in TV mode, and an AppImage.</p>

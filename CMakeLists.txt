@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(red
-    VERSION 10.3.2
+    VERSION 10.4.0
     DESCRIPTION "YouTube desktop client with a TV mode, ad blocking and a yt-dlp download manager"
     HOMEPAGE_URL "https://github.com/keshavbhatt/red"
     LANGUAGES CXX

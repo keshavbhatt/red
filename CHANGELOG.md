@@ -3,6 +3,18 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
+## [10.4.0] - 2026-11-04
+
+### Added
+- **More apps from the same developer**: *About Red* shows two other apps by Red's developer,
+  different each time you open it, and *See all* lists every one, with a search and a Refresh
+  button. **Get** opens your software centre; apps you already have are marked *Installed*.
+  Red fetches the list from ktechpit.com about once a week and sends nothing about you;
+  *Settings → General* turns it off.
+
+### Changed
+- *About Red* no longer has a *More apps* button; *See all* next to the apps replaces it.
+
 ## [10.3.2] - 2026-11-04
 
 ### Added
