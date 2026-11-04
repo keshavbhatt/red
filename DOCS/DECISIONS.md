@@ -519,7 +519,9 @@ download engine searches the application directory), and an AppRun hook that set
 `QTWEBENGINE_DISABLE_SANDBOX=1` (a read-only image cannot ship a setuid sandbox helper). It
 checks the tag against `project(VERSION)` and then waits for the release `release.yml` creates
 and uploads `Red-X.Y.Z-x86_64.AppImage` to it, so a refused tag gets no AppImage either.
-`workflow_dispatch` with a `tag` rebuilds one for an existing release. Nothing is stored as a
+The Wayland platform plugin is deployed on request, and its graphics integration
+(wayland-egl), shell and decoration plugins are copied in by hand: without them the web view
+cannot get an OpenGL context on Wayland and stays blank. `workflow_dispatch` with a `tag` rebuilds one for an existing release. Nothing is stored as a
 workflow artifact. x86_64 only; no `.deb`.
 
 **Consequences.** ffmpeg comes from the distribution, as everywhere (never downloaded). The
