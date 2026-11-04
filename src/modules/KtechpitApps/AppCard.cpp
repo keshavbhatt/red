@@ -47,10 +47,16 @@ AppCard::AppCard(const AppInfo& app, const QString& place, QWidget* parent)
     summary->setMaximumHeight(lineHeight * 2 + 2);
     summary->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_get = new QPushButton(tr("Get"), this);
-    m_get->setCursor(Qt::PointingHandCursor);
-    m_get->setToolTip(tr("Install %1").arg(app.name));
-    connect(m_get, &QPushButton::clicked, this, [this] { AppLinks::openGet(m_app, m_place); });
+    if (AppLinks::isInstalled(app)) {
+        m_get = new QPushButton(tr("Installed"), this);
+        m_get->setEnabled(false);
+        m_get->setToolTip(tr("%1 is installed on this computer").arg(app.name));
+    } else {
+        m_get = new QPushButton(tr("Get"), this);
+        m_get->setCursor(Qt::PointingHandCursor);
+        m_get->setToolTip(tr("Install %1").arg(app.name));
+        connect(m_get, &QPushButton::clicked, this, [this] { AppLinks::openGet(m_app, m_place); });
+    }
 
     auto* text = new QVBoxLayout;
     text->setSpacing(2);
