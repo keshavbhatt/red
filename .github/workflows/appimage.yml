@@ -114,6 +114,12 @@ jobs:
           mkdir -p AppDir/apprun-hooks
           echo 'export QTWEBENGINE_DISABLE_SANDBOX=1' > AppDir/apprun-hooks/sandbox.sh
 
+      - name: Keep only the SQLite driver
+        run: |
+          # linuxdeploy-plugin-qt deploys every SQL driver Qt ships; the Oracle, MySQL, ODBC,
+          # PostgreSQL and Mimer ones need client libraries the runner lacks. Red uses SQLite.
+          find "$QT_ROOT_DIR/plugins/sqldrivers" -name '*.so' ! -name 'libqsqlite.so' -print -delete
+
       - name: Fetch linuxdeploy
         run: |
           base=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous
