@@ -20,8 +20,11 @@ void openGet(const AppInfo& app, const QString& place);
 /// Opens the product page.
 void openPage(const AppInfo& app, const QString& place);
 
-/// True when the app is visibly installed here as a snap or a Flatpak. Inside a sandbox the
-/// host system is often out of sight, so this can miss an install; never the other way round.
+/// True when the app is visibly installed here as a snap or a Flatpak. What a sandbox can see
+/// (checked 2026-11-04): a native or AppImage host sees every snap and Flatpak; a snap host
+/// sees other snaps and per-user Flatpaks, not system-wide Flatpaks; a Flatpak host sees
+/// nothing. A miss only means the app shows "Get"; the software centre then says it is
+/// installed. Never reports an app that is not installed.
 [[nodiscard]] bool isInstalled(const AppInfo& app);
 
 } // namespace ktechpit::AppLinks
