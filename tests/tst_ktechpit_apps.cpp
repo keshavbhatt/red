@@ -4,6 +4,8 @@
 #include "AppLinks.h"
 
 #include <QFile>
+#include <QRandomGenerator>
+#include <QSet>
 #include <QTest>
 #include <QUrlQuery>
 
@@ -22,6 +24,18 @@ AppInfo app(const QString& id, const QStringList& tags, int trending = 0)
     a.tags = tags;
     a.trending = trending;
     return a;
+}
+
+QList<AppInfo> pool()
+{
+    return {
+        app(u"wallpaper"_s, {u"images"_s}),
+        app(u"games"_s, {u"game"_s}, 1),
+        app(u"whatsie"_s, {u"chat"_s, u"text"_s}),
+        app(u"dict"_s, {u"text"_s}),
+        app(u"paraphrase"_s, {u"chat"_s, u"text"_s, u"writing"_s}),
+        app(u"glate"_s, {u"text"_s}, 3),
+    };
 }
 
 QStringList ids(const QList<AppInfo>& apps)
@@ -101,6 +115,42 @@ private Q_SLOTS:
         // An unknown host: trending first, then catalog order.
         QCOMPARE(ids(AppCatalog::rank(apps, u"nobody"_s, 3)),
                  QStringList({u"games"_s, u"glate"_s, u"wallpaper"_s}));
+    }
+
+    void pickBestFitIsTheRanking()
+    {
+        const QList<AppInfo> apps = pool();
+        QRandomGenerator random(7);
+        QCOMPARE(ids(AppCatalog::pick(apps, u"whatsie"_s, 2, ktechpit::Pick::BestFit, random)),
+                 QStringList({u"paraphrase"_s, u"glate"_s}));
+    }
+
+    void pickMixedKeepsTheBestFitFirstAndVariesTheRest()
+    {
+        const QList<AppInfo> apps = pool();
+        QSet<QString> seen;
+        for (quint32 seed = 1; seed <= 200; ++seed) {
+            QRandomGenerator random(seed);
+            const QStringList got = ids(AppCatalog::pick(apps, u"whatsie"_s, 3, ktechpit::Pick::Mixed, random));
+            QCOMPARE(got.size(), 3);
+            QCOMPARE(got.first(), u"paraphrase"_s);
+            QVERIFY(!got.contains(u"whatsie"_s));
+            QCOMPARE(QSet<QString>(got.begin(), got.end()).size(), 3); // no app twice
+            for (const QString& id : got) {
+                seen.insert(id);
+            }
+        }
+        // Over many draws every other app shows up at least once.
+        QCOMPARE(seen.size(), apps.size() - 1);
+    }
+
+    void pickRandomCoversEveryAppAndStopsWhenTheCatalogRunsOut()
+    {
+        const QList<AppInfo> apps = pool();
+        QRandomGenerator random(3);
+        QCOMPARE(AppCatalog::pick(apps, u"whatsie"_s, 50, ktechpit::Pick::Random, random).size(),
+                 apps.size() - 1);
+        QVERIFY(AppCatalog::pick(apps, u"whatsie"_s, 0, ktechpit::Pick::Random, random).isEmpty());
     }
 
     void getLinkFollowsThePackage()
