@@ -27,6 +27,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | S9 | App lock, licensing, RateApp, intro slides, history tab | yes | DROP | Red stays closed source, but these were never worth their upkeep; YouTube keeps history |
 | S10 | `red <youtube-url>` / `red --tv` / `red --download <url>` CLI | Open URL dialog | KEEP | done — `app::CliOptions` |
 | S11 | External links (non-Google) open in the system browser; Google sign-in pop-ups stay in-app | none | KEEP | done — `core::navigation_policy`, `web::PopupWindow` |
+| S14 | "More apps from Ktechpit": two cards in About, the full list behind *More apps*, off in Settings, General | none | KEEP | done, `KtechpitApps` module (subtree), ADR-025 |
 
 ## B. Desktop YouTube mode
 

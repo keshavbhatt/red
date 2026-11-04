@@ -81,6 +81,7 @@ protected:
 
 private:
     void setupUi();
+    void setupOtherApps();
     void connectActions();
     void connectWebView();
     void restoreWindowState();

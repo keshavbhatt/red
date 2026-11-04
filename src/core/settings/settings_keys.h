@@ -29,6 +29,7 @@ inline constexpr QLatin1StringView kStartMode{"app/startMode"};
 inline constexpr QLatin1StringView kStartPage{"app/startPage"};
 inline constexpr QLatin1StringView kMiddleClickScroll{"app/middleClickScroll"};
 inline constexpr QLatin1StringView kSwipeNavigation{"app/swipeNavigation"};
+inline constexpr QLatin1StringView kShowOtherApps{"app/showOtherApps"};
 inline constexpr QLatin1StringView kNotifyOnDownloadFinish{"app/notifyOnDownloadFinish"};
 inline constexpr QLatin1StringView kTrayEnabled{"app/trayEnabled"};
 

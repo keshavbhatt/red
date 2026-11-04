@@ -19,6 +19,10 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "AppCatalog.h"
+#include "AppStrip.h"
+#include "MoreAppsDialog.h"
+
 using namespace Qt::StringLiterals;
 
 namespace red::ui {
@@ -120,9 +124,21 @@ void AboutDialog::setupUi()
     links->addWidget(report);
     links->addWidget(linkButton(tr("Contact"), links::kContact));
     links->addWidget(linkButton(tr("Donate"), kDonateUrl));
-    links->addWidget(linkButton(tr("More apps"), links::kMoreApps));
+    auto* moreApps = new QPushButton(tr("More apps"), this);
+    connect(moreApps, &QPushButton::clicked, this, [this] {
+        if (ktechpit::AppCatalog::instance()->isEnabled()) {
+            ktechpit::MoreAppsDialog(u"about"_s, this).exec();
+        } else {
+            platform::openUrl(links::kMoreApps);
+        }
+    });
+    links->addWidget(moreApps);
     links->addStretch(1);
     root->addLayout(links);
+
+    // Two apps that fit Red, side by side (KtechpitApps, ADR-025); hidden when switched off.
+    auto* otherApps = new ktechpit::AppStrip(u"about"_s, 2, ktechpit::AppStrip::Orientation::Horizontal, this);
+    root->addWidget(otherApps);
 
     auto* sep = new QFrame(this);
     sep->setProperty("redSeparator", true);

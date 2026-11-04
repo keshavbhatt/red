@@ -284,6 +284,11 @@ QWidget* SettingsDialog::buildGeneral()
     connect(m_notify, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setNotifyOnDownloadFinish(on); });
     v->addWidget(m_notify);
+    m_otherApps = new QCheckBox(tr("Show other apps by the same developer in About"), integration);
+    connect(m_otherApps, &QCheckBox::toggled, this, [this](bool on) { m_settings.setShowOtherApps(on); });
+    v->addWidget(m_otherApps);
+    v->addWidget(mutedLabel(tr("Red fetches the list of apps about once a week; nothing about you is sent."),
+                            integration));
 
     return wrapPage(
         tr("General"), tr("How Red starts, closes and sits on your desktop."),
@@ -781,6 +786,7 @@ void SettingsDialog::loadValues()
     m_notify->setChecked(m_settings.notifyOnDownloadFinish());
     m_middleScroll->setChecked(m_settings.middleClickScroll());
     m_swipe->setChecked(m_settings.swipeNavigation());
+    m_otherApps->setChecked(m_settings.showOtherApps());
     m_theme_->setCurrentIndex(m_theme_->findData(static_cast<int>(m_settings.theme())));
     m_zoom->setValue(m_settings.zoomFactor() * 100);
     m_scale->setValue(m_settings.interfaceScale() * 100);

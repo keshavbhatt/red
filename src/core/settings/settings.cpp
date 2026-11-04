@@ -25,6 +25,7 @@ constexpr bool kDefaultDownloadsPanelOpen = false;
 constexpr StartMode kDefaultStartMode = StartMode::Desktop;
 constexpr bool kDefaultMiddleClickScroll = false;
 constexpr bool kDefaultSwipeNavigation = true;
+constexpr bool kDefaultShowOtherApps = true;
 constexpr StartPage kDefaultStartPage = StartPage::Home;
 constexpr bool kDefaultNotifyOnDownloadFinish = true;
 constexpr bool kDefaultTrayEnabled = true;
@@ -342,6 +343,18 @@ void Settings::setSwipeNavigation(bool enabled)
 {
     if (storeBool(keys::kSwipeNavigation, kDefaultSwipeNavigation, enabled)) {
         Q_EMIT swipeNavigationChanged(enabled);
+    }
+}
+
+bool Settings::showOtherApps() const
+{
+    return boolValue(keys::kShowOtherApps, kDefaultShowOtherApps);
+}
+
+void Settings::setShowOtherApps(bool show)
+{
+    if (storeBool(keys::kShowOtherApps, kDefaultShowOtherApps, show)) {
+        Q_EMIT showOtherAppsChanged(show);
     }
 }
 
@@ -1072,6 +1085,7 @@ void Settings::resetToDefaults()
     Q_EMIT startPageChanged(startPage());
     Q_EMIT middleClickScrollChanged(middleClickScroll());
     Q_EMIT swipeNavigationChanged(swipeNavigation());
+    Q_EMIT showOtherAppsChanged(showOtherApps());
     Q_EMIT notifyOnDownloadFinishChanged(notifyOnDownloadFinish());
     Q_EMIT trayEnabledChanged(trayEnabled());
     Q_EMIT themeChanged(theme());

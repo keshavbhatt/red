@@ -90,6 +90,7 @@ target_link_libraries(red_ui
         red_web
         red_services
         red_platform
+        ktechpit_apps
         Qt6::Widgets
         Qt6::Svg
         Qt6::Concurrent

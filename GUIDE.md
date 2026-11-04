@@ -399,6 +399,9 @@ contacts only:
 - **SponsorBlock** (sponsor.ajay.app) and **Return YouTube Dislike**, when those features are
   on. SponsorBlock receives a short hash prefix of the video id, not the id itself.
 - **The download engine's official release site**, to fetch and update the engine.
+- **ktechpit.com**, about once a week, for the list of other apps by the same developer shown
+  in *About Red*. Only the list and the app icons are downloaded; *Settings → General → Show
+  other apps by the same developer in About* turns it off.
 
 Nothing about what you watch or download is sent anywhere else. Sign-in cookies stay on your
 machine; for downloads they are handed to the engine in a temporary file that is deleted when

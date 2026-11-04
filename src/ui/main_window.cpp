@@ -5,6 +5,7 @@
 #include "core/notifications/notification_service.h"
 #include "core/theme/theme_service.h"
 #include "core/youtube_url.h"
+#include "platform/platform_info.h"
 #include "platform/file_manager.h"
 #include "platform/notifier_factory.h"
 #include "services/dislikes_client.h"
@@ -58,6 +59,8 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QWebEngineHistory>
+
+#include "AppCatalog.h"
 #include <QWebEngineLoadingInfo>
 #include <QWebEnginePage>
 #include <QWebEnginePermission>
@@ -88,6 +91,7 @@ MainWindow::MainWindow(core::Settings& settings, core::ThemeService& theme, cons
     connectWebView();
     restoreWindowState();
     applyChrome();
+    setupOtherApps();
 
     connect(
         qApp, &QGuiApplication::commitDataRequest, this,
@@ -968,6 +972,33 @@ void MainWindow::promptDownloadLimit(int requested, int remaining)
         m_accountDialog->highlightPurchase();
         m_accountDialog->showPlans(); // the comparison on top: what is free, what Pro adds
     }
+}
+
+void MainWindow::setupOtherApps()
+{
+    // "More apps from Ktechpit" in About (KtechpitApps module, ADR-025): the catalog fetches its
+    // list in the background about once a week; the setting hides it everywhere.
+    ktechpit::CatalogConfig config;
+    config.hostAppId = u"red"_s;
+    config.source = u"red"_s;
+    const QString package = platform::packageType();
+    if (package.startsWith(u"snap"_s)) {
+        config.package = ktechpit::Package::Snap;
+    } else if (package.startsWith(u"flatpak"_s)) {
+        config.package = ktechpit::Package::Flatpak;
+    } else if (package == u"AppImage"_s) {
+        config.package = ktechpit::Package::AppImage;
+    } else {
+#ifdef Q_OS_WIN
+        config.package = ktechpit::Package::Windows;
+#else
+        config.package = ktechpit::Package::Native;
+#endif
+    }
+    ktechpit::AppCatalog::init(config);
+    ktechpit::AppCatalog::instance()->setEnabled(m_settings.showOtherApps());
+    connect(&m_settings, &core::Settings::showOtherAppsChanged, this,
+            [](bool show) { ktechpit::AppCatalog::instance()->setEnabled(show); });
 }
 
 void MainWindow::showAbout()

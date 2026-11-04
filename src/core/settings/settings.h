@@ -202,6 +202,9 @@ public:
     /// On by default; never in TV mode.
     [[nodiscard]] bool swipeNavigation() const;
     void setSwipeNavigation(bool enabled);
+    /// "More apps from Ktechpit" in About (KtechpitApps module, ADR-025). On by default.
+    [[nodiscard]] bool showOtherApps() const;
+    void setShowOtherApps(bool show);
     [[nodiscard]] StartPage startPage() const;
     void setStartPage(StartPage page);
     [[nodiscard]] bool notifyOnDownloadFinish() const;
@@ -357,6 +360,7 @@ Q_SIGNALS:
     void startPageChanged(red::core::StartPage page);
     void middleClickScrollChanged(bool enabled);
     void swipeNavigationChanged(bool enabled);
+    void showOtherAppsChanged(bool show);
     void notifyOnDownloadFinishChanged(bool enabled);
     void trayEnabledChanged(bool enabled);
     void themeChanged(red::core::Theme theme);

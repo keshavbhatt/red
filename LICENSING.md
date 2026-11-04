@@ -36,6 +36,11 @@ its endpoints in other software. These paths:
 `REUSE.toml` records the same mapping in machine-readable form; the module's own files
 carry an SPDX header.
 
+## KtechpitApps: MIT
+
+`src/modules/KtechpitApps/` ("More apps from Ktechpit") is MIT-licensed, a copy of
+github.com/keshavbhatt/ktechpit-apps kept with `git subtree`.
+
 ## What this means for forks and contributors
 
 - Contributions to the GPL part are welcome under the GPL.

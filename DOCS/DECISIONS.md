@@ -529,3 +529,24 @@ official Qt binaries lack the proprietary H.264/AAC codecs; YouTube falls back t
 Opus, so playback is unaffected, but this is the one build where that holds. The AppImage does
 not update itself: users fetch the next release.
 
+## ADR-025: "More apps from Ktechpit" from a shared module and a site endpoint (2026-11-04)
+
+**Context.** The owner wants every Ktechpit app to show users the other apps, from one module
+embedded in the apps' own widgets (About first), with the data served by the USSPublic site.
+
+**Decision.** A separate repository, `ktechpit-apps` (MIT), is pulled into
+`src/modules/KtechpitApps` with `git subtree` and builds the static `ktechpit_apps` library.
+`AppCatalog` starts from a bundled copy of the catalog, then a cached download of
+`https://ktechpit.com/USS/public/api/apps.php` (USSPublic `api/apps.php`, from
+`includes/products.php` plus tags in `includes/app_tags.php`), refreshed 20 s after start at
+most once every 7 days. It ranks apps for the host by shared tags, then trending rank, then site
+order, leaving out the host, other platforms and apps installed here as a snap or Flatpak.
+"Get" opens `snap://` or `appstream://` for the way the host was installed, else the product page
+with `?ref=red-<place>`. Red shows two cards side by side in About under the link row, and its
+*More apps* button opens the full list. `Settings::showOtherApps` (on by default; *Settings →
+General*) turns every card off; with it off, *More apps* opens the products page as before.
+The guide's Privacy section names the request.
+
+**Consequences.** Module updates come with `git subtree pull --prefix src/modules/KtechpitApps
+<repo> main --squash`. What Red suggests is decided on the site (tags, `promote`), not in Red.
+
