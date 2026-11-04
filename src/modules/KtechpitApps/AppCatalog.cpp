@@ -172,6 +172,7 @@ QList<AppInfo> AppCatalog::parse(const QByteArray& json, bool* ok)
         app.summary = o.value(u"summary"_s).toString();
         app.type = o.value(u"type"_s).toString(u"freeware"_s);
         app.platforms = stringList(o.value(u"platforms"_s));
+        app.trending = std::clamp(o.value(u"trending"_s).toInt(0), 0, 5);
         app.icon = QUrl(o.value(u"icon"_s).toString());
         app.page = QUrl(o.value(u"page"_s).toString());
         app.snap = o.value(u"snap"_s).toString();
@@ -219,11 +220,27 @@ QList<AppInfo> AppCatalog::randomApps(int count) const
     return randomApps(apps(), count, *QRandomGenerator::global());
 }
 
+int AppCatalog::weight(const AppInfo& app)
+{
+    return app.trending > 0 ? 7 - app.trending : 1;
+}
+
 QList<AppInfo> AppCatalog::randomApps(QList<AppInfo> pool, int count, QRandomGenerator& random)
 {
+    // Weighted draw without repeats: trending apps come up more often, every app can come up.
     QList<AppInfo> out;
     while (out.size() < count && !pool.isEmpty()) {
-        out << pool.takeAt(static_cast<qsizetype>(random.bounded(static_cast<quint32>(pool.size()))));
+        quint32 total = 0;
+        for (const AppInfo& app : std::as_const(pool)) {
+            total += static_cast<quint32>(weight(app));
+        }
+        quint32 roll = random.bounded(total);
+        qsizetype index = 0;
+        while (roll >= static_cast<quint32>(weight(pool.at(index)))) {
+            roll -= static_cast<quint32>(weight(pool.at(index)));
+            ++index;
+        }
+        out << pool.takeAt(index);
     }
     return out;
 }

@@ -60,6 +60,8 @@ private Q_SLOTS:
         QVERIFY(ok);
         QCOMPARE(apps.size(), 2);
         QCOMPARE(apps.at(0).platforms, QStringList({u"Linux"_s}));
+        QCOMPARE(apps.at(0).trending, 2);
+        QCOMPARE(apps.at(1).trending, 0);
         QCOMPARE(apps.at(0).flatpak, u"com.ktechpit.glate"_s);
         QVERIFY(apps.at(1).flatpak.isEmpty());
     }
@@ -104,6 +106,22 @@ private Q_SLOTS:
         }
         QCOMPARE(seen.size(), apps.size());   // every app comes up
         QCOMPARE(firsts.size(), apps.size()); // and any of them can lead
+    }
+
+    void trendingAppsComeUpMoreOften()
+    {
+        QList<AppInfo> apps = pool(); // 5 apps
+        apps[2].trending = 1;         // "dict": weight 6 against 1 for each other app
+        QCOMPARE(AppCatalog::weight(apps.at(2)), 6);
+        QCOMPARE(AppCatalog::weight(apps.at(0)), 1);
+        int first = 0;
+        constexpr int kDraws = 2000;
+        for (quint32 seed = 1; seed <= kDraws; ++seed) {
+            QRandomGenerator random(seed);
+            first += AppCatalog::randomApps(apps, 1, random).first().id == u"dict"_s ? 1 : 0;
+        }
+        // Expected share 6/10; an even draw would give 1/5.
+        QVERIFY2(first > kDraws * 5 / 10 && first < kDraws * 7 / 10, qPrintable(QString::number(first)));
     }
 
     void randomAppsStopWhenThePoolRunsOut()

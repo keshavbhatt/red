@@ -31,6 +31,7 @@ struct AppInfo {
     QString summary; ///< one line
     QString type;    ///< freeware | freemium | premium
     QStringList platforms;
+    int trending = 0; ///< the site's trending rank, 1..5; 0 when not trending
     QUrl icon;
     QUrl page;
     QString snap;    ///< snap name, empty when not on the Snap Store
@@ -68,7 +69,7 @@ public:
 
     /// Every app that runs here, in the site's order; the host app and installed apps left out.
     [[nodiscard]] QList<AppInfo> apps() const;
-    /// Up to `count` of apps(), drawn at random; different on every call.
+    /// Up to `count` of apps(), drawn at random, trending apps more often; different on every call.
     [[nodiscard]] QList<AppInfo> randomApps(int count) const;
 
     /// Off: every widget of the module hides. The host keeps the choice in its own settings.
@@ -84,6 +85,9 @@ public:
     // Pure helpers, public for the tests.
     [[nodiscard]] static QList<AppInfo> parse(const QByteArray& json, bool* ok = nullptr);
     [[nodiscard]] static QList<AppInfo> randomApps(QList<AppInfo> pool, int count, QRandomGenerator& random);
+    /// How much more often an app comes up than one that is not trending: #1 counts 6, #5
+    /// counts 2, every other app 1.
+    [[nodiscard]] static int weight(const AppInfo& app);
     [[nodiscard]] static QString currentPlatform();
     [[nodiscard]] static QPixmap placeholderIcon(const QString& name, int size);
 
