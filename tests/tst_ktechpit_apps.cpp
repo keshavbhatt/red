@@ -16,26 +16,17 @@ using ktechpit::Package;
 
 namespace {
 
-AppInfo app(const QString& id, const QStringList& tags, int trending = 0)
+AppInfo app(const QString& id)
 {
     AppInfo a;
     a.id = id;
     a.name = id;
-    a.tags = tags;
-    a.trending = trending;
     return a;
 }
 
 QList<AppInfo> pool()
 {
-    return {
-        app(u"wallpaper"_s, {u"images"_s}),
-        app(u"games"_s, {u"game"_s}, 1),
-        app(u"whatsie"_s, {u"chat"_s, u"text"_s}),
-        app(u"dict"_s, {u"text"_s}),
-        app(u"paraphrase"_s, {u"chat"_s, u"text"_s, u"writing"_s}),
-        app(u"glate"_s, {u"text"_s}, 3),
-    };
+    return {app(u"wallpaper"_s), app(u"games"_s), app(u"dict"_s), app(u"paraphrase"_s), app(u"glate"_s)};
 }
 
 QStringList ids(const QList<AppInfo>& apps)
@@ -68,10 +59,8 @@ private Q_SLOTS:
         const QList<AppInfo> apps = AppCatalog::parse(json, &ok);
         QVERIFY(ok);
         QCOMPARE(apps.size(), 2);
-        QCOMPARE(apps.at(0).tags, QStringList({u"language"_s, u"text"_s}));
-        QCOMPARE(apps.at(0).trending, 2);
+        QCOMPARE(apps.at(0).platforms, QStringList({u"Linux"_s}));
         QCOMPARE(apps.at(0).flatpak, u"com.ktechpit.glate"_s);
-        QCOMPARE(apps.at(1).trending, 0);
         QVERIFY(apps.at(1).flatpak.isEmpty());
     }
 
@@ -98,64 +87,36 @@ private Q_SLOTS:
         }
     }
 
-    void ranksBySharedTagsThenTrendingThenOrder()
-    {
-        const QList<AppInfo> apps{
-            app(u"wallpaper"_s, {u"images"_s}),
-            app(u"games"_s, {u"game"_s}, 1),
-            app(u"whatsie"_s, {u"chat"_s, u"text"_s}),
-            app(u"dict"_s, {u"text"_s}),
-            app(u"paraphrase"_s, {u"chat"_s, u"text"_s, u"writing"_s}),
-            app(u"glate"_s, {u"text"_s}, 3),
-        };
-        QCOMPARE(ids(AppCatalog::rank(apps, u"whatsie"_s, -1)),
-                 QStringList({u"paraphrase"_s, u"glate"_s, u"dict"_s, u"games"_s, u"wallpaper"_s}));
-        QCOMPARE(ids(AppCatalog::rank(apps, u"whatsie"_s, 2)),
-                 QStringList({u"paraphrase"_s, u"glate"_s}));
-        // An unknown host: trending first, then catalog order.
-        QCOMPARE(ids(AppCatalog::rank(apps, u"nobody"_s, 3)),
-                 QStringList({u"games"_s, u"glate"_s, u"wallpaper"_s}));
-    }
-
-    void pickBestFitIsTheRanking()
-    {
-        const QList<AppInfo> apps = pool();
-        QRandomGenerator random(7);
-        QCOMPARE(ids(AppCatalog::pick(apps, u"whatsie"_s, 2, ktechpit::Pick::BestFit, random)),
-                 QStringList({u"paraphrase"_s, u"glate"_s}));
-    }
-
-    void pickMixedKeepsTheBestFitFirstAndVariesTheRest()
+    void randomAppsVaryAndNeverRepeat()
     {
         const QList<AppInfo> apps = pool();
         QSet<QString> seen;
+        QSet<QString> firsts;
         for (quint32 seed = 1; seed <= 200; ++seed) {
             QRandomGenerator random(seed);
-            const QStringList got = ids(AppCatalog::pick(apps, u"whatsie"_s, 3, ktechpit::Pick::Mixed, random));
-            QCOMPARE(got.size(), 3);
-            QCOMPARE(got.first(), u"paraphrase"_s);
-            QVERIFY(!got.contains(u"whatsie"_s));
-            QCOMPARE(QSet<QString>(got.begin(), got.end()).size(), 3); // no app twice
+            const QStringList got = ids(AppCatalog::randomApps(apps, 2, random));
+            QCOMPARE(got.size(), 2);
+            QCOMPARE(QSet<QString>(got.begin(), got.end()).size(), 2); // no app twice
+            firsts.insert(got.first());
             for (const QString& id : got) {
                 seen.insert(id);
             }
         }
-        // Over many draws every other app shows up at least once.
-        QCOMPARE(seen.size(), apps.size() - 1);
+        QCOMPARE(seen.size(), apps.size());   // every app comes up
+        QCOMPARE(firsts.size(), apps.size()); // and any of them can lead
     }
 
-    void pickRandomCoversEveryAppAndStopsWhenTheCatalogRunsOut()
+    void randomAppsStopWhenThePoolRunsOut()
     {
-        const QList<AppInfo> apps = pool();
         QRandomGenerator random(3);
-        QCOMPARE(AppCatalog::pick(apps, u"whatsie"_s, 50, ktechpit::Pick::Random, random).size(),
-                 apps.size() - 1);
-        QVERIFY(AppCatalog::pick(apps, u"whatsie"_s, 0, ktechpit::Pick::Random, random).isEmpty());
+        QCOMPARE(AppCatalog::randomApps(pool(), 50, random).size(), pool().size());
+        QVERIFY(AppCatalog::randomApps(pool(), 0, random).isEmpty());
+        QVERIFY(AppCatalog::randomApps({}, 3, random).isEmpty());
     }
 
     void getLinkFollowsThePackage()
     {
-        AppInfo a = app(u"glate"_s, {});
+        AppInfo a = app(u"glate"_s);
         a.snap = u"glate"_s;
         a.flatpak = u"com.ktechpit.glate"_s;
         a.page = QUrl(u"https://ktechpit.com/USS/public/product.php?slug=glate"_s);
@@ -179,7 +140,7 @@ private Q_SLOTS:
 
     void pageUrlWithoutSource()
     {
-        AppInfo a = app(u"red"_s, {});
+        AppInfo a = app(u"red"_s);
         a.page = QUrl(u"https://ktechpit.com/USS/public/product.php?slug=red"_s);
         QCOMPARE(ktechpit::AppLinks::pageUrl(a, QString(), u"about"_s), a.page);
     }

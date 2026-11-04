@@ -69,12 +69,8 @@ void MoreAppsDialog::rebuild()
     int n = 0;
     const QList<AppInfo> apps = AppCatalog::instance()->apps();
     for (const AppInfo& app : apps) {
-        if (app.id == AppCatalog::instance()->config().hostAppId) {
-            continue;
-        }
         const bool match = needle.isEmpty() || app.name.contains(needle, Qt::CaseInsensitive)
-                           || app.summary.contains(needle, Qt::CaseInsensitive)
-                           || app.tags.contains(needle, Qt::CaseInsensitive);
+                           || app.summary.contains(needle, Qt::CaseInsensitive);
         if (!match) {
             continue;
         }

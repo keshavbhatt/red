@@ -172,8 +172,6 @@ QList<AppInfo> AppCatalog::parse(const QByteArray& json, bool* ok)
         app.summary = o.value(u"summary"_s).toString();
         app.type = o.value(u"type"_s).toString(u"freeware"_s);
         app.platforms = stringList(o.value(u"platforms"_s));
-        app.tags = stringList(o.value(u"tags"_s));
-        app.trending = o.value(u"trending"_s).toInt(0);
         app.icon = QUrl(o.value(u"icon"_s).toString());
         app.page = QUrl(o.value(u"page"_s).toString());
         app.snap = o.value(u"snap"_s).toString();
@@ -197,60 +195,12 @@ QString AppCatalog::currentPlatform()
 #endif
 }
 
-QList<AppInfo> AppCatalog::rank(const QList<AppInfo>& apps, const QString& hostId, int count)
-{
-    QStringList hostTags;
-    for (const AppInfo& app : apps) {
-        if (app.id == hostId) {
-            hostTags = app.tags;
-        }
-    }
-    struct Scored {
-        AppInfo app;
-        int shared;
-        int order;
-    };
-    QList<Scored> pool;
-    int order = 0;
-    for (const AppInfo& app : apps) {
-        if (app.id == hostId) {
-            continue;
-        }
-        int shared = 0;
-        for (const QString& tag : app.tags) {
-            shared += hostTags.contains(tag) ? 1 : 0;
-        }
-        pool.append({app, shared, order++});
-    }
-    // Most shared tags first; then trending apps by rank; then the catalog's own order.
-    std::stable_sort(pool.begin(), pool.end(), [](const Scored& a, const Scored& b) {
-        if (a.shared != b.shared) {
-            return a.shared > b.shared;
-        }
-        const int ta = a.app.trending > 0 ? a.app.trending : 1000;
-        const int tb = b.app.trending > 0 ? b.app.trending : 1000;
-        if (ta != tb) {
-            return ta < tb;
-        }
-        return a.order < b.order;
-    });
-    QList<AppInfo> out;
-    for (const Scored& s : std::as_const(pool)) {
-        if (count >= 0 && out.size() >= count) {
-            break;
-        }
-        out << s.app;
-    }
-    return out;
-}
-
 QList<AppInfo> AppCatalog::apps() const
 {
     const QString platform = currentPlatform();
     QList<AppInfo> out;
     for (const AppInfo& app : m_apps) {
         if (app.id == m_config.hostAppId) {
-            out << app; // kept for rank(), which reads the host's tags and drops it
             continue;
         }
         if (!app.platforms.isEmpty() && !app.platforms.contains(platform)) {
@@ -261,63 +211,19 @@ QList<AppInfo> AppCatalog::apps() const
         }
         out << app;
     }
-    return rank(out, m_config.hostAppId, -1);
+    return out;
 }
 
-QList<AppInfo> AppCatalog::related(int count) const
+QList<AppInfo> AppCatalog::randomApps(int count) const
 {
-    return apps().mid(0, count);
+    return randomApps(apps(), count, *QRandomGenerator::global());
 }
 
-QList<AppInfo> AppCatalog::pick(int count, Pick mode) const
+QList<AppInfo> AppCatalog::randomApps(QList<AppInfo> pool, int count, QRandomGenerator& random)
 {
-    return pick(apps(), m_config.hostAppId, count, mode, *QRandomGenerator::global());
-}
-
-QList<AppInfo> AppCatalog::pick(const QList<AppInfo>& apps, const QString& hostId, int count, Pick mode,
-                                QRandomGenerator& random)
-{
-    QList<AppInfo> ranked = rank(apps, hostId, -1);
-    if (count <= 0 || ranked.isEmpty()) {
-        return {};
-    }
-    if (mode == Pick::BestFit) {
-        return ranked.mid(0, count);
-    }
-
-    QStringList hostTags;
-    for (const AppInfo& app : apps) {
-        if (app.id == hostId) {
-            hostTags = app.tags;
-        }
-    }
     QList<AppInfo> out;
-    if (mode == Pick::Mixed) {
-        out << ranked.takeFirst(); // the best fit always shows
-    }
-    // Weighted draw without replacement. Mixed leans to apps that share tags with the host and
-    // to trending ones, so related apps come up more often but every app gets its turn.
-    while (out.size() < count && !ranked.isEmpty()) {
-        QList<int> weights;
-        int total = 0;
-        for (const AppInfo& app : std::as_const(ranked)) {
-            int weight = 1;
-            if (mode == Pick::Mixed) {
-                for (const QString& tag : app.tags) {
-                    weight += hostTags.contains(tag) ? 2 : 0;
-                }
-                weight += app.trending > 0 ? 1 : 0;
-            }
-            weights << weight;
-            total += weight;
-        }
-        int roll = static_cast<int>(random.bounded(total));
-        int index = 0;
-        while (roll >= weights.at(index)) {
-            roll -= weights.at(index);
-            ++index;
-        }
-        out << ranked.takeAt(index);
+    while (out.size() < count && !pool.isEmpty()) {
+        out << pool.takeAt(static_cast<qsizetype>(random.bounded(static_cast<quint32>(pool.size()))));
     }
     return out;
 }

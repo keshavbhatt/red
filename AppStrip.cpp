@@ -57,12 +57,6 @@ AppStrip::AppStrip(const QString& place, int count, Orientation orientation, QWi
     rebuild(true);
 }
 
-void AppStrip::setPick(Pick pick)
-{
-    m_pick = pick;
-    rebuild(true);
-}
-
 void AppStrip::setTitle(const QString& title)
 {
     m_title->setText(title);
@@ -88,7 +82,7 @@ void AppStrip::rebuild(bool repick)
         }
     }
     if (catalog->isEnabled() && apps.isEmpty()) {
-        apps = catalog->pick(m_count, m_pick);
+        apps = catalog->randomApps(m_count);
     }
     m_shown.clear();
     for (const AppInfo& app : std::as_const(apps)) {
