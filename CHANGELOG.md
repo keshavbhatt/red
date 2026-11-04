@@ -3,7 +3,12 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
-## [10.3.2] - unreleased
+## [10.3.2] - 2026-11-04
+
+### Added
+- **AppImage**: each release now also comes as an x86_64 AppImage on the
+  [releases page](https://github.com/keshavbhatt/red/releases), for distributions without snap
+  or Flatpak.
 
 ### Fixed
 - **Video menu in TV mode with a gamepad**: holding **A** on a video now opens YouTube's menu

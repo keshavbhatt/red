@@ -135,6 +135,15 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="10.3.2" date="2026-11-04" type="stable">
+      <description>
+        <p>The video menu with a gamepad in TV mode, and an AppImage.</p>
+        <ul>
+          <li>In TV mode, holding A on a gamepad opens a video's menu (Watch later, Save to playlist and more), as holding Enter does on a keyboard</li>
+          <li>Each release now also comes as an x86_64 AppImage</li>
+        </ul>
+      </description>
+    </release>
     <release version="10.3.1" date="2026-11-04" type="stable">
       <description>
         <p>Swipe to go back, finer TV speeds and a full-screen fix.</p>
