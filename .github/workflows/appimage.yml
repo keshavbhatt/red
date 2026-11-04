@@ -127,17 +127,38 @@ jobs:
       - name: Build the AppImage
         run: |
           export QMAKE="$QT_ROOT_DIR/bin/qmake"
-          # xcb is deployed by default; Wayland only when asked (with its shell, decoration
-          # and graphics integration plugins), else Wayland sessions fall back to XWayland.
+          # xcb is deployed by default; the Wayland platform plugin only when asked.
           export EXTRA_PLATFORM_PLUGINS="libqwayland.so"
-          export OUTPUT="Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage"
-          n=0
-          until ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+          retry() {
+            n=0
+            until "$@"; do
+              n=$((n+1)); [ $n -ge 3 ] && { echo "::error::linuxdeploy failed after $n attempts"; exit 1; }
+              echo "linuxdeploy attempt $n failed; retrying in 15s"; sleep 15
+            done
+          }
+          retry ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/com.ktechpit.red.desktop \
             --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/com.ktechpit.red.png \
-            --plugin qt --output appimage; do
-            n=$((n+1)); [ $n -ge 3 ] && { echo "::error::linuxdeploy failed after $n attempts"; exit 1; }
-            echo "linuxdeploy attempt $n failed; retrying in 15s"; sleep 15
+            --plugin qt
+          # The Qt plugin leaves out Wayland's graphics integration (wayland-egl), so on Wayland
+          # no OpenGL context can be made and the web view stays blank. Add the Wayland plugin
+          # directories by hand and let linuxdeploy bring in their libraries.
+          deps=()
+          for dir in wayland-graphics-integration-client wayland-decoration-client wayland-shell-integration; do
+            test -d "$QT_ROOT_DIR/plugins/$dir" || { echo "::error::Qt has no plugins/$dir"; exit 1; }
+            mkdir -p "AppDir/usr/plugins/$dir"
+            cp -v "$QT_ROOT_DIR/plugins/$dir"/*.so "AppDir/usr/plugins/$dir/"
+            deps+=(--deploy-deps-only "AppDir/usr/plugins/$dir")
+          done
+          export OUTPUT="Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage"
+          export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib"
+          retry ./linuxdeploy-x86_64.AppImage --appdir AppDir "${deps[@]}" --output appimage
+          unset LD_LIBRARY_PATH
+          # Every Wayland plugin must find its libraries inside the bundle.
+          for f in AppDir/usr/plugins/wayland-*/*.so AppDir/usr/plugins/platforms/*.so; do
+            if LD_LIBRARY_PATH= ldd "$f" | grep -q "not found"; then
+              echo "::error::$f has unresolved libraries"; ldd "$f" | grep "not found"; exit 1
+            fi
           done
 
       - name: Check the bundle
@@ -150,6 +171,8 @@ jobs:
           need libqsvg.so
           need libqwayland.so
           need libxdg-shell.so
+          ls AppDir/usr/plugins/wayland-graphics-integration-client/*egl*.so >/dev/null \
+            || { echo "::error::no wayland-egl client integration bundled"; exit 1; }
           find AppDir -path '*qtwebengine_locales/*.pak' | grep -q . || { echo "::error::no WebEngine locales bundled"; exit 1; }
           test -f AppDir/usr/lib/libsoftokn3.so || { echo "::error::NSS not bundled"; exit 1; }
           test -x AppDir/usr/bin/deno || { echo "::error::JavaScript runtime not bundled"; exit 1; }
