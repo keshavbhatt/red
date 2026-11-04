@@ -439,8 +439,8 @@ shipped metainfo, snap and guide links already point at; the public materials th
 `src/ui/account_dialog.*`, `src/ui/plans_dialog.*`, `tst_daily_allowance`, `tst_legacy_account`)
 is source-available under the Ktechpit Licensing Module License, with the same GPLv3 section 7
 additional permission for official builds. `LICENSING.md`, `REUSE.toml` and SPDX headers record
-it; the metainfo declares `GPL-3.0-or-later AND LicenseRef-proprietary=...`, the snap
-GPL-3.0-or-later; About carries the GPL's legal notice and a Licences link. The public README
+it; the metainfo and the snap declare GPL-3.0-or-later (a `LicenseRef-proprietary` part made
+Flathub show "Special License"); About carries the GPL's legal notice and a Licences link. The public README
 and guide move to the root and `scripts/publish-public.sh` goes. The history is published whole;
 the private repository stays as a frozen mirror. The snap workflow builds on `master`.
 

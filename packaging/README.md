@@ -66,8 +66,8 @@ are filled in by hand (the store info endpoint lists them:
 Lint without building: `flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.ktechpit.red.yaml`.
 The PR targets `flathub/flathub` branch `new-pr`, title `Add com.ktechpit.red`, and needs a
 short video of the Flatpak build attached. Flathub builds it in their CI; never build locally. The metainfo's licence is
-`GPL-3.0-or-later AND LicenseRef-proprietary=<URL of the module licence>`; Flathub rejects a bare
-`LicenseRef-proprietary`.
+`GPL-3.0-or-later` only: a `LicenseRef-proprietary=<URL>` part makes Flathub show "Special
+License"; the module's own licence is in LICENSING.md and REUSE.toml.
 
 ## Before tagging a release
 
