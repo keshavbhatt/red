@@ -127,6 +127,9 @@ jobs:
       - name: Build the AppImage
         run: |
           export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          # xcb is deployed by default; Wayland only when asked (with its shell, decoration
+          # and graphics integration plugins), else Wayland sessions fall back to XWayland.
+          export EXTRA_PLATFORM_PLUGINS="libqwayland.so"
           export OUTPUT="Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage"
           n=0
           until ./linuxdeploy-x86_64.AppImage --appdir AppDir \
@@ -145,6 +148,8 @@ jobs:
           need qtwebengine_resources.pak
           need libqsqlite.so
           need libqsvg.so
+          need libqwayland.so
+          need libxdg-shell.so
           find AppDir -path '*qtwebengine_locales/*.pak' | grep -q . || { echo "::error::no WebEngine locales bundled"; exit 1; }
           test -f AppDir/usr/lib/libsoftokn3.so || { echo "::error::NSS not bundled"; exit 1; }
           test -x AppDir/usr/bin/deno || { echo "::error::JavaScript runtime not bundled"; exit 1; }
