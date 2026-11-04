@@ -539,10 +539,11 @@ embedded in the apps' own widgets (About first), with the data served by the USS
 `AppCatalog` starts from a bundled copy of the catalog, then a cached download of
 `https://ktechpit.com/USS/public/api/apps.php` (USSPublic `api/apps.php`, from
 `includes/products.php` plus short names, Flathub ids and `promote` in
-`includes/app_catalog.php`), refreshed 20 s after start at most once every 7 days. It leaves out
-the host, other platforms and apps installed here as a snap or Flatpak, and does no ranking (the
-owner asked for plain random): About shows two cards side by side under the link row, drawn at
-random each time About opens, so users meet most of the catalog without opening the full list;
+`includes/app_catalog.php`, and each app's trending rank), refreshed 20 s after start at most
+once every 7 days. It leaves out the host, other platforms and apps installed here as a snap or
+Flatpak, and ranks nothing by relevance (the owner asked for random): About shows two cards side
+by side under the link row, drawn at random each time About opens, trending apps more often (#1
+weighs 6, #5 weighs 2, others 1), so users meet most of the catalog without opening the full list;
 its *More apps* button opens the full list in the site's order. "Get" opens `snap://` or
 `appstream://` for the way the host was installed, else the product page with
 `?ref=red-<place>`. `Settings::showOtherApps` (on by default; *Settings, General*) turns every
