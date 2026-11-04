@@ -78,7 +78,8 @@ bool isInstalled(const AppInfo& app)
     if (!app.flatpak.isEmpty()) {
         const QStringList roots{
             u"/var/lib/flatpak/app/"_s,
-            QDir::homePath() + u"/.local/share/flatpak/app/"_s,
+            // In a snap, $HOME is the snap's own folder; the real one is in SNAP_REAL_HOME.
+            qEnvironmentVariable("SNAP_REAL_HOME", QDir::homePath()) + u"/.local/share/flatpak/app/"_s,
         };
         for (const QString& root : roots) {
             if (QFileInfo::exists(root + app.flatpak + u"/current"_s)) {
