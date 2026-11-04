@@ -538,17 +538,16 @@ embedded in the apps' own widgets (About first), with the data served by the USS
 `src/modules/KtechpitApps` with `git subtree` and builds the static `ktechpit_apps` library.
 `AppCatalog` starts from a bundled copy of the catalog, then a cached download of
 `https://ktechpit.com/USS/public/api/apps.php` (USSPublic `api/apps.php`, from
-`includes/products.php` plus tags in `includes/app_tags.php`), refreshed 20 s after start at
-most once every 7 days. It ranks apps for the host by shared tags, then trending rank, then site
-order, leaving out the host, other platforms and apps installed here as a snap or Flatpak.
-"Get" opens `snap://` or `appstream://` for the way the host was installed, else the product page
-with `?ref=red-<place>`. Red shows two cards side by side in About under the link row: the best
-fit, and one drawn at random each time About opens (weighted toward related and trending apps),
-so users meet most of the catalog without opening the full list. Its *More apps* button opens
-the full list. `Settings::showOtherApps` (on by default; *Settings →
-General*) turns every card off; with it off, *More apps* opens the products page as before.
-The guide's Privacy section names the request.
+`includes/products.php` plus short names, Flathub ids and `promote` in
+`includes/app_catalog.php`), refreshed 20 s after start at most once every 7 days. It leaves out
+the host, other platforms and apps installed here as a snap or Flatpak, and does no ranking (the
+owner asked for plain random): About shows two cards side by side under the link row, drawn at
+random each time About opens, so users meet most of the catalog without opening the full list;
+its *More apps* button opens the full list in the site's order. "Get" opens `snap://` or
+`appstream://` for the way the host was installed, else the product page with
+`?ref=red-<place>`. `Settings::showOtherApps` (on by default; *Settings, General*) turns every
+card off; with it off, *More apps* opens the products page as before. The guide's Privacy section names the request.
 
 **Consequences.** Module updates come with `git subtree pull --prefix src/modules/KtechpitApps
-<repo> main --squash`. What Red suggests is decided on the site (tags, `promote`), not in Red.
+<repo> main --squash`. Which apps can appear is decided on the site (`promote`), not in Red.
 
