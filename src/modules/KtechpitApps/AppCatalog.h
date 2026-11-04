@@ -31,19 +31,10 @@ struct AppInfo {
     QString summary; ///< one line
     QString type;    ///< freeware | freemium | premium
     QStringList platforms;
-    QStringList tags;
-    int trending = 0; ///< 1..5, 0 when not trending
     QUrl icon;
     QUrl page;
     QString snap;    ///< snap name, empty when not on the Snap Store
     QString flatpak; ///< Flathub app id, empty when not on Flathub
-};
-
-/// How a strip chooses its apps.
-enum class Pick {
-    BestFit, ///< the apps that fit the host best, always the same
-    Mixed,   ///< the best fit first, the rest drawn at random (leaning to related and trending)
-    Random,  ///< all drawn at random, evenly
 };
 
 struct CatalogConfig {
@@ -75,12 +66,10 @@ public:
 
     [[nodiscard]] const CatalogConfig& config() const { return m_config; }
 
-    /// Every app that runs here, the host app and installed apps left out.
+    /// Every app that runs here, in the site's order; the host app and installed apps left out.
     [[nodiscard]] QList<AppInfo> apps() const;
-    /// Up to `count` apps for the host, best fit first.
-    [[nodiscard]] QList<AppInfo> related(int count) const;
-    /// Up to `count` apps chosen as `mode` says; Mixed and Random differ on every call.
-    [[nodiscard]] QList<AppInfo> pick(int count, Pick mode) const;
+    /// Up to `count` of apps(), drawn at random; different on every call.
+    [[nodiscard]] QList<AppInfo> randomApps(int count) const;
 
     /// Off: every widget of the module hides. The host keeps the choice in its own settings.
     [[nodiscard]] bool isEnabled() const { return m_enabled; }
@@ -94,10 +83,7 @@ public:
 
     // Pure helpers, public for the tests.
     [[nodiscard]] static QList<AppInfo> parse(const QByteArray& json, bool* ok = nullptr);
-    [[nodiscard]] static QList<AppInfo> rank(const QList<AppInfo>& apps, const QString& hostId,
-                                             int count);
-    [[nodiscard]] static QList<AppInfo> pick(const QList<AppInfo>& apps, const QString& hostId, int count,
-                                             Pick mode, QRandomGenerator& random);
+    [[nodiscard]] static QList<AppInfo> randomApps(QList<AppInfo> pool, int count, QRandomGenerator& random);
     [[nodiscard]] static QString currentPlatform();
     [[nodiscard]] static QPixmap placeholderIcon(const QString& name, int size);
 

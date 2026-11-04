@@ -9,24 +9,20 @@ C++17. MIT licence.
 ## What it shows
 
 The catalog comes from `https://ktechpit.com/USS/public/api/apps.php` (the USSPublic site:
-`api/apps.php`, built from `includes/products.php` and the tags in `includes/app_tags.php`).
+`api/apps.php`, built from `includes/products.php` and `includes/app_catalog.php`).
 A copy is bundled in the resources, so the cards work offline and on the first start. About 20
 seconds after start, and at most once every 7 days, the module downloads the current list and
 keeps it in `~/.cache/ktechpit-apps/`, with the icons. It sends nothing about the user: a GET
 of the list and of the icons, with the user agent `KtechpitApps/1 (<host id>)`.
 
-Which apps, in which order:
+Which apps:
 
 - never the host app, never an app for another platform, never one installed here as a snap
   or a Flatpak;
-- best fit: apps that share the most tags with the host app first (Whatsie, `chat` `text`,
-  gets Paraphrase, Glate and OmniDict first), then trending apps, then the site's own order.
-
-A strip shows the best fit first and draws its other cards at random each time it is built,
-leaning toward related and trending apps, so users see most of the catalog without opening the
-full list. `strip->setPick(ktechpit::Pick::BestFit)` keeps them fixed; `Pick::Random` draws all
-of them evenly. A catalog refresh never swaps the cards of a strip already on screen. The full
-list (`MoreAppsDialog`) is always in best-fit order.
+- a strip draws its cards at random each time it is built, so over a few visits users see most
+  of the catalog without opening the full list. A catalog refresh never swaps the cards of a
+  strip already on screen;
+- the full list (`MoreAppsDialog`) follows the site's order.
 
 **Get** opens the store page in the desktop's software centre for the way the host app was
 installed: `snap://<name>` for a snap, `appstream://<flatpak id>` for a Flatpak or a distro
@@ -96,7 +92,7 @@ endpoint; run it before tagging a release of the module.
 
 ## Adding an app to the catalog
 
-On the site: the product goes in `includes/products.php` as before; add its tags (and a short
-name) to `includes/app_tags.php`. Set `'promote' => false` to keep a product out of the apps
-(KimiDoc, a server product). Installed apps pick it up within a week; run
-`scripts/update-catalog.sh` here so new installs have it too.
+On the site: the product goes in `includes/products.php` as before. `includes/app_catalog.php`
+can give it a short name for the cards, a Flathub id when its product entry has no Flathub
+link, or `'promote' => false` to keep it out of the apps (KimiDoc, a server product). Installed
+apps pick it up within a week; run `scripts/update-catalog.sh` here so new installs have it too.
