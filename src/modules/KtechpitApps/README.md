@@ -19,8 +19,14 @@ Which apps, in which order:
 
 - never the host app, never an app for another platform, never one installed here as a snap
   or a Flatpak;
-- apps that share the most tags with the host app first (Whatsie, `chat` `text`, gets
-  Paraphrase, Glate and OmniDict first), then trending apps, then the site's own order.
+- best fit: apps that share the most tags with the host app first (Whatsie, `chat` `text`,
+  gets Paraphrase, Glate and OmniDict first), then trending apps, then the site's own order.
+
+A strip shows the best fit first and draws its other cards at random each time it is built,
+leaning toward related and trending apps, so users see most of the catalog without opening the
+full list. `strip->setPick(ktechpit::Pick::BestFit)` keeps them fixed; `Pick::Random` draws all
+of them evenly. A catalog refresh never swaps the cards of a strip already on screen. The full
+list (`MoreAppsDialog`) is always in best-fit order.
 
 **Get** opens the store page in the desktop's software centre for the way the host app was
 installed: `snap://<name>` for a snap, `appstream://<flatpak id>` for a Flatpak or a distro

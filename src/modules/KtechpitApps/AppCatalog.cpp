@@ -18,6 +18,7 @@
 #include <QNetworkReply>
 #include <QPainter>
 #include <QPointer>
+#include <QRandomGenerator>
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QTimer>
@@ -266,6 +267,59 @@ QList<AppInfo> AppCatalog::apps() const
 QList<AppInfo> AppCatalog::related(int count) const
 {
     return apps().mid(0, count);
+}
+
+QList<AppInfo> AppCatalog::pick(int count, Pick mode) const
+{
+    return pick(apps(), m_config.hostAppId, count, mode, *QRandomGenerator::global());
+}
+
+QList<AppInfo> AppCatalog::pick(const QList<AppInfo>& apps, const QString& hostId, int count, Pick mode,
+                                QRandomGenerator& random)
+{
+    QList<AppInfo> ranked = rank(apps, hostId, -1);
+    if (count <= 0 || ranked.isEmpty()) {
+        return {};
+    }
+    if (mode == Pick::BestFit) {
+        return ranked.mid(0, count);
+    }
+
+    QStringList hostTags;
+    for (const AppInfo& app : apps) {
+        if (app.id == hostId) {
+            hostTags = app.tags;
+        }
+    }
+    QList<AppInfo> out;
+    if (mode == Pick::Mixed) {
+        out << ranked.takeFirst(); // the best fit always shows
+    }
+    // Weighted draw without replacement. Mixed leans to apps that share tags with the host and
+    // to trending ones, so related apps come up more often but every app gets its turn.
+    while (out.size() < count && !ranked.isEmpty()) {
+        QList<int> weights;
+        int total = 0;
+        for (const AppInfo& app : std::as_const(ranked)) {
+            int weight = 1;
+            if (mode == Pick::Mixed) {
+                for (const QString& tag : app.tags) {
+                    weight += hostTags.contains(tag) ? 2 : 0;
+                }
+                weight += app.trending > 0 ? 1 : 0;
+            }
+            weights << weight;
+            total += weight;
+        }
+        int roll = static_cast<int>(random.bounded(total));
+        int index = 0;
+        while (roll >= weights.at(index)) {
+            roll -= weights.at(index);
+            ++index;
+        }
+        out << ranked.takeAt(index);
+    }
+    return out;
 }
 
 void AppCatalog::setEnabled(bool enabled)

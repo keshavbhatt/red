@@ -52,9 +52,15 @@ AppStrip::AppStrip(const QString& place, int count, Orientation orientation, QWi
     layout->addWidget(m_cards);
 
     AppCatalog* catalog = AppCatalog::instance();
-    connect(catalog, &AppCatalog::changed, this, &AppStrip::rebuild);
-    connect(catalog, &AppCatalog::enabledChanged, this, &AppStrip::rebuild);
-    rebuild();
+    connect(catalog, &AppCatalog::changed, this, [this] { rebuild(false); });
+    connect(catalog, &AppCatalog::enabledChanged, this, [this] { rebuild(true); });
+    rebuild(true);
+}
+
+void AppStrip::setPick(Pick pick)
+{
+    m_pick = pick;
+    rebuild(true);
 }
 
 void AppStrip::setTitle(const QString& title)
@@ -63,14 +69,31 @@ void AppStrip::setTitle(const QString& title)
     m_title->setVisible(!title.isEmpty());
 }
 
-void AppStrip::rebuild()
+void AppStrip::rebuild(bool repick)
 {
     while (QLayoutItem* item = m_cardsLayout->takeAt(0)) {
         delete item->widget();
         delete item;
     }
     AppCatalog* catalog = AppCatalog::instance();
-    const QList<AppInfo> apps = catalog->isEnabled() ? catalog->related(m_count) : QList<AppInfo>{};
+    QList<AppInfo> apps;
+    if (catalog->isEnabled() && !repick && !m_shown.isEmpty()) {
+        const QList<AppInfo> all = catalog->apps();
+        for (const QString& id : std::as_const(m_shown)) {
+            for (const AppInfo& app : all) {
+                if (app.id == id) {
+                    apps << app;
+                }
+            }
+        }
+    }
+    if (catalog->isEnabled() && apps.isEmpty()) {
+        apps = catalog->pick(m_count, m_pick);
+    }
+    m_shown.clear();
+    for (const AppInfo& app : std::as_const(apps)) {
+        m_shown << app.id;
+    }
     for (const AppInfo& app : apps) {
         m_cardsLayout->addWidget(new AppCard(app, m_place, m_cards));
     }
