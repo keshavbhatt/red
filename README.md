@@ -31,6 +31,17 @@ sudo snap install red-app
 flatpak install flathub com.ktechpit.red
 ```
 
+**AppImage** (x86_64): download `Red-<version>-x86_64.AppImage` from the
+[latest release](https://github.com/keshavbhatt/red/releases/latest), then
+
+```sh
+chmod +x Red-*-x86_64.AppImage
+./Red-*-x86_64.AppImage
+```
+
+Downloads need ffmpeg from your distribution (`sudo apt install ffmpeg`, `sudo dnf install
+ffmpeg`, `sudo pacman -S ffmpeg`); Red tells you if it is missing.
+
 ## Features
 
 **Three modes**

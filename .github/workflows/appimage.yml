@@ -1,0 +1,150 @@
+# A version tag (v10.3.2) also builds an x86_64 AppImage and attaches it to the GitHub release
+# that release.yml creates for the tag. The AppImage bundles the official Qt 6.11 binaries with
+# Qt WebEngine and the download engine's JavaScript runtime (Deno, pinned as in the snap and the
+# Flatpak); ffmpeg comes from the system, as everywhere (CLAUDE.md). Recipe from whatsie's
+# linux-bundles.yml (ADR-024).
+#
+# workflow_dispatch with a `tag` input (re)builds for an existing tag and replaces its AppImage.
+#
+# The official Qt binaries have no proprietary H.264/AAC codecs; YouTube then serves VP9/AV1
+# and Opus, which they have. The snap and the Flatpak stay the main builds.
+name: appimage
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and attach to (e.g. v10.3.2)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  appimage:
+    # Oldest supported runner, for the widest glibc compatibility.
+    runs-on: ubuntu-22.04
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: 1 # GitHub runners have no FUSE
+    steps:
+      - name: Determine the version
+        id: ver
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "ver=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.ver.outputs.tag }}
+
+      - name: Check the tag against project(VERSION)
+        run: |
+          project=$(awk '/^project\(red/ {on = 1} on && $1 == "VERSION" {print $2; exit}' CMakeLists.txt)
+          if [ "${{ steps.ver.outputs.ver }}" != "$project" ]; then
+            echo "::error::tag ${{ steps.ver.outputs.tag }} does not match project(VERSION) $project"
+            exit 1
+          fi
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.*'
+          # qtpositioning and qtserialport: linuxdeploy-plugin-qt fails to deploy WebEngine
+          # without them present (the NMEA positioning plugin links qtserialport).
+          modules: 'qtwebengine qtwebchannel qtpositioning qtserialport'
+          cache: true
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libx11-dev libxcb1-dev libfuse2 libnss3 unzip
+
+      - name: Build and install into the AppDir
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
+            -DRED_BUILD_TESTS=OFF
+          cmake --build build --parallel
+          DESTDIR="$PWD/AppDir" cmake --install build
+
+      - name: Add the download engine's JavaScript runtime
+        run: |
+          # Next to the binary: the engine searches the application directory.
+          curl -fsSL -o deno.zip \
+            https://github.com/denoland/deno/releases/download/v2.7.7/deno-x86_64-unknown-linux-gnu.zip
+          echo "0cd918870657ccc3d96ac682290e894dda374e2a742424aae9118b258a6cf7a3  deno.zip" | sha256sum -c -
+          unzip -o deno.zip deno
+          install -Dm755 deno AppDir/usr/bin/deno
+
+      - name: Bundle the NSS modules WebEngine loads at run time
+        run: |
+          # linuxdeploy bundles the linked NSS libraries but not the ones NSS dlopen()s;
+          # shipping the matching set avoids a symbol-version crash on newer distros.
+          mkdir -p AppDir/usr/lib
+          for lib in libsoftokn3.so libfreebl3.so libnssckbi.so libnssdbm3.so; do
+            f=$(find /usr/lib/x86_64-linux-gnu -maxdepth 2 -name "$lib" | head -1)
+            if [ -n "$f" ]; then cp -v "$f" AppDir/usr/lib/
+            else echo "::error::NSS module $lib not found on the runner"; exit 1; fi
+          done
+
+      - name: Turn off the WebEngine sandbox in the bundle
+        run: |
+          # A read-only AppImage cannot ship a setuid chrome-sandbox. The renderer still runs
+          # in its own process; only the OS sandbox is off (standard for WebEngine AppImages).
+          mkdir -p AppDir/apprun-hooks
+          echo 'export QTWEBENGINE_DISABLE_SANDBOX=1' > AppDir/apprun-hooks/sandbox.sh
+
+      - name: Fetch linuxdeploy
+        run: |
+          base=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous
+          qtbase=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous
+          wget -q --tries=5 --retry-connrefused "$base/linuxdeploy-x86_64.AppImage"
+          wget -q --tries=5 --retry-connrefused "$qtbase/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Build the AppImage
+        run: |
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          export OUTPUT="Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage"
+          n=0
+          until ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/com.ktechpit.red.desktop \
+            --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/com.ktechpit.red.png \
+            --plugin qt --output appimage; do
+            n=$((n+1)); [ $n -ge 3 ] && { echo "::error::linuxdeploy failed after $n attempts"; exit 1; }
+            echo "linuxdeploy attempt $n failed; retrying in 15s"; sleep 15
+          done
+
+      - name: Check the bundle
+        run: |
+          need() { find AppDir -name "$1" | grep -q . || { echo "::error::missing $1 from the bundle"; exit 1; }; }
+          need QtWebEngineProcess
+          need icudtl.dat
+          need qtwebengine_resources.pak
+          need libqsqlite.so
+          need libqsvg.so
+          find AppDir -path '*qtwebengine_locales/*.pak' | grep -q . || { echo "::error::no WebEngine locales bundled"; exit 1; }
+          test -f AppDir/usr/lib/libsoftokn3.so || { echo "::error::NSS not bundled"; exit 1; }
+          test -x AppDir/usr/bin/deno || { echo "::error::JavaScript runtime not bundled"; exit 1; }
+          QT_QPA_PLATFORM=offscreen ./Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage --version
+
+      - name: Attach to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          # release.yml creates the release (with the changelog notes) and refuses a tag that
+          # is undated or mismatched; wait for it rather than create one here.
+          for i in $(seq 1 30); do
+            gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 && break
+            [ "$i" -eq 30 ] && { echo "::error::no GitHub release for $TAG; did release.yml fail?"; exit 1; }
+            sleep 20
+          done
+          gh release upload "$TAG" "Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage" \
+            --repo "$GITHUB_REPOSITORY" --clobber

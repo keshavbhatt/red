@@ -77,7 +77,16 @@ License"; the module's own licence is in LICENSING.md and REUSE.toml.
 - `dist/linux/com.ktechpit.red.metainfo.xml`: matching `<release version date>` notes.
 - `CMakeLists.txt`: `project(VERSION)` bumped.
 - Check the edge build of that commit, then `git tag vX.Y.Z && git push origin vX.Y.Z`: the
-  snap goes to stable and `release.yml` creates the GitHub release from the changelog section.
+  snap goes to stable, `release.yml` creates the GitHub release from the changelog section and
+  `appimage.yml` attaches `Red-X.Y.Z-x86_64.AppImage` to it.
+
+## AppImage
+
+Built by `.github/workflows/appimage.yml` on each `vX.Y.Z` tag (ADR-024): official Qt 6.11
+binaries bundled with linuxdeploy on ubuntu-22.04, Deno next to the binary, the WebEngine
+sandbox off through an AppRun hook. It waits for the release `release.yml` creates and uploads
+to it. To rebuild one for an existing release: Actions, *appimage*, *Run workflow* with the tag.
+Never built locally.
 
 ## Validation without building
 

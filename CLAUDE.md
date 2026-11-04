@@ -23,4 +23,5 @@ in LICENSING.md and REUSE.toml: GPL-3.0-or-later, licensing module under its own
 - Release checklist: replace the unreleased marker in the `## [x.y.z]` changelog heading with
   ` - YYYY-MM-DD`, keep the metainfo `<release>` in sync, bump `project(VERSION)`, then push the
   tag `vX.Y.Z`. The tag publishes the snap to stable and creates the GitHub release with the
-  changelog section as notes (ADR-021); pushes to `master` only reach edge.
+  changelog section as notes (ADR-021), with an x86_64 AppImage attached by `appimage.yml`
+  (ADR-024); pushes to `master` only reach edge.

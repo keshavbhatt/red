@@ -505,3 +505,24 @@ selected image (its normal colour unless told otherwise), so no icon is tinted b
 Settings pane's current page shows its icon in a light red (`#FF6B81` dark, `#FF0033` light).
 
 **Consequences.** Supersedes ADR-017's blue `control`; red is no longer only for small marks.
+
+## ADR-024: an AppImage on every release tag, built as whatsie's (2026-11-04)
+
+**Context.** The owner asked for AppImage release builds, as whatsie publishes them, for
+distributions without snap or Flatpak.
+
+**Decision.** `.github/workflows/appimage.yml` runs on the same `vX.Y.Z` tag as `release.yml`
+and `snap.yml`: on ubuntu-22.04 (widest glibc reach) it builds against the official Qt 6.11
+binaries (`jurplel/install-qt-action`), bundles them with `linuxdeploy` and its Qt plugin, adds
+the NSS modules Qt WebEngine dlopen()s, Deno 2.7.7 pinned by checksum next to the binary (the
+download engine searches the application directory), and an AppRun hook that sets
+`QTWEBENGINE_DISABLE_SANDBOX=1` (a read-only image cannot ship a setuid sandbox helper). It
+checks the tag against `project(VERSION)` and then waits for the release `release.yml` creates
+and uploads `Red-X.Y.Z-x86_64.AppImage` to it, so a refused tag gets no AppImage either.
+`workflow_dispatch` with a `tag` rebuilds one for an existing release. x86_64 only; no `.deb`.
+
+**Consequences.** ffmpeg comes from the distribution, as everywhere (never downloaded). The
+official Qt binaries lack the proprietary H.264/AAC codecs; YouTube falls back to VP9/AV1 and
+Opus, so playback is unaffected, but this is the one build where that holds. The AppImage does
+not update itself: users fetch the next release.
+
