@@ -11,6 +11,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F01%2Ficon_ceVbiAf.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=colorsmith",
       "snap": "colorsmith",
@@ -25,6 +26,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2023%2F04%2Ficon_InXhjPh.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=colorwall",
       "snap": "colorwall",
@@ -39,6 +41,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": 1,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2022%2F07%2Ficon-256_JJoNAAt.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=ultimate-media-downloader",
       "snap": "ultimate-media-downloader",
@@ -53,6 +56,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": 2,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F06%2Ficon-256.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=orion",
       "snap": "orion-desktop",
@@ -68,6 +72,7 @@
         "Linux",
         "Windows"
       ],
+      "trending": 3,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2022%2F10%2Ficon-512.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=torrhunt",
       "snap": "torrhunt",
@@ -82,6 +87,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fplaylist-downloader-source.svg.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=playlist-dl",
       "snap": "playlist-dl",
@@ -97,6 +103,7 @@
         "Linux",
         "Windows"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2024%2F08%2Ficon.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=whatsie",
       "snap": "whatsie",
@@ -111,6 +118,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F03%2Ficon-256.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=glate",
       "snap": "glate",
@@ -125,6 +133,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F03%2Ficon-256.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=pixelfx",
       "snap": "pixelfx",
@@ -139,6 +148,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F04%2Ficon-512.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=plumber",
       "snap": "plumber",
@@ -153,6 +163,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F04%2Ficon-512_xDKaPOR.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=music-radar",
       "snap": "music-radar",
@@ -167,6 +178,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F03%2Ficon-512-0.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=utube",
       "snap": "utube",
@@ -181,6 +193,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F09%2Ficon_XtK2HwG.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=qtube-dl",
       "snap": "qtubedl",
@@ -195,6 +208,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2018%2F05%2Ficon_ocFwlch.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=wonderwall",
       "snap": "wonderwall",
@@ -209,6 +223,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2025%2F11%2Ficon.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=pixelbatch",
       "snap": "pixelbatch",
@@ -223,6 +238,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F06%2Ficon_Saln4Gk.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=formatfactory",
       "snap": "formatfactory",
@@ -237,6 +253,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F07%2Fcom.ktechpit.arrowescape.svg.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=arrowescape",
       "snap": "arrowescape",
@@ -251,6 +268,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F07%2Ficon-256_8EqAZdW.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=hungrysnake",
       "snap": "hungrysnake",
@@ -265,6 +283,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": 5,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fred.svg.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=red",
       "snap": "red-app",
@@ -279,6 +298,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": 4,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fcom.ktechpit.typingtutor.svg.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=typingtutor",
       "snap": "typingtutor",
@@ -293,6 +313,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fcom.ktechpit.omnidict.svg.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=omnidict",
       "snap": "omnidict",
@@ -307,6 +328,7 @@
       "platforms": [
         "Linux"
       ],
+      "trending": null,
       "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F10%2Ficon.svg_2Zrs5AT.png",
       "page": "https://ktechpit.com/USS/public/product.php?slug=paraphrase",
       "snap": "paraphrase",

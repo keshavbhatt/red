@@ -11,7 +11,7 @@ class QLabel;
 namespace ktechpit {
 
 /// "More apps from Ktechpit": a heading, `count` apps drawn at random each time the strip is
-/// built, and a "See all" link to MoreAppsDialog. Drop it into an About dialog, a What's new sheet or a welcome page. Hides itself when the
+/// built (trending apps more often), and a "See all" link to MoreAppsDialog. Drop it into an About dialog, a What's new sheet or a welcome page. Hides itself when the
 /// catalog is switched off or has nothing to show.
 class AppStrip : public QWidget
 {

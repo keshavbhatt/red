@@ -20,7 +20,8 @@ Which apps:
 - never the host app, never an app for another platform, never one installed here as a snap
   or a Flatpak;
 - a strip draws its cards at random each time it is built, so over a few visits users see most
-  of the catalog without opening the full list. A catalog refresh never swaps the cards of a
+  of the catalog without opening the full list. Apps with a trending rank on the site come up
+  more often: #1 six times as often as a non-trending app, #5 twice as often. A catalog refresh never swaps the cards of a
   strip already on screen;
 - the full list (`MoreAppsDialog`) follows the site's order.
 
