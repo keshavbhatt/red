@@ -4,7 +4,7 @@
 # KtechpitApps: "More apps from Ktechpit" cards for the About dialog, the What's new sheet
 # and a full list. Add it to an app with add_subdirectory() and link ktechpit_apps.
 cmake_minimum_required(VERSION 3.21)
-project(ktechpit_apps LANGUAGES CXX)
+project(ktechpit_apps VERSION 1.0.0 LANGUAGES CXX)
 
 if(NOT Qt6_FOUND OR NOT TARGET Qt6::Widgets OR NOT TARGET Qt6::Network)
     find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Widgets Network)

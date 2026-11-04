@@ -45,7 +45,9 @@ Pull it in as a subtree (once):
 git subtree add --prefix src/modules/KtechpitApps git@github.com:keshavbhatt/ktechpit-apps.git main --squash
 ```
 
-and later updates with `git subtree pull` and the same arguments. Then:
+and later updates with `git subtree pull` and the same arguments. To stay on a release
+instead of `main`, use its tag (`v1.0.0`) in place of `main`; [CHANGELOG.md](CHANGELOG.md)
+says what changed. Then:
 
 ```cmake
 add_subdirectory(src/modules/KtechpitApps)
