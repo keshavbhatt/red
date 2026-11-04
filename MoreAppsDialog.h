@@ -5,11 +5,14 @@
 #include <QDialog>
 
 class QGridLayout;
+class QLabel;
 class QLineEdit;
+class QPushButton;
 
 namespace ktechpit {
 
-/// Every Ktechpit app that runs here, best fit first, with a search field.
+/// Every Ktechpit app that runs here (installed ones marked), in the site's order, with a search
+/// field and a Refresh button that fetches the list now.
 class MoreAppsDialog : public QDialog
 {
     Q_OBJECT
@@ -22,6 +25,8 @@ private:
 
     QString m_place;
     QLineEdit* m_search = nullptr;
+    QPushButton* m_refresh = nullptr;
+    QLabel* m_status = nullptr;
     QWidget* m_grid = nullptr;
     QGridLayout* m_gridLayout = nullptr;
 };

@@ -122,6 +122,10 @@ bool AppCatalog::adopt(const QByteArray& json)
 
 void AppCatalog::refresh()
 {
+    if (m_refreshing) {
+        return;
+    }
+    m_refreshing = true;
     if (!m_network) {
         m_network = new QNetworkAccessManager(this);
         m_network->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
@@ -132,11 +136,11 @@ void AppCatalog::refresh()
     QNetworkReply* reply = m_network->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply] {
         reply->deleteLater();
-        if (reply->error() != QNetworkReply::NoError) {
-            return; // keep what we have; the next start tries again
-        }
-        const QByteArray body = reply->readAll();
-        if (!adopt(body)) {
+        m_refreshing = false;
+        // On any failure keep what we have; the next start tries again.
+        const QByteArray body = reply->error() == QNetworkReply::NoError ? reply->readAll() : QByteArray();
+        if (body.isEmpty() || !adopt(body)) {
+            Q_EMIT refreshFinished(false);
             return;
         }
         QDir().mkpath(cacheDir());
@@ -145,6 +149,7 @@ void AppCatalog::refresh()
             file.write(body);
             file.commit();
         }
+        Q_EMIT refreshFinished(true);
     });
 }
 
@@ -211,6 +216,18 @@ QList<AppInfo> AppCatalog::apps() const
             continue;
         }
         out << app;
+    }
+    return out;
+}
+
+QList<AppInfo> AppCatalog::allApps() const
+{
+    const QString platform = currentPlatform();
+    QList<AppInfo> out;
+    for (const AppInfo& app : m_apps) {
+        if (app.id != m_config.hostAppId && (app.platforms.isEmpty() || app.platforms.contains(platform))) {
+            out << app;
+        }
     }
     return out;
 }

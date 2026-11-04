@@ -69,6 +69,8 @@ public:
 
     /// Every app that runs here, in the site's order; the host app and installed apps left out.
     [[nodiscard]] QList<AppInfo> apps() const;
+    /// Every app that runs here, installed ones too, in the site's order; the host app left out.
+    [[nodiscard]] QList<AppInfo> allApps() const;
     /// Up to `count` of apps(), drawn at random, trending apps more often; different on every call.
     [[nodiscard]] QList<AppInfo> randomApps(int count) const;
 
@@ -79,8 +81,9 @@ public:
     /// The app's icon at `size` px: bundled, cached or downloaded; a lettered tile meanwhile.
     [[nodiscard]] QPixmap icon(const AppInfo& app, int size) const;
 
-    /// Fetches the catalog now.
+    /// Fetches the catalog now; refreshFinished() tells how it went.
     void refresh();
+    [[nodiscard]] bool isRefreshing() const { return m_refreshing; }
 
     // Pure helpers, public for the tests.
     [[nodiscard]] static QList<AppInfo> parse(const QByteArray& json, bool* ok = nullptr);
@@ -95,6 +98,8 @@ Q_SIGNALS:
     void changed();
     void iconReady(const QString& appId);
     void enabledChanged(bool enabled);
+    /// `ok`: the list was downloaded and is now in use; otherwise the saved one stays.
+    void refreshFinished(bool ok);
 
 private:
     explicit AppCatalog(const CatalogConfig& config, QObject* parent = nullptr);
@@ -106,6 +111,7 @@ private:
     CatalogConfig m_config;
     QList<AppInfo> m_apps;
     bool m_enabled = true;
+    bool m_refreshing = false;
     QNetworkAccessManager* m_network = nullptr;
     mutable QSet<QString> m_iconRequests;
 };

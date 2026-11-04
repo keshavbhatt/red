@@ -23,7 +23,9 @@ Which apps:
   of the catalog without opening the full list. Apps with a trending rank on the site come up
   more often: #1 six times as often as a non-trending app, #5 twice as often. A catalog refresh never swaps the cards of a
   strip already on screen;
-- the full list (`MoreAppsDialog`) follows the site's order.
+- the full list (`MoreAppsDialog`) shows every app in the site's order, installed ones too, marked
+  *Installed*. Its **Refresh** button fetches the list right away and says whether it worked;
+  if not, the saved list stays.
 
 **Get** opens the store page in the desktop's software centre for the way the host app was
 installed: `snap://<name>` for a snap, `appstream://<flatpak id>` for a Flatpak or a distro
