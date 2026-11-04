@@ -544,10 +544,12 @@ once every 7 days. It leaves out the host, other platforms and apps installed he
 Flatpak, and ranks nothing by relevance (the owner asked for random): About shows two cards side
 by side under the link row, drawn at random each time About opens, trending apps more often (#1
 weighs 6, #5 weighs 2, others 1), so users meet most of the catalog without opening the full list;
-its *More apps* button opens the full list in the site's order. "Get" opens `snap://` or
+the strip's *See all* opens the full list in the site's order, installed apps marked, with a
+Refresh button that fetches the list at once. About's former *More apps* button (a link to
+the products page) is gone. "Get" opens `snap://` or
 `appstream://` for the way the host was installed, else the product page with
 `?ref=red-<place>`. `Settings::showOtherApps` (on by default; *Settings, General*) turns every
-card off; with it off, *More apps* opens the products page as before. The guide's Privacy section names the request.
+card off. The guide's Privacy section names the request.
 
 **Consequences.** Module updates come with `git subtree pull --prefix src/modules/KtechpitApps
 <repo> main --squash`. Which apps can appear is decided on the site (`promote`), not in Red.
