@@ -519,8 +519,8 @@ download engine searches the application directory), and an AppRun hook that set
 `QTWEBENGINE_DISABLE_SANDBOX=1` (a read-only image cannot ship a setuid sandbox helper). It
 checks the tag against `project(VERSION)` and then waits for the release `release.yml` creates
 and uploads `Red-X.Y.Z-x86_64.AppImage` to it, so a refused tag gets no AppImage either.
-`workflow_dispatch` with a `tag` rebuilds one for an existing release; without one it is a
-test build of the branch, kept 7 days as a workflow artifact. x86_64 only; no `.deb`.
+`workflow_dispatch` with a `tag` rebuilds one for an existing release. Nothing is stored as a
+workflow artifact. x86_64 only; no `.deb`.
 
 **Consequences.** ffmpeg comes from the distribution, as everywhere (never downloaded). The
 official Qt binaries lack the proprietary H.264/AAC codecs; YouTube falls back to VP9/AV1 and

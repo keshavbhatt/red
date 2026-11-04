@@ -4,9 +4,8 @@
 # Flatpak); ffmpeg comes from the system, as everywhere (CLAUDE.md). Recipe from whatsie's
 # linux-bundles.yml (ADR-024).
 #
-# Run by hand (Actions, appimage, Run workflow): with a `tag` it (re)builds for that existing tag
-# and replaces its release's AppImage; without one it is a test build of the chosen branch,
-# kept as a workflow artifact and attached to no release.
+# Run by hand (Actions, appimage, Run workflow) with a `tag` it (re)builds for that existing tag
+# and replaces its release's AppImage. Nothing is kept as a workflow artifact.
 #
 # The official Qt binaries have no proprietary H.264/AAC codecs; YouTube then serves VP9/AV1
 # and Opus, which they have. The snap and the Flatpak stay the main builds.
@@ -18,9 +17,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag to rebuild and attach to (e.g. v10.3.1); empty for a test build'
-        required: false
-        default: ''
+        description: 'Existing tag to rebuild and attach to (e.g. v10.3.1)'
+        required: true
 
 permissions:
   contents: write
@@ -38,15 +36,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event_name == 'push' && github.ref_name || github.event.inputs.tag }}
         run: |
-          if [ -n "$TAG" ] && ! gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" >/dev/null 2>&1; then
-            echo "::error::tag $TAG does not exist; push it first, or leave the tag empty for a test build"
+          if ! gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "::error::tag $TAG does not exist; push it first"
             exit 1
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v5
         with:
-          ref: ${{ steps.tag.outputs.tag || github.ref }}
+          ref: ${{ steps.tag.outputs.tag }}
 
       - name: Determine the version
         id: ver
@@ -54,9 +52,7 @@ jobs:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
           project=$(awk '/^project\(red/ {on = 1} on && $1 == "VERSION" {print $2; exit}' CMakeLists.txt)
-          if [ -z "$TAG" ]; then
-            echo "ver=${project}+git$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-          elif [ "${TAG#v}" != "$project" ]; then
+          if [ "${TAG#v}" != "$project" ]; then
             echo "::error::tag $TAG does not match project(VERSION) $project"
             exit 1
           else
@@ -154,16 +150,7 @@ jobs:
           test -x AppDir/usr/bin/deno || { echo "::error::JavaScript runtime not bundled"; exit 1; }
           QT_QPA_PLATFORM=offscreen ./Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage --version
 
-      - name: Keep the test build
-        if: steps.tag.outputs.tag == ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage
-          path: Red-${{ steps.ver.outputs.ver }}-x86_64.AppImage
-          retention-days: 7
-
       - name: Attach to the GitHub release
-        if: steps.tag.outputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.tag.outputs.tag }}
