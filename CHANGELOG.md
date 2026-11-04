@@ -3,6 +3,13 @@
 All notable changes to Red. The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow [Semantic Versioning](https://semver.org/).
 
+## [10.3.2] - unreleased
+
+### Fixed
+- **Video menu in TV mode with a gamepad**: holding **A** on a video now opens YouTube's menu
+  for it (Watch later, Save to playlist and more), as holding **Enter** already did on a
+  keyboard. A quick press still plays the video (#25).
+
 ## [10.3.1] - 2026-11-04
 
 ### Added

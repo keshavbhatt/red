@@ -144,7 +144,8 @@ from YouTube it opens TV mode, in TV mode it goes back.
 | F11 | Leave full screen |
 
 A **gamepad** works as on a console: the left stick or D-pad moves, **A** selects, **B** goes
-back, **LT / RT** seek. Plug it in before or after starting Red; nothing needs pairing.
+back, **LT / RT** seek. Hold **A** (or **Enter** on a keyboard) on a video for its menu: Watch
+later, Save to playlist and more. Plug it in before or after starting Red; nothing needs pairing.
 
 *Settings → TV mode* can keep it windowed, hide Shorts, allow resolutions above the screen size
 and use the lighter low-memory interface. To open Red in TV mode, set *Settings → General →

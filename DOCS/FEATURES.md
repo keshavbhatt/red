@@ -57,7 +57,7 @@ scratch with a brand theme matching YouTube, whatsie coding practices, packaging
 | T2 | Switch modes at runtime (rail mode switch, tray, Ctrl+3 / Ctrl+T toggle, `--tv`, *Back to YouTube* pill); "Open Red in" start mode (YouTube default, or last used) | n/a | KEEP | done, `ui::MainWindow`, `ui::SideRail`, `ui::TvExitButton`, ADR-014 |
 | T3 | 16:9 content, fullscreen by default in TV mode, window chrome hidden | yes | KEEP | done — `MainWindow` |
 | T4 | Keyboard: arrows/Enter/Esc/Backspace native; right-click = back; hotkeys copy URL, captions, volume, speed | yes | KEEP | done — `tv/input.js` |
-| T5 | Gamepad → key events (Standard Gamepad map, repeat, stick) | yes | KEEP | done — `tv/gamepad.js` |
+| T5 | Gamepad → key events (Standard Gamepad map, repeat, stick); A held like a remote's OK, so a hold opens Leanback's video menu (#25) | yes | KEEP | done — `tv/gamepad.js` |
 | T6 | `window.h5vcc` shim (deep link, resolution override/unlock 4K) | yes | KEEP | done — `tv/h5vcc.js` |
 | T7 | Identification rewrite (environment/ytcfg/tectonicConfig/`context.client` → DESKTOP Chrome "Red") | yes | KEEP | done — `tv/identification.js` |
 | T8 | Fix exit / reload / playback-cap / sign-in / DRM notice signals via `resolveCommand` hook | yes | KEEP | done — `tv/leanback-fixes.js` |
